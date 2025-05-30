@@ -66,6 +66,6 @@ PostBot 只有通过开源协作才能蓬勃发展。秉持这一精神,我们�
 ## 👥 加入社区
 PostBot 内容同步助手 微信 交流群：
 
-<img src="" width="230px" title="PostBot 内容同步助手 微信群" />
+<img src="https://cdn.exmay.com/exmay/exmay-app/static/images/gitcoffee_wechat.jpg" width="230px" title="PostBot 内容同步助手 微信群" />
 
 (扫码添加微信，备注：PostBot，邀您加入群聊)
