@@ -1,5 +1,5 @@
 <p align="center">
-	<img alt="logo" src="https://cdn.exmay.com/exmay/exmay-app/static/images/postbot_logo.svg" width="150" height="150">
+	<img alt="logo" src="https://postbot.exmay.com/docs/images/postbot_logo.svg" width="150" height="150">
 </p>
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.0.0</h1>
 <h4 align="center">
@@ -19,9 +19,9 @@
 	正在持续迭代中...
 </p>
 
-### PostBot 内容同步助手 介绍
-![postbot-homepage](https://cdn.exmay.com/exmay/exmay-app/static/images/postbot_homepage.png)
-![postbot-homepage](https://cdn.exmay.com/exmay/exmay-app/static/images/postbot_homepage_dark.png)
+## PostBot 内容同步助手 介绍
+![postbot-homepage](https://postbot.exmay.com/docs/images/postbot_homepage.png)
+![postbot-homepage](https://postbot.exmay.com/docs/images/postbot_homepage_dark.png)
 
 ## 🌟 核心特性
 ### 📝 专注内容
@@ -61,11 +61,15 @@ PostBot 只有通过开源协作才能蓬勃发展。秉持这一精神,我们�
 
 ## 🤝 商务合作
 
-- [预约咨询](https://postbot.exmay.com/docs/partner)
+- [合作咨询](https://postbot.exmay.com/docs/partner)
 
 ## 👥 加入社区
 PostBot 内容同步助手 微信 交流群：
 
-<img src="https://cdn.exmay.com/exmay/exmay-app/static/images/gitcoffee_wechat.jpg" width="230px" title="PostBot 内容同步助手 微信群" />
+<img src="https://postbot.exmay.com/docs/images/gitcoffee_wechat.jpg" width="230px" title="PostBot 内容同步助手 微信群" />
 
 (扫码添加微信，备注：PostBot，邀您加入群聊)
+
+## 🌍 开源生态
+
+[开源生态](https://postbot.exmay.com/docs/opensource) 
