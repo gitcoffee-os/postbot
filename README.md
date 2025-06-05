@@ -39,12 +39,12 @@
 ### 🎯 平台适配
    - 自动优化内容适配，以满足各平台特性要求。
 ### ✨ AI
-   - 可扩展集成 AI，内容及流程更智能。
+   - 可扩展集成 AI，内容更个性化、流程更智能。
 ### 💡 生态
    - 提供内容创作者效率提升、开发者业务集成生态支持。
 
 ## 👀 试用体验
-- [PostBot 内容同步助手 体验](https://postbot.exmay.com/exmay/postbot/center/home)
+- [PostBot 内容同步助手 云端体验](https://postbot.exmay.com/exmay/postbot/center/home)
 
 ## 📚 技术文档
 - [官网文档](https://postbot.exmay.com/docs)
