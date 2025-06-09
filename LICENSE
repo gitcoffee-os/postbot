@@ -7,7 +7,7 @@ PostBot is licensed under a modified version of the Apache License 2.0, with the
 a. Multi-tenant service: Unless explicitly authorized by PostBot in writing, you may not use the PostBot source code to operate a multi-tenant environment.
     - Tenant Definition: Within the context of PostBot, one tenant corresponds to one workspace. The workspace provides a separated area for each tenant's data and configurations.
 
-b. LOGO, watermark, author and copyright information: In the process of using PostBot's frontend, you may not remove or modify the LOGO, watermark, author or copyright information in the PostBot console or applications. This restriction is inapplicable to uses of PostBot that do not involve its frontend.
+b. LOGO, watermark, author, and copyright information: In the process of using PostBot's frontend, you may not remove or modify the LOGO, watermark, author, or copyright information in the PostBot console or applications. This restriction is inapplicable to uses of PostBot that do not involve its frontend.
 
 2. As a contributor, you should agree that:
 
