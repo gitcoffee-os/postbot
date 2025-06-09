@@ -59,6 +59,10 @@
 
 PostBot 只有通过开源协作才能蓬勃发展。秉持这一精神,我们欢迎来自社区的各种贡献。如果您有意参与其中，请查阅我们的 [贡献者指南](https://postbot.exmay.com/docs/contributing) 。
 
+## ⚖️ License
+
+本仓库遵循 [GitCoffee Open Source License](https://github.com/gitcoffee-os/postbot/blob/main/LICENSE) 开源协议，该许可证本质上是 Apache License 2.0，但有一些额外的限制。
+
 ## 🤝 商务合作
 
 - [合作咨询](https://postbot.exmay.com/docs/partner)
