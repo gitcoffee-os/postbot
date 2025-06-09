@@ -61,7 +61,7 @@ PostBot 只有通过开源协作才能蓬勃发展。秉持这一精神,我们�
 
 ## ⚖️ License
 
-本仓库遵循 [GitCoffee Open Source License](https://github.com/gitcoffee-os/postbot/blob/main/LICENSE) 开源协议，该许可证本质上是 Apache License 2.0，但有一些额外的限制。
+本仓库遵循 [GitCoffee Open Source License](https://github.com/gitcoffee-os/postbot/blob/main/LICENSE) 开源协议，该许可证本质上是 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)，但有一些额外的限制。
 
 ## 🤝 商务合作
 
