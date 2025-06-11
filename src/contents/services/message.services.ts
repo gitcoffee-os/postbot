@@ -54,6 +54,10 @@ export const handleMessage = (request, sender, sendResponse) => {
             state.isModalVisible = true;
             sendResponse(message);
             break;
+        case 'setFlowButton':
+            state.showFlowButton = request?.showFlowButton;
+            sendResponse({});
+            break;
         default:
             handleMetaMessage(request, sender, sendResponse);
             break;

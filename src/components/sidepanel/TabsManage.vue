@@ -18,6 +18,9 @@
         <div style="padding:10px;">
             <UserCard />
         </div>
+        <div style="margin:20px 0;">
+          <Switch v-model:checked="showFlowButton" checked-children="显示同步浮动按钮" un-checked-children="隐藏同步浮动按钮" @change="onSwitchChange" />
+        </div>
         <div class="postbot-ui-main">
             
             <div style="width:100%;">
@@ -91,7 +94,7 @@
   <script lang="ts" setup>
     import {ref } from 'vue'
     import 'ant-design-vue/dist/reset.css';
-    import { Space, Button, Modal, Divider, Empty } from "ant-design-vue"
+    import { Space, Button, Modal, Divider, Empty, Switch } from "ant-design-vue"
     // import { Space, Card, CardMeta, Avatar, Button } from 'ant-design-vue';
     import { SettingOutlined, EditOutlined, EllipsisOutlined, PlusOutlined, DownloadOutlined, CloudUploadOutlined } from '@ant-design/icons-vue';
 
@@ -131,16 +134,12 @@
     //     style.textContent = antdResetCssText
     //     return style
     // }
-
-  // 定义任务列表
-  const tasks = ref([
-    { title: "完成作业", description: "编写 Vue 3 任务管理页面" },
-    { title: "复习代码", description: "复习 Plasmo 框架和 Ant Design Vue" }
-  ])
   
   // 控制模态框的显示
   const isModalVisible = ref(false)
   const newTask = ref("")
+
+  const showFlowButton = ref(true);
   
   // 显示模态框
   const showModal = () => {
@@ -150,10 +149,7 @@
   // 处理模态框确认
   const handleOk = () => {
     if (newTask.value) {
-      tasks.value.push({
-        title: newTask.value,
-        description: "新任务描述"
-      })
+
     }
     newTask.value = ""
     isModalVisible.value = false
@@ -167,6 +163,17 @@
 
   const onPlus = () => {
     chrome.tabs.create({ url: `${BASE_URL}/exmay/postbot/media/publish` });
+  }
+
+  const onSwitchChange = (checked) => {
+
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tabId = tabs[0].id;
+      chrome.tabs.sendMessage(tabId, { action: 'setFlowButton', showFlowButton: checked }, (response) => {
+        console.log('response', response);
+      });
+    });
+
   }
   </script>
   

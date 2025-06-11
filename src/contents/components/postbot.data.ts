@@ -16,6 +16,7 @@
 import { reactive } from 'vue';
 
 export const state = reactive({
+    showFlowButton: true,
     rangType: 'content',
     isModalVisible: false,
     contentData: {},

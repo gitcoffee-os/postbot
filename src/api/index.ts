@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { setTrustedDomains } from "~stores"
+import { getTrustedDomains, setTrustedDomains } from "~stores"
 
 import { isLoginApi } from "./media/user.api";
 
@@ -21,7 +21,7 @@ import { listingApi } from "./media/platform.api";
 
 import { updateApi } from "./media/client.api";
 
-import { getTrustedDomains } from "~stores";
+import { state } from "~contents/components/postbot.data";
 
 const intervalTime: number = 1000 * 30;
 

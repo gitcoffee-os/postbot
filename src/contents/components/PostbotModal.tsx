@@ -112,7 +112,7 @@ export default defineComponent({
       }, [
         // h(Button, { type: 'primary', onClick: handleClick }, '点击打开 Modal'),
         // h(PostbotButton, { onClick: handleClick }),
-        h(PostbotFloatButton, { onClick: handleClick }),
+        state.showFlowButton ? h(PostbotFloatButton, { onClick: handleClick }) : null,
         state.isModalVisible ?
           // 使用 Ant Design Vue 的 Modal 组件
           h(Modal, {
