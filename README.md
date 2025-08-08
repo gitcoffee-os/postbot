@@ -43,7 +43,7 @@
 ### 💡 生态
    - 提供内容创作者效率提升、开发者业务集成生态支持。
 
-## 👀 试用体验
+## 👀 使用体验
 - [PostBot 内容同步助手 云端体验](https://postbot.exmay.com/exmay/postbot/center/home)
 
 ## 📚 技术文档
