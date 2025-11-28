@@ -15,11 +15,13 @@
  */
 import { toutiaoArticlePublisher } from "./platfrom/article/toutiao.publisher";
 import { xiaohongshuMonmentPublisher } from "./platfrom/moment/xiaohongshu.publisher";
+import { zhihuArticlePublisher } from "./platfrom/article/zhihu.publisher";
 
 const publisher = {
     article: {
         toutiao: toutiaoArticlePublisher,
         xiaohongshu: xiaohongshuMonmentPublisher,
+        zhihu: zhihuArticlePublisher,
     },
 }
 

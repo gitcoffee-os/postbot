@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const toutiaoArticlePublisher = async (data) => {
-    console.log('toutiaoArticlePublisher data', data);
+export const zhihuArticlePublisher = async (data) => {
+    console.log('zhihuArticlePublisher data', data);
 
     // const { contentData, processedData } = data;
 
@@ -80,17 +80,12 @@ export const toutiaoArticlePublisher = async (data) => {
       };
     
     const formElement = {
-        title: 'textarea[placeholder="请输入文章标题（2～30个字）"]',
+        title: 'textarea[placeholder="请输入标题（最多 100 个字）"]',
         editor: 'div[contenteditable="true"]',
-        coverDelete: '.article-cover-delete',
-        imageUploadAdd: 'div.article-cover-add',
-        imageUploadTabs: 'div.byte-tabs-header-title',
-        imageUploadTabText: '上传图片',
-        imageUpload: 'input[type="file"]',
-        confirmUploadButton: 'button[data-e2e="imageUploadConfirm-btn"]',
-        publishButtons: 'button.publish-btn',
-        publishButtonText: '预览并发布',
-        confirmButtonText: '确认发布',
+        imageUpload: 'input.UploadPicture-input[type="file"]',
+        publishButtons: 'button.Button',
+        publishButtonText: '预览',
+        confirmButtonText: '发布',
     }
     
     const fromRule = {
@@ -228,40 +223,6 @@ export const toutiaoArticlePublisher = async (data) => {
     }
     
     const autoFillCover = async(cover) => {
-        const clearDefaultCovers = async() => {
-            const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
-            if (!coverDeleteElements) {
-                return;
-            }
-            console.log('coverDeleteElements length', coverDeleteElements.length);
-            for (const coverDeleteElement of coverDeleteElements) {
-                if (!coverDeleteElement) {
-                    continue;
-                }
-                console.log('coverDelete trrigle click');
-                (coverDeleteElement as HTMLElement).click();
-            }
-            await sleep(1000);
-        };
-
-        await clearDefaultCovers();
-
-        const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
-        if (!imageUploadAdd) {
-            return;
-        }
-
-        imageUploadAdd.click();
-        await sleep(1000);
-
-        const imageUploadTabs = document.querySelectorAll(formElement.imageUploadTabs);
-        const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
-        if (!imageUploadTab) {
-            return;
-        }
-        (imageUploadTab as HTMLElement).click();
-        await sleep(1000);
-
         const images = [];
 
         console.log('cover', cover);
@@ -274,22 +235,14 @@ export const toutiaoArticlePublisher = async (data) => {
         console.log('images', images);
         await uploadImages(images);
         await sleep(2000);
-
-        const confirmUploadButton = document.querySelector(formElement.confirmUploadButton);
-        if (!confirmUploadButton) {
-            return;
-        }
-
-        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
-        await sleep(2000);
     };
     
-    const getPublishButton = () => {
-        const buttons = document.querySelectorAll(formElement.publishButtons);
-        const publishButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.publishButtonText));
-        console.log('publishButton', publishButton);
-        return publishButton;
-    }
+    // const getPublishButton = () => {
+    //     const buttons = document.querySelectorAll(formElement.publishButtons);
+    //     const publishButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.publishButtonText));
+    //     console.log('publishButton', publishButton);
+    //     return publishButton;
+    // }
 
     const getConfirmPublishButton = () => {
         const buttons = document.querySelectorAll(formElement.publishButtons);
@@ -300,26 +253,26 @@ export const toutiaoArticlePublisher = async (data) => {
     
     const autoPublish = async() => {
         console.log('autoPublish');
-        const publishButton = getPublishButton();
-        if (!publishButton) {
-            console.log(`未找到${formElement.publishButtonText}按钮`)
-            return;
-        }
-        console.log('trrigle publish button click');
-        publishButton.dispatchEvent(new Event('click', {
-            bubbles: true,
-            cancelable: true
-        }));
+        // const publishButton = getPublishButton();
+        // if (!publishButton) {
+        //     console.log(`未找到${formElement.publishButtonText}按钮`)
+        //     return;
+        // }
+        // console.log('trrigle publish button click');
+        // publishButton.dispatchEvent(new Event('click', {
+        //     bubbles: true,
+        //     cancelable: true
+        // }));
         
         const confirmPlublishButton = await observeElement(getConfirmPublishButton);
         if (!confirmPlublishButton) {
             console.log(`未找到${formElement.confirmButtonText}按钮`)
             return;
         }
-        // confirmPlublishButton.dispatchEvent(new Event('click', {
-        //     bubbles: true,
-        //     cancelable: true
-        // }));
+        confirmPlublishButton.dispatchEvent(new Event('click', {
+            bubbles: true,
+            cancelable: true
+        }));
     }
 
     await observeElement(formElement.editor);

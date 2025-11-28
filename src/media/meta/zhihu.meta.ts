@@ -16,7 +16,7 @@
 import { platforms } from "~media/platform";
 
 const Api = {
-  MediaInfo: platforms.article.toutiao.mediaInfoUrl,
+  MediaInfo: platforms.article.zhihu.mediaInfoUrl,
 };
 
 const getMediaInfo = async () => {
@@ -26,20 +26,18 @@ const getMediaInfo = async () => {
   if (response.ok) {
     const body = await response.json();
     console.log('body', body);
-    if (body.code === 0) {
-      const data = body?.data;
-      const { user, media } = data;
+      const data = body;
+      const { id, uid, name, avatar_url, phone } = data;
       return {
-        name: user?.screen_name || media?.display_name,
-        avatarUrl: user?.https_avatar_url || media?.https_avatar_url,
-        userId: user?.id_str || media?.id_str,
+        userId: uid,
+        name: name,
+        avatarUrl: avatar_url,
+        // phone: phone,
       }
     }
     return null;
-  }
-  return null;
 }
 
-export const toutiaoMetaInfo = {
+export const zhihuMetaInfo = {
   getMediaInfo,
 }

@@ -15,10 +15,12 @@
  */
 import { toutiaoMetaInfo } from './toutiao.meta';
 import { xiaohongshuMetaInfo } from './xiaohongshu.meta';
+import { zhihuMetaInfo } from './zhihu.meta';
 
 export const metaInfoList = {
     toutiao: toutiaoMetaInfo,
     xiaohongshu: xiaohongshuMetaInfo,
+    zhihu: zhihuMetaInfo,
 }
 
 export const getMetaInfoList = async () => {
