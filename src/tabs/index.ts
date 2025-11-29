@@ -44,7 +44,7 @@ export const createTabGroup = async (tabIds) => {
 export const updateTabGroup = async (tabGroupId) => {
     await chrome.tabGroups.update(tabGroupId,
         {
-            color: 'green',
+            color: 'purple',
             title: `PostBot发布助手`,
         }
     );
