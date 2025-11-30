@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const xiaohongshuMonmentPublisher = async (data) => {
-    console.log('xiaohongshuMonmentPublisher data', data);
+export const xiaohongshuMomentPublisher = async (data) => {
+    console.log('xiaohongshuMomentPublisher data', data);
 
     const contentData = data?.data;
     const processedData = data?.data;

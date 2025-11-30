@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { toutiaoArticlePublisher } from "./platfrom/article/toutiao.publisher";
-import { xiaohongshuMonmentPublisher } from "./platfrom/moment/xiaohongshu.publisher";
-import { zhihuArticlePublisher } from "./platfrom/article/zhihu.publisher";
+import { toutiaoArticlePublisher } from "./platform/article/toutiao.publisher";
+import { xiaohongshuMomentPublisher } from "./platform/moment/xiaohongshu.publisher";
+import { zhihuArticlePublisher } from "./platform/article/zhihu.publisher";
 
 const publisher = {
     article: {
         toutiao: toutiaoArticlePublisher,
-        xiaohongshu: xiaohongshuMonmentPublisher,
         zhihu: zhihuArticlePublisher,
+    },
+    moment: {
+        xiaohongshu: xiaohongshuMomentPublisher,
     },
 }
 
@@ -37,7 +39,7 @@ export const executeScriptsToTabs = (tabs, data) => {
                 chrome.tabs.onUpdated.removeListener(listener);
                 console.log('tab.id', tab.id);
                 if (platform) {
-                    platform['executeScript'] = publisher['article'][platform.code] || publisher['monment'][platform.code];
+                    platform['executeScript'] = publisher['article'][platform.code] || publisher['moment'][platform.code];
                     const publisherData = {
                         data: data?.data,
                         platform: platform,
