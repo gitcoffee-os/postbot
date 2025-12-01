@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { weixinMetaInfo } from './weixin.meta';
 import { toutiaoMetaInfo } from './toutiao.meta';
 import { xiaohongshuMetaInfo } from './xiaohongshu.meta';
 import { zhihuMetaInfo } from './zhihu.meta';
 
 export const metaInfoList = {
+    weixin: weixinMetaInfo,
     toutiao: toutiaoMetaInfo,
     xiaohongshu: xiaohongshuMetaInfo,
     zhihu: zhihuMetaInfo,

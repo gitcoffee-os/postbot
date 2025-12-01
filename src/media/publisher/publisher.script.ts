@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { weixinArticlePublisher } from "./platform/article/weixin.publisher";
 import { toutiaoArticlePublisher } from "./platform/article/toutiao.publisher";
 import { xiaohongshuMomentPublisher } from "./platform/moment/xiaohongshu.publisher";
 import { toutiaoMomentPublisher } from "./platform/moment/toutiao.publisher";
@@ -20,6 +21,7 @@ import { zhihuArticlePublisher } from "./platform/article/zhihu.publisher";
 
 const publisher = {
     article: {
+        weixin: weixinArticlePublisher,
         toutiao: toutiaoArticlePublisher,
         zhihu: zhihuArticlePublisher,
     },

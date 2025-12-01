@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { getMetaInfoList } from "~media/meta"
+import { getWeixinMetaInfo } from "~media/meta/weixin.meta"
 
 export const handleMetaMessage = (request, sender, sendResponse) => {
     let metaInfo = {};
@@ -22,6 +23,10 @@ export const handleMetaMessage = (request, sender, sendResponse) => {
         case 'getMetaInfoList':
             const metaInfoList = getMetaInfoList();
             sendResponse(metaInfoList);
+            break;
+        case 'getWeixinMetaInfo':
+            metaInfo = getWeixinMetaInfo(html);
+            sendResponse(metaInfo);
             break;
         default:
             break;
