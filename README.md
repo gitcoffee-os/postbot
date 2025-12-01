@@ -23,6 +23,7 @@
 ## PostBot 内容同步助手 介绍
 ![postbot-homepage](https://postbot.exmay.com/docs/images/postbot_homepage.png)
 ![postbot-homepage](https://postbot.exmay.com/docs/images/postbot_homepage_dark.png)
+![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png)
 
 ## 🌟 核心特性
 ### 📝 专注内容

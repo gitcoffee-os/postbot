@@ -61,6 +61,20 @@ export const platforms = reactive({
             tags: ['CN'],
             status: 'enabled',
         },
+        weibo: {
+            type: 'article',
+            platformName: '微博',
+            name: '微博',
+            code: 'weibo',
+            site: 'https://www.weibo.com/',
+            homepage: 'https://www.weibo.com/',
+            mediaInfoUrl: 'https://card.weibo.com/article/v3/editor',
+            publishUrl: 'https://card.weibo.com/article/v3/editor',
+            faviconUrl: 'https://www.weibo.com/favicon.ico',
+            icon: 'https://p-pc-weboff.byteimg.com/tos-cn-i-9r5gewecjs/logo-horizontal.svg',
+            tags: ['CN'],
+            status: 'enabled',
+        },
     },
     moment: {
         xiaohongshu: {
