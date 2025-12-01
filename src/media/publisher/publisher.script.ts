@@ -15,6 +15,7 @@
  */
 import { toutiaoArticlePublisher } from "./platform/article/toutiao.publisher";
 import { xiaohongshuMomentPublisher } from "./platform/moment/xiaohongshu.publisher";
+import { toutiaoMomentPublisher } from "./platform/moment/toutiao.publisher";
 import { zhihuArticlePublisher } from "./platform/article/zhihu.publisher";
 
 const publisher = {
@@ -24,6 +25,7 @@ const publisher = {
     },
     moment: {
         xiaohongshu: xiaohongshuMomentPublisher,
+        toutiao: toutiaoMomentPublisher,
     },
 }
 

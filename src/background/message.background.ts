@@ -74,12 +74,13 @@ export const handleMessage = async (request, sender, sendResponse) => {
             state.contentData = null;
             break;
         case POSTBOT_ACTION.PUBLISH_NOW:
+            const mediaType = data.mediaType || 'article'
             const platformCodes = data.platformCodes;
             console.debug('platformCodes', platformCodes);
             const publishPlatforms = getPlatforms();
             console.debug('publishPlatforms', publishPlatforms);
 
-            let allPlatforms = Object.values(publishPlatforms.article);
+            let allPlatforms = Object.values(publishPlatforms[mediaType]);
             const checkedPlatforms = allPlatforms.filter(item => platformCodes.includes(item.code));
             console.debug('checkedPlatforms', checkedPlatforms);
 
