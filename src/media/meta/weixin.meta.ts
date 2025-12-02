@@ -25,73 +25,6 @@ const getMatchData = (match) => {
     return match ? match[1] : '';
 }
 
-// const getMetaInfo = (html) => {
-//     // chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-//     //     if (tabs[0].id) {
-//     //       chrome.tabs.sendMessage(tabs[0].id, { action: 'getWxCommonData', html: html }, (response) => {
-//     //         console.log('Response from content.js:', response.data);
-//     //       });
-//     //     }
-//     //   });
-//     // chrome.runtime.sendMessage({ action: 'getWxCommonData', html: html }, (response) => {
-//     //       console.log('response', response);
-//     //     return true;
-//     // });
-//     const match = html.match(/window\.wx\.commonData\s*=\s*\{([\s\S]*?)\};/);
-
-//     console.log('match', match);
-//     if (!match) {
-//         throw new Error('获取登录信息失败');
-//     }
-
-//     const tokenMatch = match[1].match(/t:\s*["'](\d+)["']/);
-//     const aliasMatch = match[1].match(/alias:\s*["']([^"']+)["']/);
-//     const usernameMatch = match[1].match(/user_name:\s*["']([^"']+)["']/);
-//     const nickenameMatch = match[1].match(/nick_name:\s*["']([^"']+)["']/);
-//     const ticketMatch = match[1].match(/ticket:\s*["']([^"']+)["']/);
-//     const avatarMatch = match[1].match(/head_img:\s*["']([^"']+)["']/);
-
-//     if (!tokenMatch) {
-//         throw new Error('暂无登录信息');
-//     }
-
-//     const userInfo = {
-//         userId: getMatchData(aliasMatch),
-//         username: getMatchData(usernameMatch),
-//         nickname: getMatchData(nickenameMatch),
-//         token: getMatchData(tokenMatch),
-//         ticket: getMatchData(ticketMatch),
-//         avatar: getMatchData(avatarMatch),
-//     };
-//     console.log('userInfo', userInfo);
-//     return userInfo;
-// }
-
-// const getMediaInfo = async () => {
-//     const response = await fetch(Api.HomePage, {
-//         method: 'GET',
-//     });
-
-//     if (response.ok) {
-//         const body = await response.text();
-//         console.log('body', body);
-//         const userInfo = getMetaInfo(body);
-//         const { userId, nickname, username, avatar, token, ticket } = userInfo;
-//         return {
-//             name: nickname,
-//             avatarUrl: avatar,
-//             userId: userId,
-//             username: username,
-//             // phone: phone,
-//             profile: '',
-//             token: token,
-//             ticket: ticket,
-//         };
-//     } else {
-//         throw new Error('获取失败');
-//     }
-// }
-
 const parserUsrInfo = (script) => {
     const match = script.match(/window\.wx\.commonData\s*=\s*\{([\s\S]*?)\};/);
 
@@ -129,27 +62,7 @@ export const getWeixinMetaInfo = (html) => {
     const script = scripts[0].text;
     const code = script.substring(script.indexOf('window.wx.commonData'));
     console.debug('code', code);
-    // const wx = new Function(`window.wx = {}; window.handlerNickname = function(){};'${code}return window.wx;`)();
-    // console.log('wx', wx);
 
-    // const commonData = Object.assign({}, wx.commonData);
-    // const { data } = commonData;
-    // delete window.wx;
-    // if (!data.t) {
-    //     throw new Error('暂无登录信息');
-    // }
-
-    // const userInfo = {
-    //     name: data.nick_name,
-    //     avatarUrl: data.head_img,
-    //     userId: data.alias,
-    //     username: data.user_name,
-    //     // phone: phone,
-    //     profile: '',
-    //     token: data.t,
-    //     ticket: data.ticket,
-    // };
-    // console.log('userInfo', userInfo);
     const userInfo = parserUsrInfo(code);
     return userInfo;
 }

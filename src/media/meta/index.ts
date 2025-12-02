@@ -17,12 +17,14 @@ import { weixinMetaInfo } from './weixin.meta';
 import { toutiaoMetaInfo } from './toutiao.meta';
 import { xiaohongshuMetaInfo } from './xiaohongshu.meta';
 import { zhihuMetaInfo } from './zhihu.meta';
+import { weiboMetaInfo } from './weibo.meta';
 
 export const metaInfoList = {
     weixin: weixinMetaInfo,
     toutiao: toutiaoMetaInfo,
     xiaohongshu: xiaohongshuMetaInfo,
     zhihu: zhihuMetaInfo,
+    weibo: weiboMetaInfo,
 }
 
 export const getMetaInfoList = async () => {

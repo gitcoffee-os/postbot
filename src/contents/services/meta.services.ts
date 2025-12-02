@@ -15,6 +15,7 @@
  */
 import { getMetaInfoList } from "~media/meta"
 import { getWeixinMetaInfo } from "~media/meta/weixin.meta"
+import { getWeiboMetaInfo } from "~media/meta/weibo.meta"
 
 export const handleMetaMessage = (request, sender, sendResponse) => {
     let metaInfo = {};
@@ -28,6 +29,10 @@ export const handleMetaMessage = (request, sender, sendResponse) => {
             metaInfo = getWeixinMetaInfo(html);
             sendResponse(metaInfo);
             break;
+        // case 'getWeiboMetaInfo':
+        //     metaInfo = getWeiboMetaInfo(html);
+        //     sendResponse(metaInfo);
+        //     break;
         default:
             break;
     }
