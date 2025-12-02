@@ -316,10 +316,10 @@ export const toutiaoArticlePublisher = async (data) => {
             console.log(`未找到${formElement.confirmButtonText}按钮`)
             return;
         }
-        // confirmPlublishButton.dispatchEvent(new Event('click', {
-        //     bubbles: true,
-        //     cancelable: true
-        // }));
+        confirmPlublishButton.dispatchEvent(new Event('click', {
+            bubbles: true,
+            cancelable: true
+        }));
     }
 
     await observeElement(formElement.editor);
