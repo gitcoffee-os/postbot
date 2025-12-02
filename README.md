@@ -22,8 +22,22 @@
 
 ## PostBot 内容同步助手 介绍
 ![postbot-homepage](https://postbot.exmay.com/docs/images/postbot_homepage.png)
+<br />
 ![postbot-homepage](https://postbot.exmay.com/docs/images/postbot_homepage_dark.png)
+<br />
+![postbot-extension](https://postbot.exmay.com/docs/images/postbot_extension.png)
+<br />
+![postbot-extension](https://postbot.exmay.com/docs/images/postbot_extension_dark.png)
+<br />
+![postbot-modal](https://postbot.exmay.com/docs/images/postbot_modal.png)
+<br />
+![postbot-modal](https://postbot.exmay.com/docs/images/postbot_modal_dark.png)
+<br />
 ![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png)
+<br />
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png)
+<br />
+![postbot-sidebar](https://postbot.exmay.com/docs/images/postbot_sidebar.png)
 
 ## 🌟 核心特性
 ### 📝 专注内容
