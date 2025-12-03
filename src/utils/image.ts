@@ -13,6 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+const BAIDU_DOWNLOAD_URL = 'https://image.baidu.com/search/down?url=';
+const WORD_PRESS_IMAGE_DOMAIN = 'i0.wp.com';
+
+export const getImageDownloadUrl = (imageUrl) => {
+    return BAIDU_DOWNLOAD_URL + imageUrl;
+}
+
+export const getImageUrl = (url) => {
+    const regex = /^(https?:\/\/)([^\/]+)(\/.*)$/;
+    const match = url.match(regex);
+    if (match) {
+      const protocol = match[1];
+      const domain = match[2];
+      const path = match[3];
+      return `${protocol}${WORD_PRESS_IMAGE_DOMAIN}/${domain}${path}`;
+    }
+    return url;
+}
+
 export const imageToBase64 = async (imageUrl) => {
     let imageBase64 = null;
     try {
@@ -42,4 +62,9 @@ export const imageToBase64 = async (imageUrl) => {
         console.error('获取图片失败:', error);
     }
     return imageBase64;
+}
+
+export const imageDownloadToBase64 = async (imageUrl) => {
+    const url = getImageDownloadUrl(imageUrl);
+    return await imageToBase64(url);
 }

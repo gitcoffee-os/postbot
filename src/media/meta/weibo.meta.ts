@@ -1,5 +1,5 @@
 import { platforms } from "~media/platform";
-import { imageToBase64 } from "~utils/image";
+import { getImageUrl, imageDownloadToBase64 } from "~utils/image";
 
 const Api = {
     MediaInfo: platforms.article.weibo.mediaInfoUrl,
@@ -19,12 +19,17 @@ const getWeiboMetaInfo = async(html) => {
       const { uid, nick, avatar_large } = config;
 
       const avatarUrl = decodeURI(avatar_large);
+
+      let avatar = null;
+      if(avatarUrl) {
+        avatar = await imageDownloadToBase64(avatarUrl);
+      }
       
       const userInfo = {
         userId: uid,
         name: nick,
-        avatarUrl: avatarUrl,
-        // avatar: avatar,
+        avatarUrl: getImageUrl(avatarUrl),
+        avatar: avatar,
       };
       
       return userInfo;

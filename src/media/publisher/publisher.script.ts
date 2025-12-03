@@ -18,12 +18,14 @@ import { toutiaoArticlePublisher } from "./platform/article/toutiao.publisher";
 import { xiaohongshuMomentPublisher } from "./platform/moment/xiaohongshu.publisher";
 import { toutiaoMomentPublisher } from "./platform/moment/toutiao.publisher";
 import { zhihuArticlePublisher } from "./platform/article/zhihu.publisher";
+import { weiboArticlePublisher } from "./platform/article/weibo.publisher";
 
 const publisher = {
     article: {
         weixin: weixinArticlePublisher,
         toutiao: toutiaoArticlePublisher,
         zhihu: zhihuArticlePublisher,
+        weibo: weiboArticlePublisher,
     },
     moment: {
         xiaohongshu: xiaohongshuMomentPublisher,
@@ -39,11 +41,15 @@ export const executeScriptsToTabs = (tabs, data) => {
             return;
         }
         chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+            console.log('tabId', tab.id);
+            console.log('info.status', info.status);
             if (tabId === tab.id && info.status === 'complete') {
                 chrome.tabs.onUpdated.removeListener(listener);
                 console.log('tab.id', tab.id);
+                console.log('platform.type', platform.type);
+                console.log('platform.code', platform.code);
                 if (platform) {
-                    platform['executeScript'] = publisher['article'][platform.code] || publisher['moment'][platform.code];
+                    platform['executeScript'] = publisher[platform.type][platform.code] || publisher['article'][platform.code];
                     const publisherData = {
                         data: data?.data,
                         platform: platform,
