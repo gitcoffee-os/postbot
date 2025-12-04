@@ -81,14 +81,18 @@ export const baijiahaoArticlePublisher = async (data) => {
     
     const formElement = {
         title: 'div.input-box textarea',
-        editor: 'div.edui-editor-iframeholder div[contenteditable="true"]',
-        coverDelete: '.op-remove',
-        imageUploadAdd: 'div.coverUploaderView',
+        editorIframe: 'div.edui-editor iframe',
+        editor: '.news-editor-pc',
+        imageAddButtons: 'label.cheetah-radio-wrapper',
+        imageAdd1: '单图',
+        imageAdd3: '三图',
+        // coverDelete: '.op-remove',
+        imageUploadAdd: 'div.coverUploaderView div.container',
         imageUploadTabs: 'div.cheetah-tabs-tab',
         imageUploadTabText: '本地图片',
-        imageUpload: 'input[type="file"]',
-        confirmUploadButton: 'div.editor-component-operator button.cheetah-btn',
-        publishButtons: 'button.publish-btn',
+        imageUpload: 'div.choose-cover-local-upload input[type="file"]',
+        confirmUploadButton: 'div.cheetah-modal-footer button.cheetah-btn-primary',
+        publishButtons: 'div.editor-component-operator button.cheetah-btn',
         saveDraftButtonText: '存草稿',
         previewButtonText: '预览',
         timingButtonText: '定时发布',
@@ -102,7 +106,7 @@ export const baijiahaoArticlePublisher = async (data) => {
         }
     }
     
-    const autoFillContent = (contentData) => {
+    const autoFillContent = async(contentData) => {
         console.log('autoFillContent');
         const titleTextarea = document.querySelector(formElement.title);
         console.log('titleTextarea', titleTextarea);
@@ -112,18 +116,91 @@ export const baijiahaoArticlePublisher = async (data) => {
             titleTextarea.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
-        const editor = document.querySelector(formElement.editor)  as HTMLElement;
+        const editorIframe = document.querySelector(formElement.editorIframe);
+        if (!editorIframe || !editorIframe.contentWindow) {
+            console.log('未找到编辑器 IFrame');
+            return;
+        }
+
+        const editor = editorIframe.contentWindow.document.querySelector(formElement.editor)  as HTMLElement;
         console.log('editor', editor);
         if (!editor) {
             console.log('未找到编辑器');
             return;
         }
+
+        // await sleep(5000);
+
+        const iframeDocument = editorIframe.contentWindow.document;
+
+        function clearEditorContent(editorElement) {
+            try {
+                // 聚焦编辑器（确保可以操作）
+                editorElement.focus();
+                
+                // 创建范围选择所有内容
+                const range = document.createRange();
+                range.selectNodeContents(editorElement);
+                
+                // 获取选择对象并应用范围
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                // 删除选中的内容
+                // 使用现代方法：
+                range.deleteContents();
+                
+                // 清除选择
+                selection.removeAllRanges();
+                
+            } catch (error) {
+                console.error('清空编辑器内容失败:', error);
+                
+                // 降级方案：直接清空innerHTML
+                editorElement.innerHTML = '';
+            }
+        }
+
+        clearEditorContent(editor);
+
+        const content = contentData?.content;
+        
+        // 聚焦编辑器
         editor.focus();
-        const editorPasteEvent = pasteEvent();
-        editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
-        editor.dispatchEvent(editorPasteEvent);
-        editor.dispatchEvent(new Event('input', { bubbles: true }));
-        editor.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // 插入新内容
+        if (iframeDocument.execCommand('insertHTML', false, content)) {
+            console.log('内容插入成功');
+        } else {
+            // 降级到DOM操作
+            editor.innerHTML = content;
+        }
+
+        // 触发事件
+        const inputEvent = new Event('input', { bubbles: true });
+        editor.dispatchEvent(inputEvent);
+
+        // editor.focus();
+
+        // const editorPasteEvent = new ClipboardEvent('paste', {
+        //     bubbles: true,
+        //     cancelable: true,
+        //     clipboardData: new DataTransfer(),
+        // })
+        // console.log('contentData?.content', contentData?.content);
+        // editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
+        // editor.dispatchEvent(editorPasteEvent);
+        // editor.dispatchEvent(new Event('input', { bubbles: true }));
+        // // editor.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // const events = ['input', 'change', 'blur', 'focus'];
+    
+        // events.forEach(eventType => {
+        //     const event = new Event(eventType, { bubbles: true });
+        //     editor.dispatchEvent(event);
+        // });
+        
     };
 
     const base64ToBinary = (base64) => {
@@ -230,26 +307,40 @@ export const baijiahaoArticlePublisher = async (data) => {
     }
     
     const autoFillCover = async(cover) => {
-        const clearDefaultCovers = async() => {
-            const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
-            if (!coverDeleteElements) {
-                return;
-            }
-            console.log('coverDeleteElements length', coverDeleteElements.length);
-            for (const coverDeleteElement of coverDeleteElements) {
-                if (!coverDeleteElement) {
-                    continue;
-                }
-                console.log('coverDelete trrigle click');
-                (coverDeleteElement as HTMLElement).click();
-            }
-            await sleep(1000);
-        };
+        // const clearDefaultCovers = async() => {
+        //     const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
+        //     if (!coverDeleteElements) {
+        //         return;
+        //     }
+        //     console.log('coverDeleteElements length', coverDeleteElements.length);
+        //     for (const coverDeleteElement of coverDeleteElements) {
+        //         if (!coverDeleteElement) {
+        //             continue;
+        //         }
+        //         console.log('coverDelete trrigle click');
+        //         (coverDeleteElement as HTMLElement).click();
+        //     }
+        //     await sleep(1000);
+        // };
 
-        await clearDefaultCovers();
+        // await clearDefaultCovers();
 
-        const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
+        const imageAddButtons = document.querySelectorAll(formElement.imageAddButtons);
+        // 默认单图
+        const imageAdd1 = Array.from(imageAddButtons).find(button => button.textContent?.includes(formElement.imageAdd1));
+        if (!imageAdd1) {
+            console.log(`未找到${formElement.imageAdd1}按钮`);
+            return;
+        }
+        (imageAdd1 as HTMLElement).click();
+
+        const getImageUploadAdd = () => {
+            return document.querySelector(formElement.imageUploadAdd) as HTMLElement;
+        }
+
+        const imageUploadAdd = await observeElement(getImageUploadAdd);
         if (!imageUploadAdd) {
+            console.log('未找到封面上传按钮');
             return;
         }
 
@@ -259,6 +350,7 @@ export const baijiahaoArticlePublisher = async (data) => {
         const imageUploadTabs = document.querySelectorAll(formElement.imageUploadTabs);
         const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
         if (!imageUploadTab) {
+            console.log(`未找到${formElement.imageUploadTabText}按钮`);
             return;
         }
         (imageUploadTab as HTMLElement).click();
@@ -325,18 +417,18 @@ export const baijiahaoArticlePublisher = async (data) => {
             cancelable: true
         }));
     }
-
-    await observeElement(formElement.editor);
+    
+    await observeElement(formElement.editorIframe);
     await sleep(1000);
 
-    autoFillContent(processedData);
+    await autoFillContent(processedData);
     await sleep(5000);
 
     if (processedData?.cover) {
-        autoFillCover(processedData.cover);
+       await autoFillCover(processedData.cover);
     }
 
-    autoSaveDraf();
+    await autoSaveDraf();
     
     if (contentData.isAutoPublish) {
         await sleep(5000);

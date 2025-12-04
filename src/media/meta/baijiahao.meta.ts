@@ -11,14 +11,14 @@ const getMediaInfo = async () => {
   if (response.ok) {
     const body = await response.json();
     console.log('body', body);
-    if (body.errno !== 10001401) {
+    if (body.errno === 0) {
       const data = body?.data;
-      const { user_id, user_name, avatar_large, phone } = data;
+      const user = data.user;
+      const { userid, name, username, avatar } = user;
       return {
-        userId: user_id,
-        name: user_name,
-        avatarUrl: avatar_large,
-        phone: phone,
+        userId: userid,
+        name: name,
+        avatarUrl: avatar,
       }
     }
     return null;
