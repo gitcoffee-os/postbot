@@ -1,8 +1,8 @@
 {
   "name": "PostBot",
-  "displayName": "PostBot内容同步助手",
-  "version": "1.0.3",
-  "description": "PostBot内容同步助手",
+  "displayName": "PostBot 内容同步助手",
+  "version": "1.0.4",
+  "description": "PostBot 内容同步助手",
   "author": "GitCoffee Team @GitCoffee",
   "scripts": {
     "dev": "plasmo dev",
