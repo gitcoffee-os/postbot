@@ -18,6 +18,7 @@ import { toutiaoMetaInfo } from './toutiao.meta';
 import { xiaohongshuMetaInfo } from './xiaohongshu.meta';
 import { zhihuMetaInfo } from './zhihu.meta';
 import { weiboMetaInfo } from './weibo.meta';
+import { baijiahaoMetaInfo } from './baijiahao.meta';
 
 export const metaInfoList = {
     weixin: weixinMetaInfo,
@@ -25,6 +26,7 @@ export const metaInfoList = {
     xiaohongshu: xiaohongshuMetaInfo,
     zhihu: zhihuMetaInfo,
     weibo: weiboMetaInfo,
+    baijiahao: baijiahaoMetaInfo,
 }
 
 export const getMetaInfoList = async () => {
