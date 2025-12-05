@@ -20,19 +20,28 @@ import { toutiaoMomentPublisher } from "./platform/moment/toutiao.publisher";
 import { zhihuArticlePublisher } from "./platform/article/zhihu.publisher";
 import { weiboArticlePublisher } from "./platform/article/weibo.publisher";
 import { baijiahaoArticlePublisher } from "./platform/article/baijiahao.publisher";
-
+import { douyinArticlePublisher } from "./platform/article/douyin.publisher";
+import { bilibiliArticlePublisher } from "./platform/article/bilibili.publisher";
+import { kuaishouMomentPublisher } from "./platform/moment/kuaishou.publisher";
 
 const publisher = {
     article: {
         weixin: weixinArticlePublisher,
         toutiao: toutiaoArticlePublisher,
+        xiaohongshu: xiaohongshuMomentPublisher,
         zhihu: zhihuArticlePublisher,
         weibo: weiboArticlePublisher,
         baijiahao: baijiahaoArticlePublisher,
+        douyin: douyinArticlePublisher,
+        bilibili: bilibiliArticlePublisher,
+        kuaishou: kuaishouMomentPublisher,
     },
     moment: {
         xiaohongshu: xiaohongshuMomentPublisher,
         toutiao: toutiaoMomentPublisher,
+        douyin: douyinArticlePublisher,
+        bilibili: bilibiliArticlePublisher,
+        kuaishou: kuaishouMomentPublisher,
     },
 }
 
