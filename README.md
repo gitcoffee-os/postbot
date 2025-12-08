@@ -33,9 +33,9 @@
 <br />
 ![postbot-modal](https://postbot.exmay.com/docs/images/postbot_modal_dark.png)
 <br />
-![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png)
+![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.0.6)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.0.6)
 <br />
 ![postbot-sidebar](https://postbot.exmay.com/docs/images/postbot_sidebar.png)
 
