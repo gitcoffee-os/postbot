@@ -22,7 +22,11 @@ import { weiboArticlePublisher } from "./platform/article/weibo.publisher";
 import { baijiahaoArticlePublisher } from "./platform/article/baijiahao.publisher";
 import { douyinArticlePublisher } from "./platform/article/douyin.publisher";
 import { bilibiliArticlePublisher } from "./platform/article/bilibili.publisher";
+import { doubanArticlePublisher } from "./platform/article/douban.publisher";
+import { jianshuArticlePublisher } from "./platform/article/jianshu.publisher";
+import { zsxqArticlePublisher } from "./platform/article/zsxq.publisher";
 import { kuaishouMomentPublisher } from "./platform/moment/kuaishou.publisher";
+import { zsxqMonmentPublisher } from "./platform/moment/zsxq.publisher";
 
 const publisher = {
     article: {
@@ -35,6 +39,9 @@ const publisher = {
         douyin: douyinArticlePublisher,
         bilibili: bilibiliArticlePublisher,
         kuaishou: kuaishouMomentPublisher,
+        douban: doubanArticlePublisher,
+        jianshu: jianshuArticlePublisher,
+        zsxq: zsxqArticlePublisher,
     },
     moment: {
         xiaohongshu: xiaohongshuMomentPublisher,
@@ -42,6 +49,7 @@ const publisher = {
         douyin: douyinArticlePublisher,
         bilibili: bilibiliArticlePublisher,
         kuaishou: kuaishouMomentPublisher,
+        zsxq: zsxqMonmentPublisher,
     },
 }
 

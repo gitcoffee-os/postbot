@@ -1,0 +1,235 @@
+import { state } from "~contents/components/postbot.data";
+
+export const getGroupTopicPublishUrl = (groupId) => {
+    const groups = state.metaInfoList?.zsxq?.groups;
+    if (!groups) {
+        return null;
+    }
+    let group = groups[0];
+    if (groupId) {
+        group = groups.find(group => group.groupId === groupId);
+    }
+    const publishUrl = `https://wx.zsxq.com/group/${group.groupId}`;
+    console.log('publishUrl', publishUrl);
+    return publishUrl;
+}
+
+export const zsxqMonmentPublisher = async (data) => {
+    console.log('zsxqMonmentPublisher data', data);
+
+    const contentData = data?.data;
+    const processedData = data?.data;
+
+    const sleep = async (time) => {
+        console.log('sleep', time);
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
+    const pasteEvent = (): ClipboardEvent => {
+        console.log('pasteEvent');
+        return new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: new DataTransfer(),
+        });
+    }
+
+    const observeElement = (selector, timeout = 10000) => {
+        console.log('observeElement', selector);
+        return new Promise((resolve, reject) => {
+            //   const checkElement = () => document.querySelector(selector);
+
+            let checkElement = null;
+            if (selector instanceof Function) {
+                checkElement = selector;
+            } else {
+                checkElement = () => document.querySelector(selector);
+            }
+
+            // 立即检查元素
+            let element = checkElement();
+            console.log('element', element);
+            if (element) {
+                resolve(element);
+                return;
+            }
+
+            // 创建 MutationObserver 进行监听
+            const observer = new MutationObserver(() => {
+                element = checkElement();
+                console.log('element', element);
+                if (element) {
+                    resolve(element);
+                    observer.disconnect();
+                }
+            });
+
+            // 启动观察
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true,
+            });
+
+            // 如果超时，拒绝 Promise，并返回中文错误提示
+            setTimeout(() => {
+                observer.disconnect();
+                reject(new Error(`未能在 ${timeout} 毫秒内找到选择器为 "${selector}" 的元素`));
+            }, timeout);
+        });
+    };
+
+    const formElement = {
+        topicAdd: 'div.post-topic-head',
+        topicEditor: 'div.ql-editor',
+        imageUpload: 'input[type="file"]',
+        submitButtons: 'div.submit-btn',
+        submitButtonText: '发布',
+    };
+
+    const base64ToBinary = (base64) => {
+        const binaryString = atob(base64);  // 解码Base64
+        const byteArray = new Uint8Array(binaryString.length);
+
+        for (let i = 0; i < binaryString.length; i++) {
+            byteArray[i] = binaryString.charCodeAt(i);
+        }
+
+        return byteArray;
+    }
+
+    const fetchImage = async (imageUrl) => {
+        return new Promise((resolve, reject) => {
+            // 发送消息到背景脚本，要求获取图片内容
+            chrome.runtime.sendMessage({
+                type: 'request',
+                action: 'fetchImage',
+                data: {
+                    imageUrl: imageUrl
+                }
+            }, (response) => {
+                console.log('response', response);
+                const base64data = response.base64data;
+                if (base64data) {
+                    const dataPairs = base64data.split(',');
+                    const fileType = dataPairs[0].replace('data:', '').split(';')[0];
+                    const base64 = dataPairs[1];
+                    const imageData = {
+                        type: fileType || 'image/jpg',
+                        bits: base64ToBinary(base64),
+                        overwrite: true,
+                        src: imageUrl,
+                        fileName: response.imageName
+                    }
+                    console.log('imageData', imageData);
+                    console.log('获取图片成功');
+                    resolve(imageData);
+                } else {
+                    console.log('获取图片失败');
+                    reject('获取图片失败');
+                }
+            });
+        });
+    }
+
+    const getFileName = (fileName, url) => {
+        let newFileName = fileName;
+        console.log('fileName', fileName);
+        if (!fileName) {
+            const name = url.substring(url.lastIndexOf('/') + 1);
+            if (name.indexOf('.') !== -1) {
+                newFileName = name;
+            }
+        }
+
+        if (!fileName) {
+            newFileName = `${Date.now()}.jpg`;
+        }
+        console.log('newFileName', newFileName);
+        return newFileName;
+    }
+
+    const uploadImages = async (images) => {
+        console.log('images', images);
+        const imageUpload = await observeElement(formElement.imageUpload);
+        if (!imageUpload) {
+            throw new Error('未找到图片上传元素');
+        }
+
+        console.log('imageUpload', imageUpload);
+
+        const dataTransfer = new DataTransfer();
+
+        for (const image of images) {
+            const url = image?.url || image?.src;
+            const imageData = await fetchImage(url);
+
+            let fileName = imageData.fileName;
+            if (!fileName) {
+                fileName = getFileName(fileName, url);
+            }
+
+            const blob = new Blob([imageData.bits], { type: imageData.type });
+            const file = new File([blob], fileName, { type: imageData.type });
+            dataTransfer.items.add(file);
+        }
+
+        if (dataTransfer.files.length === 0) {
+            console.error('上传文件失败');
+            return;
+        }
+
+        imageUpload.files = dataTransfer.files;
+        imageUpload.dispatchEvent(new Event('change', { bubbles: true }));
+        await sleep(2000);
+        console.log('图片上传成功');
+    }
+
+    const autoFillContent = async() => {
+        const topicAdd = await observeElement(formElement.topicAdd) as HTMLElement;
+        console.log('topicAdd', topicAdd);
+        if (!topicAdd) {
+            return;
+        }
+        topicAdd.click();
+        topicAdd.dispatchEvent(new Event('click', { bubbles: true }));
+        await sleep(2000)
+    
+        const editor = await observeElement(formElement.topicEditor) as HTMLElement;
+        console.log('editor', editor);
+        if (!editor) {
+            return;
+        }
+        editor.innerHTML = '';
+        editor.focus();
+        const editorPasteEvent = pasteEvent();
+        editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
+        editor.dispatchEvent(editorPasteEvent);
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
+        editor.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    const autoPublish = () => {
+        const submitButtons = document.querySelectorAll(formElement.submitButtons);
+        console.log('submitButtons', submitButtons);
+        if (!submitButtons) {
+            return;
+        }
+        const submitButton = Array.from(submitButtons).find(button => button.textContent?.includes(formElement.submitButtonText));
+        console.log('submitButton', submitButton);
+        if (!submitButton) {
+            return;
+        }
+        (submitButton as HTMLElement).click();
+    }
+
+    await autoFillContent();
+    await sleep(1000);
+
+    await uploadImages(contentData?.images || contentData?.contentImages);
+
+    if (contentData.isAutoPublish) {
+        await sleep(5000);
+        autoPublish();
+    }
+
+}

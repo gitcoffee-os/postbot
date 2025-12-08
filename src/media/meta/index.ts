@@ -22,6 +22,9 @@ import { baijiahaoMetaInfo } from './baijiahao.meta';
 import { douyinMetaInfo } from './douyin.meta';
 import { kuaishouMetaInfo } from './kuaishou.meta';
 import { bilibiliMetaInfo } from './bilibili.meta';
+import { doubanMetaInfo } from './douban.meta';
+import { jianshuMetaInfo } from './jianshu.meta';
+import { zsxqMetaInfo } from './zsxq.meta';
 
 export const metaInfoList = {
     weixin: weixinMetaInfo,
@@ -33,6 +36,9 @@ export const metaInfoList = {
     douyin: douyinMetaInfo,
     kuaishou: kuaishouMetaInfo,
     bilibili: bilibiliMetaInfo,
+    douban: doubanMetaInfo,
+    jianshu: jianshuMetaInfo,
+    zsxq: zsxqMetaInfo,
 }
 
 export const getMetaInfoList = async () => {
