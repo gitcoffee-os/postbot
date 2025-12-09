@@ -1,7 +1,7 @@
 {
   "name": "PostBot",
   "displayName": "PostBot 内容同步助手",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "PostBot 内容同步助手",
   "author": "GitCoffee Team @GitCoffee",
   "scripts": {
