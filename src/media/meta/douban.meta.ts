@@ -1,7 +1,7 @@
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 
 const Api = {
-  MediaInfo: platforms.article.douban.mediaInfoUrl,
+  MediaInfo: platformMetas.douban.mediaInfoUrl,
 };
 
 const getMediaInfo = async () => {

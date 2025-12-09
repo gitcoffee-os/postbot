@@ -1,8 +1,8 @@
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 import { getImageUrl, imageDownloadToBase64 } from "~utils/image";
 
 const Api = {
-    MediaInfo: platforms.article.weibo.mediaInfoUrl,
+    MediaInfo: platformMetas.weibo.mediaInfoUrl,
 };
 
 const getWeiboMetaInfo = async(html) => {

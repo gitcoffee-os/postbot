@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 
 const Api = {
-  MediaInfo: platforms.article.toutiao.mediaInfoUrl,
+  MediaInfo: platformMetas.toutiao.mediaInfoUrl,
 };
 
 const getMediaInfo = async () => {

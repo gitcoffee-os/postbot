@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { reactive } from 'vue';
+
 import { weixinMetaInfo } from './weixin.meta';
 import { toutiaoMetaInfo } from './toutiao.meta';
 import { xiaohongshuMetaInfo } from './xiaohongshu.meta';
@@ -26,7 +28,7 @@ import { doubanMetaInfo } from './douban.meta';
 import { jianshuMetaInfo } from './jianshu.meta';
 import { zsxqMetaInfo } from './zsxq.meta';
 
-export const metaInfoList = {
+export const metaInfoList = reactive({
     weixin: weixinMetaInfo,
     toutiao: toutiaoMetaInfo,
     xiaohongshu: xiaohongshuMetaInfo,
@@ -39,7 +41,7 @@ export const metaInfoList = {
     douban: doubanMetaInfo,
     jianshu: jianshuMetaInfo,
     zsxq: zsxqMetaInfo,
-}
+});
 
 export const getMetaInfoList = async () => {
     const results = await Promise.all(

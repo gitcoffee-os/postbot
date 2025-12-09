@@ -1,8 +1,8 @@
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 import { getImageUrl } from "~utils/image";
 
 const Api = {
-  MediaInfo: platforms.article.jianshu.mediaInfoUrl,
+  MediaInfo: platformMetas.jianshu.mediaInfoUrl,
 };
 
 const getMediaInfo = async () => {

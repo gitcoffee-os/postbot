@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 
 const Api = {
-  MediaInfo: platforms.article.zhihu.mediaInfoUrl,
+  MediaInfo: platformMetas.zhihu.mediaInfoUrl,
 };
 
 const getMediaInfo = async () => {

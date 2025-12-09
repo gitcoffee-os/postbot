@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { reactive } from "vue";
+
 import { weixinArticlePublisher } from "./platform/article/weixin.publisher";
 import { toutiaoArticlePublisher } from "./platform/article/toutiao.publisher";
 import { xiaohongshuMomentPublisher } from "./platform/moment/xiaohongshu.publisher";
@@ -28,7 +30,7 @@ import { zsxqArticlePublisher } from "./platform/article/zsxq.publisher";
 import { kuaishouMomentPublisher } from "./platform/moment/kuaishou.publisher";
 import { zsxqMonmentPublisher } from "./platform/moment/zsxq.publisher";
 
-const publisher = {
+export const publisher = reactive({
     article: {
         weixin: weixinArticlePublisher,
         toutiao: toutiaoArticlePublisher,
@@ -51,7 +53,7 @@ const publisher = {
         kuaishou: kuaishouMomentPublisher,
         zsxq: zsxqMonmentPublisher,
     },
-}
+});
 
 export const executeScriptsToTabs = (tabs, data) => {
     console.log('executeScriptsToTabs');

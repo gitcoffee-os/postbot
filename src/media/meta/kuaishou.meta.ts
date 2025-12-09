@@ -1,7 +1,7 @@
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 
 const Api = {
-  MediaInfo: platforms.article.kuaishou.mediaInfoUrl,
+  MediaInfo: platformMetas.kuaishou.mediaInfoUrl,
 };
 
 const getMediaInfo = async () => {

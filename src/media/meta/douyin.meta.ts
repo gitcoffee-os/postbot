@@ -1,7 +1,7 @@
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 
 const Api = {
-  MediaInfo: platforms.article.douyin.mediaInfoUrl,
+  MediaInfo: platformMetas.douyin.mediaInfoUrl,
 };
 
 const USER_BASE_URL = 'https://www.douyin.com/user'

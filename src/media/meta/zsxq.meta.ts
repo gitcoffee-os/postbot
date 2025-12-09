@@ -1,11 +1,11 @@
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 
 import { imageToBase64 } from "~utils/image";
 
 const Api = {
-  MediaInfo: platforms.article.zsxq.mediaInfoUrl,
-  HomePage: platforms.article.zsxq.homepage,
-  Groups: platforms.article.zsxq.groupsUrl,
+  MediaInfo: platformMetas.zsxq.mediaInfoUrl,
+  HomePage: platformMetas.zsxq.homepage,
+  Groups: platformMetas.zsxq.groupsUrl,
 };
 
 const getGroups = async () => {

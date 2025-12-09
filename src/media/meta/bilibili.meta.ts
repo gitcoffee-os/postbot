@@ -1,8 +1,8 @@
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 import { imageToBase64 } from "~utils/image";
 
 const Api = {
-  MediaInfo: platforms.article.bilibili.mediaInfoUrl,
+  MediaInfo: platformMetas.bilibili.mediaInfoUrl,
 };
 
 const getMediaInfo = async () => {

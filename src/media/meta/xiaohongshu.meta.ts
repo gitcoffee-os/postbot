@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 
 const Api = {
-  MediaInfo: platforms.article.xiaohongshu.mediaInfoUrl,
-  HomePage: platforms.article.xiaohongshu.homepage,
-  Explor: platforms.article.xiaohongshu.exploreUrl,
+  MediaInfo: platformMetas.xiaohongshu.mediaInfoUrl,
+  HomePage: platformMetas.xiaohongshu.homepage,
+  Explor: platformMetas.xiaohongshu.exploreUrl,
 };
 
 // const getMediaInfo = async() => {

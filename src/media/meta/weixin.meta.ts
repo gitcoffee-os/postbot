@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { platforms } from "~media/platform";
+import { platformMetas } from "~media/platform";
 import { getDocument } from "~utils/html";
 
 const Api = {
-    HomePage: platforms.article.weixin.homepage,
-    MediaInfo: platforms.article.weixin.mediaInfoUrl,
+    HomePage: platformMetas.weixin.homepage,
+    MediaInfo: platformMetas.weixin.mediaInfoUrl,
 };
 
 const getMatchData = (match) => {
