@@ -15,6 +15,9 @@
  */
 import { initPostBot } from "~api"
 
+// 初始化插件系统
+import "~plugins";
+
 import { initEvents } from "~events";
 
 import { handleMessage } from "./message.background";

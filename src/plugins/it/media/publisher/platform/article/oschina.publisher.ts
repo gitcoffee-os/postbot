@@ -1,0 +1,152 @@
+import { state } from "~contents/components/postbot.data";
+
+export const oschinaBlogPublishUrl = () => {
+    const user = state.metaInfoList?.oschina;
+    if (!user) {
+        return null;
+    }
+    const publishUrl = `https://my.oschina.net/u/${user.userId}/blog/write`;
+    console.log('publishUrl', publishUrl);
+    return publishUrl;
+}
+
+export const oschinaArticlePublisher = async (data) => {
+    console.log('oschinaArticlePublisher data', data);
+
+    // const { contentData, processedData } = data;
+
+    const contentData = data?.data;
+    const processedData = data?.data;
+
+    const sleep = async (time) => {
+        console.log('sleep', time);
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
+    const pasteEvent = (): ClipboardEvent => {
+        console.log('pasteEvent');
+        return new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: new DataTransfer(),
+        });
+    }
+
+    const observeElement = (selector, timeout = 10000) => {
+        console.log('observeElement', selector);
+        return new Promise((resolve, reject) => {
+            //   const checkElement = () => document.querySelector(selector);
+
+            let checkElement = null;
+            if (selector instanceof Function) {
+                checkElement = selector;
+            } else {
+                checkElement = () => document.querySelector(selector);
+            }
+
+            // 立即检查元素
+            let element = checkElement();
+            console.log('element', element);
+            if (element) {
+                resolve(element);
+                return;
+            }
+
+            // 创建 MutationObserver 进行监听
+            const observer = new MutationObserver(() => {
+                element = checkElement();
+                console.log('element', element);
+                if (element) {
+                    resolve(element);
+                    observer.disconnect();
+                }
+            });
+
+            // 启动观察
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true,
+            });
+
+            // 如果超时，拒绝 Promise，并返回中文错误提示
+            setTimeout(() => {
+                observer.disconnect();
+                reject(new Error(`未能在 ${timeout} 毫秒内找到选择器为 "${selector}" 的元素`));
+            }, timeout);
+        });
+    };
+
+    const formElement = {
+        title: '#titleGrid input[name=title]',
+        editor: '[contenteditable="true"]',
+        submitButtons: 'div.submit',
+        submitButtonText: '发布文章',
+    }
+
+    const fromRule = {
+        title: {
+            min: 2,
+            max: 100,
+        }
+    }
+
+    const getEditor = () => {
+        const iframe = document.querySelector('iframe');
+        console.log('iframe', iframe);
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        console.log('iframeDoc', iframeDoc);
+
+        // const editor = await observeElement(formElement.editor) as HTMLElement;
+        const editor = iframeDoc.querySelector(formElement.editor) as HTMLElement;
+        return editor;
+    }
+
+    const autoFillContent = async (contentData) => {
+        console.log('autoFillContent');
+        const titleInput = await observeElement(formElement.title) as HTMLElement;
+        console.log('titleInput', titleInput);
+        if (!titleInput) {
+            console.log('未找到标题输入框');
+            return;
+        }
+        (titleInput as HTMLTextAreaElement).value = contentData?.title?.slice(0, fromRule.title.max) || '';
+        titleInput.dispatchEvent(new Event('input', { bubbles: true }));
+        titleInput.dispatchEvent(new Event('change', { bubbles: true }));
+        await sleep(1000);
+
+        const editor = (await observeElement(getEditor)) as HTMLElement;
+        console.log('editor', editor);
+        if (!editor) {
+            console.log('未找到编辑器');
+            return;
+        }
+        editor.focus();
+        const editorPasteEvent = pasteEvent();
+        editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
+        editor.dispatchEvent(editorPasteEvent);
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
+        editor.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    const autoPublish = () => {
+        const submitButtons = document.querySelectorAll(formElement.submitButtons);
+        console.log('submitButtons', submitButtons);
+        if (!submitButtons) {
+            return;
+        }
+        const submitButton = Array.from(submitButtons).find(button => button.textContent?.includes(formElement.submitButtonText));
+        console.log('submitButton', submitButton);
+        if (!submitButton) {
+            return;
+        }
+        (submitButton as HTMLElement).click();
+    }
+
+    await autoFillContent(contentData);
+    await sleep(5000);
+
+    if (contentData.isAutoPublish) {
+        autoPublish();
+    }
+
+}
