@@ -17,8 +17,6 @@ import { state } from "~contents/components/postbot.data";
 
 import { POSTBOT_ACTION } from "../message/postbot.action";
 
-// import { getMetaInfoList } from "~media/meta";
-
 // import { checkExtensionStatus } from "~utils/extenstion";
 
 import type { PlasmoCSConfig } from "plasmo"

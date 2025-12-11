@@ -13,25 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { state } from "~contents/components/postbot.data";
-
-export const getGroupTopicPublishUrl = (groupId) => {
-    const groups = state.metaInfoList?.zsxq?.groups;
-    if (!groups) {
-        return null;
-    }
-    let group = groups[0];
-    if (groupId) {
-        group = groups.find(group => group.groupId === groupId);
-    }
-    const publishUrl = `https://wx.zsxq.com/group/${group.groupId}`;
-    console.log('publishUrl', publishUrl);
-    return publishUrl;
-}
-
-export const zsxqMonmentPublisher = async (data) => {
-    console.log('zsxqMonmentPublisher data', data);
+export const kuaishouVideoPublisher = async (data) => {
+    console.log('kuaishouVideoPublisher data', data);
 
     const contentData = data?.data;
     const processedData = data?.data;
@@ -95,12 +78,28 @@ export const zsxqMonmentPublisher = async (data) => {
     };
 
     const formElement = {
-        topicAdd: 'div.post-topic-head',
-        topicEditor: 'div.ql-editor',
-        imageUpload: 'input[type="file"]',
-        submitButtons: 'div.submit-btn',
-        submitButtonText: '发布',
-    };
+        uploadButtons: 'button[class^="_upload-btn_"]',
+        videoUpload: 'input[type="file"]',
+        imageUpload: 'input[type="file"][accept="image/png, image/jpg, image/jpeg, image/webp"]',
+        uploadImageButtonText: '上传图片',
+        uploadVideoButtonText: '上传视频',
+        // title: 'input[type="text"]',
+        editor: 'div[contenteditable="true"]',
+        submitButton: 'button',
+        publishButtonText: '发布',
+        draftButtonText: '暂存离开',
+    }
+
+    const fromRule = {
+        title: {
+            min: 2,
+            max: 64,
+        },
+        content: {
+            min: 2,
+            max: 1000,
+        }
+    }
 
     const base64ToBinary = (base64) => {
         const binaryString = atob(base64);  // 解码Base64
@@ -200,48 +199,118 @@ export const zsxqMonmentPublisher = async (data) => {
         console.log('图片上传成功');
     }
 
-    const autoFillContent = async() => {
-        const topicAdd = await observeElement(formElement.topicAdd) as HTMLElement;
-        console.log('topicAdd', topicAdd);
-        if (!topicAdd) {
-            return;
-        }
-        topicAdd.click();
-        topicAdd.dispatchEvent(new Event('click', { bubbles: true }));
-        await sleep(2000)
-    
-        const editor = await observeElement(formElement.topicEditor) as HTMLElement;
+    const autoFillContent = async (contentData) => {
+        // const titleElement = await observeElement(formElement.title);
+        // if (titleElement) {
+        //     const title = contentData?.title?.slice(0, fromRule.title.max) || '';
+        //     (titleElement as HTMLTextAreaElement).value = title;
+        //     titleElement.dispatchEvent(new Event('input', { bubbles: true }));
+        //     titleElement.dispatchEvent(new Event('change', { bubbles: true }));
+        // }
+
+        const editor = (await observeElement(formElement.editor)) as HTMLElement;
         console.log('editor', editor);
         if (!editor) {
+            console.log('未找到编辑器');
             return;
         }
-        editor.innerHTML = '';
+
+        const content = contentData?.description || contentData?.content;
+
+        // 聚焦编辑器
         editor.focus();
-        const editorPasteEvent = pasteEvent();
-        editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
-        editor.dispatchEvent(editorPasteEvent);
-        editor.dispatchEvent(new Event('input', { bubbles: true }));
-        editor.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // 插入新内容
+        if (document.execCommand('insertHTML', false, content)) {
+            console.log('内容插入成功');
+        } else {
+            // 降级到DOM操作
+            editor.innerHTML = content;
+        }
+
+        // 触发事件
+        const inputEvent = new Event('input', { bubbles: true });
+        editor.dispatchEvent(inputEvent);
+
+        // editor.focus();
+
+        // editor.innerHTML = contentData?.content;
+        // editor.dispatchEvent(new Event('input', { bubbles: true }));
+        // editor.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // const editorPasteEvent = pasteEvent();
+        // editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
+        // editor.dispatchEvent(editorPasteEvent);
+        // editor.dispatchEvent(new Event('input', { bubbles: true }));
+        // editor.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
-    const autoPublish = () => {
-        const submitButtons = document.querySelectorAll(formElement.submitButtons);
-        console.log('submitButtons', submitButtons);
-        if (!submitButtons) {
-            return;
+    const autoUploadVideo = async(videoData) => {
+        console.log('videoData', videoData);
+
+        const videoUpload = (await observeElement(formElement.videoUpload)) as HTMLElement;
+        if (!videoUpload) {
+            throw new Error('未找到视频上传元素');
         }
-        const submitButton = Array.from(submitButtons).find(button => button.textContent?.includes(formElement.submitButtonText));
-        console.log('submitButton', submitButton);
-        if (!submitButton) {
-            return;
-        }
-        (submitButton as HTMLElement).click();
+
+        console.log('videoUpload', videoUpload);
+
+        // const blob = new Blob([videoData.videoBuffer], { type: videoData.type });
+
+        const response = await fetch(videoData.objectUrl);
+        const blob = await response.blob();
+
+        const file = new File([blob], videoData.name, { type: videoData.type });
+
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+        videoUpload.files = dataTransfer.files;
+        videoUpload.dispatchEvent(new Event('input', { bubbles: true }));
+        videoUpload.dispatchEvent(new Event('change', { bubbles: true }));
+        await sleep(2000);
+        console.log('视频上传事件已发送');
     }
 
-    await autoFillContent();
+    const autoPublish = async () => {
+        console.log('autoPublish');
+        const buttons = document.querySelectorAll(formElement.submitButton);
+        const publishButton = Array.from(buttons).find((button) => button.textContent?.includes(formElement.publishButtonText));
+        if (publishButton) {
+            console.log('自动点击发布');
+            publishButton.click();
+            await sleep(5000);
+            window.location.href = 'https://creator.kuaishou.com/new/note-manager';
+        }
+    }
+
+    await observeElement(formElement.videoUpload);
     await sleep(1000);
 
-    await uploadImages(contentData?.images || contentData?.contentImages);
+    await autoUploadVideo(processedData.videoData);
+    await sleep(1000);
+
+    // await observeElement(formElement.uploadButtons);
+    // await sleep(1000);
+
+    // const uploadButtons = document.querySelectorAll(formElement.uploadButtons);
+
+    // const uploadImageButton = Array.from(uploadButtons).find(
+    //     (element) => element.textContent?.includes(formElement.uploadImageButtonText),
+    // );
+
+    // if (!uploadImageButton) {
+    //     throw new Error(`未找到${formElement.uploadImageButtonText}按钮元素`);
+    // }
+
+    // uploadImageButton.click();
+    // uploadImageButton.dispatchEvent(new Event('click', { bubbles: true }));
+    // await sleep(1000);
+
+    // await uploadImages(contentData?.images || contentData?.contentImages);
+    // await sleep(5000);
+
+    await autoFillContent(contentData);
 
     if (contentData.isAutoPublish) {
         await sleep(5000);

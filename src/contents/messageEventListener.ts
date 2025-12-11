@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { POSTBOT_ACTION } from "~message/postbot.action";
-import { getMetaInfoList } from "~media/meta";
+// import { getMetaInfoList } from "~media/meta";
 
 window.addEventListener('message', async (event) => {
   const request = event.data;

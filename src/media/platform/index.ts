@@ -64,7 +64,7 @@ export const platformMetas = reactive({
     },
     zhihu: {
         platformName: '知乎',
-        name: '知乎(文章)',
+        name: '知乎',
         code: 'zhihu',
         site: 'https://www.zhihu.com/',
         homepage: 'https://www.zhihu.com/',
@@ -90,7 +90,7 @@ export const platformMetas = reactive({
     },
     baijiahao: {
         platformName: '百度',
-        name: '百家号(文章)',
+        name: '百家号',
         code: 'baijiahao',
         site: 'https://www.baidu.com/',
         homepage: 'https://baijiahao.baidu.com/',
@@ -213,6 +213,7 @@ export const platforms = reactive({
             status: 'enabled',
         }),
         zhihu: createPlatform('article', 'zhihu', {
+            name: '知乎(文章)',
             publishUrl: 'https://zhuanlan.zhihu.com/write',
             sort: 4,
             status: 'enabled',
@@ -224,11 +225,13 @@ export const platforms = reactive({
             status: 'enabled',
         }),
         baijiahao: createPlatform('article', 'baijiahao', {
+            name: '百家号(文章)',
             publishUrl: 'https://baijiahao.baidu.com/builder/rc/edit?type=news',
             sort: 6,
             status: 'enabled',
         }),
         douyin: createPlatform('article', 'douyin', {
+            name: '抖音',
             publishUrl: 'https://creator.douyin.com/creator-micro/content/post/article?default-tab=5&enter_from=publish_page&media_type=article&type=new',
             sort: 7,
             status: 'enabled',
@@ -292,11 +295,32 @@ export const platforms = reactive({
             status: 'enabled',
         }),
         zsxq: createPlatform('moment', 'zsxq', {
+            name: '知识星球',
             publishUrl: getGroupTopicPublishUrl,
             sort: 12,
             status: 'enabled',
         }),
-    }
+    },
+    video: {
+        douyin: createPlatform('video', 'douyin', {
+            name: '抖音',
+            publishUrl: 'https://creator.douyin.com/creator-micro/content/upload?enter_from=dou_web',
+            sort: 1,
+            status: 'enabled',
+        }),
+        kuaishou: createPlatform('video', 'kuaishou', {
+            name: '快手',
+            publishUrl: 'https://cp.kuaishou.com/article/publish/video?tabType=1',
+            sort: 2,
+            status: 'enabled',
+        }),
+        toutiao: createPlatform('video', 'toutiao', {
+            name: '头条号',
+            publishUrl: 'https://mp.toutiao.com/profile_v4/xigua/upload-video',
+            sort: 2,
+            status: 'enabled',
+        }),
+    },
 });
 
 // 平台排序辅助函数，递归处理对象中的平台按 sort 升序

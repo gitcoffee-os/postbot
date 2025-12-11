@@ -30,6 +30,10 @@ import { zsxqArticlePublisher } from "./platform/article/zsxq.publisher";
 import { kuaishouMomentPublisher } from "./platform/moment/kuaishou.publisher";
 import { zsxqMonmentPublisher } from "./platform/moment/zsxq.publisher";
 
+import { douyinVideoPublisher } from "./platform/video/douyin.publisher";
+import { kuaishouVideoPublisher } from "./platform/video/kuaishou.publisher";
+import { toutiaoVideoPublisher } from "./platform/video/toutiao.publisher";
+
 export const publisher = reactive({
     article: {
         weixin: weixinArticlePublisher,
@@ -53,6 +57,11 @@ export const publisher = reactive({
         kuaishou: kuaishouMomentPublisher,
         zsxq: zsxqMonmentPublisher,
     },
+    video: {
+        douyin: douyinVideoPublisher,
+        kuaishou: kuaishouVideoPublisher,
+        toutiao: toutiaoVideoPublisher,
+    }
 });
 
 export const executeScriptsToTabs = (tabs, data) => {
