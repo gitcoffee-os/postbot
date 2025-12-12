@@ -22,6 +22,7 @@ import { toutiaoMomentPublisher } from "./platform/moment/toutiao.publisher";
 import { zhihuArticlePublisher } from "./platform/article/zhihu.publisher";
 import { weiboArticlePublisher } from "./platform/article/weibo.publisher";
 import { baijiahaoArticlePublisher } from "./platform/article/baijiahao.publisher";
+import { qqOmArticlePublisher } from "./platform/article/qqOm.publisher";
 import { douyinArticlePublisher } from "./platform/article/douyin.publisher";
 import { bilibiliArticlePublisher } from "./platform/article/bilibili.publisher";
 import { doubanArticlePublisher } from "./platform/article/douban.publisher";
@@ -32,7 +33,10 @@ import { zsxqMonmentPublisher } from "./platform/moment/zsxq.publisher";
 
 import { douyinVideoPublisher } from "./platform/video/douyin.publisher";
 import { kuaishouVideoPublisher } from "./platform/video/kuaishou.publisher";
+import { bilibiliVideoPublisher } from "./platform/video/bilibili.publisher";
 import { toutiaoVideoPublisher } from "./platform/video/toutiao.publisher";
+import { weixinChannelsVideoPublisher } from "./platform/video/weixinChannels.publisher";
+import { qqOmVideoPublisher } from "./platform/video/qqOm.publisher";
 
 export const publisher = reactive({
     article: {
@@ -42,6 +46,7 @@ export const publisher = reactive({
         zhihu: zhihuArticlePublisher,
         weibo: weiboArticlePublisher,
         baijiahao: baijiahaoArticlePublisher,
+        qq_om: qqOmArticlePublisher,
         douyin: douyinArticlePublisher,
         bilibili: bilibiliArticlePublisher,
         kuaishou: kuaishouMomentPublisher,
@@ -60,7 +65,10 @@ export const publisher = reactive({
     video: {
         douyin: douyinVideoPublisher,
         kuaishou: kuaishouVideoPublisher,
+        bilibili: bilibiliVideoPublisher,
         toutiao: toutiaoVideoPublisher,
+        weixin_channels: weixinChannelsVideoPublisher,
+        qq_om: qqOmVideoPublisher,
     }
 });
 

@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const bilibiliArticlePublisher = async (data) => {
-    console.log('bilibiliArticlePublisher data', data);
+export const qqOmArticlePublisher = async (data) => {
+    console.log('qqOmArticlePublisher data', data);
 
     // const { contentData, processedData } = data;
 
     const contentData = data?.data;
     const processedData = data?.data;
-
-    let editorDocument = null;
 
     const sleep = async (time) => {
         console.log('sleep', time);
@@ -46,7 +44,7 @@ export const bilibiliArticlePublisher = async (data) => {
           if (selector instanceof Function) {
             checkElement = selector;
           } else {
-            checkElement = () => (editorDocument || document).querySelector(selector);
+            checkElement = () => document.querySelector(selector);
           }
       
           // 立即检查元素
@@ -68,7 +66,7 @@ export const bilibiliArticlePublisher = async (data) => {
           });
       
           // 启动观察
-          observer.observe((editorDocument || document).body, {
+          observer.observe(document.body, {
             childList: true,
             subtree: true,
           });
@@ -80,68 +78,62 @@ export const bilibiliArticlePublisher = async (data) => {
           }, timeout);
         });
       };
-
+    
     const formElement = {
-        editorIframe: '#edit-article-box iframe',
-        title: 'div.video-title input',
-        editor: 'div[contenteditable="true"]',
-        imageUpload: 'div.bre-settings__coverbox__img__icon',
-        imagePickerButtons: 'div.bre-modal button.bre-btn',
-        imagePickerConfirmText: '确认',
-        publishButtons: 'div.submit-container span',
-        saveDraftButtonText: '存草稿',
-        confirmButtonText: '立即投稿',
+        title: '#omEditorTitle span[data-placeholder="请输入标题（5-64个字）"]',
+        editor: 'div.ProseMirror[contenteditable="true"]',
+        coverDelete: '.article-cover-delete',
+        imageUploadAdd: 'button.omui-button--add',
+        imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label',
+        imageUploadTabText: '本地上传',
+        imageUpload: 'input[type="file"]',
+        confirmUploadButton: 'div.omui-dialog-footer button.omui-button--primary',
+        publishButtons: 'ul li button.omui-button',
+        publishButtonText: '存草稿',
+        timingPublishButtonText: '定时发布',
+        previewButtonText: '预览',
+        confirmButtonText: '发布',
     }
     
     const fromRule = {
         title: {
-            min: 4,
-            max: 80,
+            min: 5,
+            max: 64,
         }
-    }
-
-    const getEditorIframe = () => {
-        return document.querySelector(formElement.editorIframe);
-    }
-
-    const getEditorDocument = () => {
-        const editorIframe = getEditorIframe();
-        return editorIframe.contentWindow.document;
     }
     
     const autoFillContent = (contentData) => {
         console.log('autoFillContent');
-        const titleTextarea = editorDocument.querySelector(formElement.title);
+        const titleTextarea = document.querySelector(formElement.title) as HTMLElement;
         console.log('titleTextarea', titleTextarea);
         if (titleTextarea) {
-            (titleTextarea as HTMLTextAreaElement).value = contentData?.title?.slice(0, fromRule.title.max) || '';
-            titleTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-            titleTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+            const title = contentData?.title?.slice(0, fromRule.title.max) || '';
+
+            titleTextarea.innerHTML = title;
+
+            // titleTextarea.focus();
+            // const editorPasteEvent = pasteEvent();
+            // editorPasteEvent.clipboardData.setData('text/html', title);
+            // titleTextarea.dispatchEvent(editorPasteEvent);
+            // titleTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+            // titleTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // (titleTextarea as HTMLTextAreaElement).value = contentData?.title?.slice(0, fromRule.title.max) || '';
+            // titleTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+            // titleTextarea.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
-        const editor = editorDocument.querySelector(formElement.editor)  as HTMLElement;
+        const editor = document.querySelector(formElement.editor) as HTMLElement;
         console.log('editor', editor);
         if (!editor) {
             console.log('未找到编辑器');
             return;
         }
         editor.focus();
-
-        const content = contentData?.content;
-
-        if (editor.contentEditable === 'true') {
-            editor.innerHTML = content;
-            editor.dispatchEvent(new Event('input', { bubbles: true }));
-            editor.dispatchEvent(new Event('change', { bubbles: true }));
-            return;
-        }
-
-        const editorPasteEvent = new ClipboardEvent('paste', {
-            bubbles: true,
-            cancelable: true,
-            clipboardData: new DataTransfer(),
-        });
-        editorPasteEvent.clipboardData.setData('text/html', content);
+        // 先清空原草稿
+        editor.innerHTML = '';
+        const editorPasteEvent = pasteEvent();
+        editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
         editor.dispatchEvent(editorPasteEvent);
         editor.dispatchEvent(new Event('input', { bubbles: true }));
         editor.dispatchEvent(new Event('change', { bubbles: true }));
@@ -216,7 +208,7 @@ export const bilibiliArticlePublisher = async (data) => {
         //     throw new Error('未找到图片上传元素');
         // }
 
-        const imageUpload = editorDocument.querySelector(formElement.imageUpload) as HTMLElement;
+        const imageUpload = document.querySelector(formElement.imageUpload) as HTMLElement;
         if (!imageUpload) {
             throw new Error('未找到图片上传元素');
         }
@@ -251,6 +243,40 @@ export const bilibiliArticlePublisher = async (data) => {
     }
     
     const autoFillCover = async(cover) => {
+        const clearDefaultCovers = async() => {
+            const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
+            if (!coverDeleteElements) {
+                return;
+            }
+            console.log('coverDeleteElements length', coverDeleteElements.length);
+            for (const coverDeleteElement of coverDeleteElements) {
+                if (!coverDeleteElement) {
+                    continue;
+                }
+                console.log('coverDelete trrigle click');
+                (coverDeleteElement as HTMLElement).click();
+            }
+            await sleep(1000);
+        };
+
+        await clearDefaultCovers();
+
+        const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
+        if (!imageUploadAdd) {
+            return;
+        }
+
+        imageUploadAdd.click();
+        await sleep(1000);
+
+        const imageUploadTabs = document.querySelectorAll(formElement.imageUploadTabs);
+        const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
+        if (!imageUploadTab) {
+            return;
+        }
+        (imageUploadTab as HTMLElement).click();
+        await sleep(1000);
+
         const images = [];
 
         console.log('cover', cover);
@@ -263,38 +289,42 @@ export const bilibiliArticlePublisher = async (data) => {
         console.log('images', images);
         await uploadImages(images);
         await sleep(2000);
+
+        const confirmUploadButton = document.querySelector(formElement.confirmUploadButton);
+        if (!confirmUploadButton) {
+            return;
+        }
+
+        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
+        await sleep(2000);
     };
     
-    const getSaveDraftButton = () => {
-        const buttons = editorDocument.querySelectorAll(formElement.publishButtons);
-        const saveDraftButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.saveDraftButtonText));
-        console.log('saveDraftButton', saveDraftButton);
-        return saveDraftButton;
+    const getPublishButton = () => {
+        const buttons = document.querySelectorAll(formElement.publishButtons);
+        const publishButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.publishButtonText));
+        console.log('publishButton', publishButton);
+        return publishButton;
     }
 
     const getConfirmPublishButton = () => {
-        const buttons = editorDocument.querySelectorAll(formElement.publishButtons);
+        const buttons = document.querySelectorAll(formElement.publishButtons);
         const confirmPublishButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.confirmButtonText));
         console.log('confirmPublishButton', confirmPublishButton);
         return confirmPublishButton;
     }
-
-    const autoSaveDraft = async() => {
-        console.log('autoSaveDraft');
-        const saveDraftButton = getSaveDraftButton();
-        if (!saveDraftButton) {
-            console.log(`未找到${formElement.saveDraftButtonText}按钮`)
-            return;
-        }
-        console.log('trrigle publish button click');
-        saveDraftButton.dispatchEvent(new Event('click', {
-            bubbles: true,
-            cancelable: true
-        }));
-    }
     
     const autoPublish = async() => {
         console.log('autoPublish');
+        // const publishButton = getPublishButton();
+        // if (!publishButton) {
+        //     console.log(`未找到${formElement.publishButtonText}按钮`)
+        //     return;
+        // }
+        // console.log('trrigle publish button click');
+        // publishButton.dispatchEvent(new Event('click', {
+        //     bubbles: true,
+        //     cancelable: true
+        // }));
         
         const confirmPlublishButton = await observeElement(getConfirmPublishButton);
         if (!confirmPlublishButton) {
@@ -307,23 +337,19 @@ export const bilibiliArticlePublisher = async (data) => {
         }));
     }
 
-    await observeElement(formElement.editorIframe);
+    await observeElement(formElement.editor);
     await sleep(1000);
-
-    editorDocument = getEditorDocument();
 
     autoFillContent(processedData);
     await sleep(5000);
 
-    // if (processedData?.cover) {
-    //     autoFillCover(processedData.cover);
-    // }
+    if (processedData?.cover) {
+        autoFillCover(processedData.cover);
+    }
 
     if (contentData.isAutoPublish) {
         await sleep(5000);
         autoPublish();
-    } else {
-        // autoSaveDraft();
     }
 
 }

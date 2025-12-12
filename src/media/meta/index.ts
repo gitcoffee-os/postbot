@@ -24,6 +24,8 @@ import { baijiahaoMetaInfo } from './baijiahao.meta';
 import { douyinMetaInfo } from './douyin.meta';
 import { kuaishouMetaInfo } from './kuaishou.meta';
 import { bilibiliMetaInfo } from './bilibili.meta';
+import { weixinChannelsMetaInfo } from './weixinChannels.meta';
+import { qqOmMetaInfo } from './qqOm.meta';
 import { doubanMetaInfo } from './douban.meta';
 import { jianshuMetaInfo } from './jianshu.meta';
 import { zsxqMetaInfo } from './zsxq.meta';
@@ -38,6 +40,8 @@ export const metaInfoList = reactive({
     douyin: douyinMetaInfo,
     kuaishou: kuaishouMetaInfo,
     bilibili: bilibiliMetaInfo,
+    weixin_channels: weixinChannelsMetaInfo,
+    qq_om: qqOmMetaInfo,
     douban: doubanMetaInfo,
     jianshu: jianshuMetaInfo,
     zsxq: zsxqMetaInfo,

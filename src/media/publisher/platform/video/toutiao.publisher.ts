@@ -91,7 +91,7 @@ export const toutiaoVideoPublisher = async (data) => {
         imageUploadTabText: '上传图片',
         imageUpload: 'input[type="file"]',
         confirmUploadButton: 'button[data-e2e="imageUploadConfirm-btn"]',
-        publishButtons: 'div。button-group button.byte-btn',
+        publishButtons: 'div.button-group button.byte-btn',
         publishButtonText: '存草稿',
         confirmButtonText: '发布',
     }

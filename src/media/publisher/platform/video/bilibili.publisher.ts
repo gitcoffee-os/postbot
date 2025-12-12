@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const bilibiliArticlePublisher = async (data) => {
-    console.log('bilibiliArticlePublisher data', data);
+export const bilibiliVideoPublisher = async (data) => {
+    console.log('bilibiliVideoPublisher data', data);
 
     // const { contentData, processedData } = data;
 
     const contentData = data?.data;
     const processedData = data?.data;
 
-    let editorDocument = null;
+    let editorDocument = document;
 
     const sleep = async (time) => {
         console.log('sleep', time);
@@ -80,23 +80,24 @@ export const bilibiliArticlePublisher = async (data) => {
           }, timeout);
         });
       };
-
+    
     const formElement = {
-        editorIframe: '#edit-article-box iframe',
-        title: 'div.video-title input',
+        // editorIframe: '#edit-article-box iframe',
+        videoUpload: 'div.bcc-upload-wrapper input[type="file"]',
+        title: 'div.bre-title-input textarea',
         editor: 'div[contenteditable="true"]',
         imageUpload: 'div.bre-settings__coverbox__img__icon',
         imagePickerButtons: 'div.bre-modal button.bre-btn',
         imagePickerConfirmText: '确认',
-        publishButtons: 'div.submit-container span',
+        publishButtons: 'div.b-read-editor__btns button.bre-btn',
         saveDraftButtonText: '存草稿',
-        confirmButtonText: '立即投稿',
+        confirmButtonText: '提交文章',
     }
     
     const fromRule = {
         title: {
-            min: 4,
-            max: 80,
+            min: 2,
+            max: 30,
         }
     }
 
@@ -264,6 +265,33 @@ export const bilibiliArticlePublisher = async (data) => {
         await uploadImages(images);
         await sleep(2000);
     };
+
+    const autoUploadVideo = async(videoData) => {
+        console.log('videoData', videoData);
+
+        const videoUpload = (await observeElement(formElement.videoUpload)) as HTMLElement;
+        if (!videoUpload) {
+            throw new Error('未找到视频上传元素');
+        }
+
+        console.log('videoUpload', videoUpload);
+
+        // const blob = new Blob([videoData.videoBuffer], { type: videoData.type });
+
+        const response = await fetch(videoData.objectUrl);
+        const blob = await response.blob();
+
+        const file = new File([blob], videoData.name, { type: videoData.type });
+
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+        videoUpload.files = dataTransfer.files;
+        videoUpload.dispatchEvent(new Event('input', { bubbles: true }));
+        videoUpload.dispatchEvent(new Event('change', { bubbles: true }));
+        await sleep(2000);
+        console.log('视频上传事件已发送');
+    }
     
     const getSaveDraftButton = () => {
         const buttons = editorDocument.querySelectorAll(formElement.publishButtons);
@@ -307,10 +335,13 @@ export const bilibiliArticlePublisher = async (data) => {
         }));
     }
 
-    await observeElement(formElement.editorIframe);
+    await observeElement(formElement.videoUpload);
     await sleep(1000);
 
-    editorDocument = getEditorDocument();
+    // editorDocument = getEditorDocument();
+
+    await autoUploadVideo(processedData.videoData);
+    await sleep(1000);
 
     autoFillContent(processedData);
     await sleep(5000);
