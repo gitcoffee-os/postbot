@@ -84,31 +84,31 @@ export const bilibiliVideoPublisher = async (data) => {
     const formElement = {
         // editorIframe: '#edit-article-box iframe',
         videoUpload: 'div.bcc-upload-wrapper input[type="file"]',
-        title: 'div.bre-title-input textarea',
+        title: 'div.video-title input',
         editor: 'div[contenteditable="true"]',
         imageUpload: 'div.bre-settings__coverbox__img__icon',
         imagePickerButtons: 'div.bre-modal button.bre-btn',
         imagePickerConfirmText: '确认',
-        publishButtons: 'div.b-read-editor__btns button.bre-btn',
+        publishButtons: 'div.submit-container span',
         saveDraftButtonText: '存草稿',
-        confirmButtonText: '提交文章',
+        confirmButtonText: '立即投稿',
     }
     
     const fromRule = {
         title: {
-            min: 2,
-            max: 30,
+            min: 4,
+            max: 80,
         }
     }
 
-    const getEditorIframe = () => {
-        return document.querySelector(formElement.editorIframe);
-    }
+    // const getEditorIframe = () => {
+    //     return document.querySelector(formElement.editorIframe);
+    // }
 
-    const getEditorDocument = () => {
-        const editorIframe = getEditorIframe();
-        return editorIframe.contentWindow.document;
-    }
+    // const getEditorDocument = () => {
+    //     const editorIframe = getEditorIframe();
+    //     return editorIframe.contentWindow.document;
+    // }
     
     const autoFillContent = (contentData) => {
         console.log('autoFillContent');
@@ -128,24 +128,24 @@ export const bilibiliVideoPublisher = async (data) => {
         }
         editor.focus();
 
-        const content = contentData?.content;
+        const content = contentData?.description || contentData?.content;
 
-        if (editor.contentEditable === 'true') {
+        // if (editor.contentEditable === 'true') {
             editor.innerHTML = content;
             editor.dispatchEvent(new Event('input', { bubbles: true }));
             editor.dispatchEvent(new Event('change', { bubbles: true }));
-            return;
-        }
+        //     return;
+        // }
 
-        const editorPasteEvent = new ClipboardEvent('paste', {
-            bubbles: true,
-            cancelable: true,
-            clipboardData: new DataTransfer(),
-        });
-        editorPasteEvent.clipboardData.setData('text/html', content);
-        editor.dispatchEvent(editorPasteEvent);
-        editor.dispatchEvent(new Event('input', { bubbles: true }));
-        editor.dispatchEvent(new Event('change', { bubbles: true }));
+        // const editorPasteEvent = new ClipboardEvent('paste', {
+        //     bubbles: true,
+        //     cancelable: true,
+        //     clipboardData: new DataTransfer(),
+        // });
+        // editorPasteEvent.clipboardData.setData('text/plain', content);
+        // editor.dispatchEvent(editorPasteEvent);
+        // editor.dispatchEvent(new Event('input', { bubbles: true }));
+        // editor.dispatchEvent(new Event('change', { bubbles: true }));
     };
 
     const base64ToBinary = (base64) => {

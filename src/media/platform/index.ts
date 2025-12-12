@@ -352,7 +352,7 @@ export const platforms = reactive({
             sort: 2,
             status: 'enabled',
         }),
-        bilibili: createPlatform('article', 'bilibili', {
+        bilibili: createPlatform('video', 'bilibili', {
             name: '哔哩哔哩',
             publishUrl: 'https://member.bilibili.com/platform/upload/video/frame',
             sort: 3,

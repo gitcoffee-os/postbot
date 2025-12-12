@@ -83,20 +83,20 @@ export const bilibiliArticlePublisher = async (data) => {
 
     const formElement = {
         editorIframe: '#edit-article-box iframe',
-        title: 'div.video-title input',
+        title: 'div.bre-title-input textarea',
         editor: 'div[contenteditable="true"]',
         imageUpload: 'div.bre-settings__coverbox__img__icon',
         imagePickerButtons: 'div.bre-modal button.bre-btn',
         imagePickerConfirmText: '确认',
-        publishButtons: 'div.submit-container span',
+        publishButtons: 'div.b-read-editor__btns button.bre-btn',
         saveDraftButtonText: '存草稿',
-        confirmButtonText: '立即投稿',
+        confirmButtonText: '提交文章',
     }
     
     const fromRule = {
         title: {
-            min: 4,
-            max: 80,
+            min: 0,
+            max: 40,
         }
     }
 
@@ -311,6 +311,8 @@ export const bilibiliArticlePublisher = async (data) => {
     await sleep(1000);
 
     editorDocument = getEditorDocument();
+    
+    await observeElement(formElement.editor);
 
     autoFillContent(processedData);
     await sleep(5000);
