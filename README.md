@@ -37,6 +37,8 @@
 <br />
 ![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.1)
 <br />
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.1)
+<br />
 ![postbot-sidebar](https://postbot.exmay.com/docs/images/postbot_sidebar.png)
 
 ## 🌟 核心特性
