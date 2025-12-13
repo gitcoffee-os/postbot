@@ -37,6 +37,9 @@ import { bilibiliVideoPublisher } from "./platform/video/bilibili.publisher";
 import { toutiaoVideoPublisher } from "./platform/video/toutiao.publisher";
 import { weixinChannelsVideoPublisher } from "./platform/video/weixinChannels.publisher";
 import { qqOmVideoPublisher } from "./platform/video/qqOm.publisher";
+import { xiaohongshuVideoPublisher } from "./platform/video/xiaohongshu.publisher";
+import { weiboVideoPublisher } from "./platform/video/weibo.publisher";
+import { zhihuVideoPublisher } from "./platform/video/zhihu.publisher";
 
 export const publisher = reactive({
     article: {
@@ -69,6 +72,9 @@ export const publisher = reactive({
         toutiao: toutiaoVideoPublisher,
         weixin_channels: weixinChannelsVideoPublisher,
         qq_om: qqOmVideoPublisher,
+        xiaohongshu: xiaohongshuVideoPublisher,
+        weibo: weiboVideoPublisher,
+        zhihu: zhihuVideoPublisher,
     }
 });
 

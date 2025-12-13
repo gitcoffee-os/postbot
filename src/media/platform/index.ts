@@ -376,6 +376,24 @@ export const platforms = reactive({
             sort: 6,
             status: 'enabled',
         }),
+        xiaohongshu: createPlatform('video', 'xiaohongshu', {
+            name: '小红书',
+            publishUrl: 'https://creator.xiaohongshu.com/publish/publish?from=menu&target=video',
+            sort: 7,
+            status: 'enabled',
+        }),
+        weibo: createPlatform('video', 'weibo', {
+            name: '微博',
+            publishUrl: 'https://weibo.com/upload/channel',
+            sort: 8,
+            status: 'enabled',
+        }),
+        zhihu: createPlatform('video', 'zhihu', {
+            name: '知乎',
+            publishUrl: 'https://www.zhihu.com/zvideo/upload-video',
+            sort: 9,
+            status: 'enabled',
+        }),
     },
 });
 
