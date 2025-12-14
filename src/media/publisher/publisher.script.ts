@@ -41,6 +41,10 @@ import { xiaohongshuVideoPublisher } from "./platform/video/xiaohongshu.publishe
 import { weiboVideoPublisher } from "./platform/video/weibo.publisher";
 import { zhihuVideoPublisher } from "./platform/video/zhihu.publisher";
 
+import { music163AudioPublisher } from "./platform/audio/music163.publisher";
+import { qqmusicAudioPublisher } from "./platform/audio/qqmusic.publisher";
+import { ximalayaAudioPublisher } from "./platform/audio/ximalaya.publisher";
+
 export const publisher = reactive({
     article: {
         weixin: weixinArticlePublisher,
@@ -75,6 +79,11 @@ export const publisher = reactive({
         xiaohongshu: xiaohongshuVideoPublisher,
         weibo: weiboVideoPublisher,
         zhihu: zhihuVideoPublisher,
+    },
+    audio: {
+        music163: music163AudioPublisher,
+        qqmusic: qqmusicAudioPublisher,
+        ximalaya: ximalayaAudioPublisher,
     }
 });
 

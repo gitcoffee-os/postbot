@@ -21,6 +21,10 @@ import { getGroupArticlePublishUrl } from "~media/publisher/platform/article/zsx
 
 import { getGroupTopicPublishUrl } from "~media/publisher/platform/moment/zsxq.publisher";
 
+import { getVoicelistPublishUrl } from "~media/publisher/platform/audio/music163.publisher"; 
+import { getQqMusicAlbumPublishUrl } from "~media/publisher/platform/audio/qqmusic.publisher"; 
+import { getXimalayaAlbumPublishUrl } from "~media/publisher/platform/audio/ximalaya.publisher";
+
 export const platformMetas = reactive({
     weixin: {
         platformName: '微信公众号',
@@ -202,6 +206,45 @@ export const platformMetas = reactive({
         faviconUrl: 'https://wx.zsxq.com/favicon.ico',
         tags: ['CN'],
         sort: 14,
+        status: 'enabled',
+    },
+    music163: {
+        platformName: '网易云音乐',
+        name: '网易云音乐',
+        code: 'music163',
+        site: 'https://music.163.com/',
+        homepage: 'https://music.163.com/st/ncreator/',
+        mediaInfoUrl: 'https://music.163.com/st/ncreator/',
+        voicesUrl: 'https://music.163.com/st/ncreator/manage/voicelist/display',
+        faviconUrl: 'https://music.163.com/favicon.ico',
+        tags: ['CN'],
+        sort: 60,
+        status: 'enabled',
+    },
+    qqmusic: {
+        platformName: 'QQ音乐(TME播客)',
+        name: 'QQ音乐(TME播客)',
+        code: 'qqmusic',
+        site: 'https://y.qq.com/',
+        homepage: 'https://mp.tencentmusic.com/',
+        mediaInfoUrl: 'https://mp.tencentmusic.com/index',
+        albumsUrl: 'https://mp.tencentmusic.com/content/album/list',
+        faviconUrl: 'https://y.qq.com/favicon.ico',
+        tags: ['CN'],
+        sort: 61,
+        status: 'enabled',
+    },
+    ximalaya: {
+        platformName: '喜马拉雅',
+        name: '喜马拉雅',
+        code: 'ximalaya',
+        site: 'https://www.ximalaya.com/',
+        homepage: 'https://studio.ximalaya.com/',
+        mediaInfoUrl: 'https://studio.ximalaya.com/',
+        albumsUrl: 'https://studio.ximalaya.com/albumClassify',
+        faviconUrl: 'https://www.ximalaya.com/favicon.ico',
+        tags: ['CN'],
+        sort: 62,
         status: 'enabled',
     },
 });
@@ -392,6 +435,29 @@ export const platforms = reactive({
             name: '知乎',
             publishUrl: 'https://www.zhihu.com/zvideo/upload-video',
             sort: 9,
+            status: 'enabled',
+        }),
+    },
+    audio: {
+        music163: createPlatform('audio', 'music163', {
+            name: '网易云音乐',
+            // publishUrl: 'https://music.163.com/st/ncreator/upload',
+            publishUrl: getVoicelistPublishUrl,
+            sort: 1,
+            status: 'enabled',
+        }),
+        qqmusic: createPlatform('audio', 'qqmusic', {
+            name: 'QQ音乐(TME播客)',
+            // publishUrl: 'https://mp.tencentmusic.com/content/program/create',
+            publishUrl: getQqMusicAlbumPublishUrl,
+            sort: 2,
+            status: 'enabled',
+        }),
+        ximalaya: createPlatform('audio', 'ximalaya', {
+            name: '喜马拉雅',
+            // publishUrl: 'https://studio.ximalaya.com/upload',
+            publishUrl: getXimalayaAlbumPublishUrl,
+            sort: 3,
             status: 'enabled',
         }),
     },
