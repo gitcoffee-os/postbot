@@ -24,6 +24,9 @@ import { getGroupTopicPublishUrl } from "~media/publisher/platform/moment/zsxq.p
 import { getVoicelistPublishUrl } from "~media/publisher/platform/audio/music163.publisher"; 
 import { getQqMusicAlbumPublishUrl } from "~media/publisher/platform/audio/qqmusic.publisher"; 
 import { getXimalayaAlbumPublishUrl } from "~media/publisher/platform/audio/ximalaya.publisher";
+import { getQingtingAlbumPublishUrl } from "~media/publisher/platform/audio/qingting.publisher";
+import { getLizhiAlbumPublishUrl } from "~media/publisher/platform/audio/lizhi.publisher";
+import { getXiaoyuzhoufmAlbumPublishUrl } from "~media/publisher/platform/audio/xiaoyuzhoufm.publisher";
 
 export const platformMetas = reactive({
     weixin: {
@@ -247,6 +250,45 @@ export const platformMetas = reactive({
         sort: 62,
         status: 'enabled',
     },
+    qingting: {
+        platformName: '蜻蜓FM',
+        name: '蜻蜓FM',
+        code: 'qingting',
+        site: 'https://www.qtfm.cn/',
+        homepage: 'https://admin.qingting.fm/',
+        mediaInfoUrl: 'https://admin.qingting.fm/',
+        albumsUrl: 'https://admin.qingting.fm/content/channels',
+        faviconUrl: 'https://www.qtfm.cn/favicon.ico',
+        tags: ['CN'],
+        sort: 63,
+        status: 'enabled',
+    },
+    lizhi: {
+        platformName: '荔枝FM',
+        name: '荔枝FM',
+        code: 'lizhi',
+        site: 'https://www.lizhi.fm/',
+        homepage: 'https://nj.lizhi.fm/',
+        mediaInfoUrl: 'https://nj.lizhi.fm/',
+        albumsUrl: 'https://nj.lizhi.fm/static/newsite/#/manage/sheet',
+        faviconUrl: 'https://www.lizhi.fm/favicon.ico',
+        tags: ['CN'],
+        sort: 64,
+        status: 'enabled',
+    },
+    xiaoyuzhoufm: {
+        platformName: '小宇宙',
+        name: '小宇宙',
+        code: 'xiaoyuzhoufm',
+        site: 'https://www.xiaoyuzhoufm.com/',
+        homepage: 'https://podcaster.xiaoyuzhoufm.com/',
+        mediaInfoUrl: 'https://podcaster.xiaoyuzhoufm.com/',
+        albumsUrl: '',
+        faviconUrl: 'https://www.xiaoyuzhoufm.com/favicon.ico',
+        tags: ['CN'],
+        sort: 65,
+        status: 'enabled',
+    },
 });
 
 // 辅助函数：合并 platformMetas 和个性化属性
@@ -458,6 +500,27 @@ export const platforms = reactive({
             // publishUrl: 'https://studio.ximalaya.com/upload',
             publishUrl: getXimalayaAlbumPublishUrl,
             sort: 3,
+            status: 'enabled',
+        }),
+        qingting: createPlatform('audio', 'qingting', {
+            name: '蜻蜓FM',
+            // publishUrl: 'https://admin.qingting.fm/content/upload_program',
+            publishUrl: getQingtingAlbumPublishUrl,
+            sort: 4,
+            status: 'enabled',
+        }),
+        lizhi: createPlatform('audio', 'lizhi', {
+            name: '荔枝FM',
+            // publishUrl: 'https://nj.lizhi.fm/static/newsite/#/content/upload',
+            publishUrl: getLizhiAlbumPublishUrl,
+            sort: 5,
+            status: 'enabled',
+        }),
+        xiaoyuzhoufm: createPlatform('audio', 'xiaoyuzhoufm', {
+            name: '小宇宙',
+            // publishUrl: 'https://podcaster.xiaoyuzhoufm.com/podcasts/',
+            publishUrl: getXiaoyuzhoufmAlbumPublishUrl,
+            sort: 5,
             status: 'enabled',
         }),
     },

@@ -44,6 +44,9 @@ import { zhihuVideoPublisher } from "./platform/video/zhihu.publisher";
 import { music163AudioPublisher } from "./platform/audio/music163.publisher";
 import { qqmusicAudioPublisher } from "./platform/audio/qqmusic.publisher";
 import { ximalayaAudioPublisher } from "./platform/audio/ximalaya.publisher";
+import { qingtingAudioPublisher } from "./platform/audio/qingting.publisher";
+import { lizhiAudioPublisher } from "./platform/audio/lizhi.publisher";
+import { xiaoyuzhoufmAudioPublisher } from "./platform/audio/xiaoyuzhoufm.publisher";
 
 export const publisher = reactive({
     article: {
@@ -84,6 +87,9 @@ export const publisher = reactive({
         music163: music163AudioPublisher,
         qqmusic: qqmusicAudioPublisher,
         ximalaya: ximalayaAudioPublisher,
+        qingting: qingtingAudioPublisher,
+        lizhi: lizhiAudioPublisher,
+        xiaoyuzhou: xiaoyuzhoufmAudioPublisher,
     }
 });
 
