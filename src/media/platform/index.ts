@@ -19,6 +19,8 @@ import { getNewPublishUrl } from "~media/publisher/platform/article/weixin.publi
 
 import { getGroupArticlePublishUrl } from "~media/publisher/platform/article/zsxq.publisher";
 
+import { getMomentPublishUrl } from "~media/publisher/platform/moment/weixin.publisher";
+
 import { getGroupTopicPublishUrl } from "~media/publisher/platform/moment/zsxq.publisher";
 
 import { getVoicelistPublishUrl } from "~media/publisher/platform/audio/music163.publisher"; 
@@ -321,6 +323,7 @@ export const platforms = reactive({
         xiaohongshu: createPlatform('article', 'xiaohongshu', {
             name: '小红书(长文|图文)',
             publishUrl: 'https://creator.xiaohongshu.com/publish/publish?from=menu',
+            // publishurl: "https://creator.xiaohongshu.com/publish/publish?from=menu&target=article",
             sort: 3,
             status: 'enabled',
         }),
@@ -348,45 +351,57 @@ export const platforms = reactive({
             sort: 7,
             status: 'enabled',
         }),
+        weixin_channels: createPlatform('article', 'weixin_channels', {
+            name: '视频号(图文)',
+            publishUrl: 'https://channels.weixin.qq.com/platform/post/finderNewLifeCreate',
+            sort: 8,
+            status: 'enabled',
+        }),
         douyin: createPlatform('article', 'douyin', {
             name: '抖音(文章)',
             publishUrl: 'https://creator.douyin.com/creator-micro/content/post/article?default-tab=5&enter_from=publish_page&media_type=article&type=new',
-            sort: 8,
+            sort: 9,
             status: 'enabled',
         }),
         kuaishou: createPlatform('article', 'kuaishou', {
             name: '快手(图文)',
             publishUrl: 'https://cp.kuaishou.com/article/publish/video?tabType=2',
-            sort: 9,
+            sort: 10,
             status: 'enabled',
         }),
         bilibili: createPlatform('article', 'bilibili', {
             name: '哔哩哔哩(专栏)',
             publishUrl: 'https://member.bilibili.com/platform/upload/text/edit',
-            sort: 10,
+            sort: 11,
             status: 'enabled',
         }),
         douban: createPlatform('article', 'douban', {
             name: '豆瓣(写日记)',
             publishUrl: 'https://www.douban.com/note/create',
-            sort: 11,
+            sort: 12,
             status: 'enabled',
         }),
         jianshu: createPlatform('article', 'jianshu', {
             name: '简书',
             publishUrl: 'https://www.jianshu.com/writer',
-            sort: 12,
+            sort: 13,
             status: 'enabled',
         }),
         zsxq: createPlatform('article', 'zsxq', {
             name: '知识星球',
             publishUrl: getGroupArticlePublishUrl,
             icon: 'https://wx.zsxq.com/assets_dweb/images/favicon_32.ico',
-            sort: 13,
+            sort: 14,
             status: 'enabled',
         }),
     },
     moment: {
+        weibo: createPlatform('moment', 'weibo', {
+            name: '微博',
+            publishUrl: 'https://weibo.com/',
+            sort: 1,
+            status: 'enabled',
+        }),
         toutiao: createPlatform('moment', 'toutiao', {
             name: '微头条',
             publishUrl: 'https://mp.toutiao.com/profile_v4/weitoutiao/publish',
@@ -399,22 +414,52 @@ export const platforms = reactive({
             sort: 3,
             status: 'enabled',
         }),
-        douyin: createPlatform('moment', 'douyin', {
-            name: '抖音(文章)',
-            publishUrl: 'https://creator.douyin.com/creator-micro/content/post/article?default-tab=5&enter_from=publish_page&media_type=article&type=new',
+        baijiahao: createPlatform('moment', 'baijiahao', {
+            name: '百家号',
+            publishUrl: 'https://baijiahao.baidu.com/builder/rc/edit?type=events',
+            sort: 4,
+            status: 'enabled',
+        }),
+        zhihu: createPlatform('moment', 'zhihu', {
+            name: '知乎(写想法)',
+            publishUrl: 'https://www.zhihu.com/creator',
+            sort: 5,
+            status: 'enabled',
+        }),
+        weixin: createPlatform('moment', 'weixin', {
+            name: '公众号(图文)',
+            publishUrl: getMomentPublishUrl,
+            sort: 6,
+            status: 'enabled',
+        }),
+        weixin_channels: createPlatform('moment', 'weixin_channels', {
+            name: '视频号(图文)',
+            publishUrl: 'https://channels.weixin.qq.com/platform/post/finderNewLifeCreate',
             sort: 7,
+            status: 'enabled',
+        }),
+        douyin: createPlatform('moment', 'douyin', {
+            name: '抖音(图文)',
+            publishUrl: 'https://creator.douyin.com/creator-micro/content/upload?default-tab=3',
+            sort: 8,
             status: 'enabled',
         }),
         kuaishou: createPlatform('moment', 'kuaishou', {
             name: '快手(图文)',
             publishUrl: 'https://cp.kuaishou.com/article/publish/video?tabType=2',
-            sort: 8,
+            sort: 9,
             status: 'enabled',
         }),
         bilibili: createPlatform('moment', 'bilibili', {
             name: '哔哩哔哩(专栏)',
             publishUrl: 'https://member.bilibili.com/platform/upload/text/edit',
-            sort: 9,
+            sort: 10,
+            status: 'enabled',
+        }),
+        douban: createPlatform('moment', 'douban', {
+            name: '豆瓣',
+            publishUrl: 'https://www.douban.com/',
+            sort: 11,
             status: 'enabled',
         }),
         zsxq: createPlatform('moment', 'zsxq', {

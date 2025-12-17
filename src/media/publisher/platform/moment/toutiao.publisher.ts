@@ -76,10 +76,13 @@ export const toutiaoMomentPublisher = async (data) => {
     };
 
     const formElement = {
-        editor: 'textarea[placeholder="分享新鲜事..."]',
+        emptyButton: 'span.wtt-publish-message-opr',
+        editor: 'div[contenteditable="true"]',
+        imageAddButtons: 'button.syl-toolbar-button',
+        imageAddText: '图片',
         imageUpload: 'input[type="file"]',
-        imageUploadButton: 'button[data-e2e="microblog-image-upload-btn"]',
-        publishButton: 'button[data-e2e="microblog-publish-btn"]',
+        confirmUploadButton: 'button[data-e2e="imageUploadConfirm-btn"]:not([disabled])',
+        publishButtons: 'button.publish-btn',
         publishButtonText: '发布',
     }
 
@@ -155,13 +158,21 @@ export const toutiaoMomentPublisher = async (data) => {
     const uploadImages = async (images) => {
         console.log('images', images);
 
-        const imageUploadButton = await observeElement(formElement.imageUploadButton);
-        if (!imageUploadButton) {
+        const imageAddButtons = document.querySelectorAll(formElement.imageAddButtons);
+        const imageAddButton = Array.from(imageAddButtons)?.find((button) => button.textContent?.includes(formElement.imageAddText));
+
+        if (!imageAddButton) {
             throw new Error('未找到图片上传按钮');
         }
 
         // 点击图片上传按钮
-        imageUploadButton.click();
+        // imageAddButton.click();
+
+        imageAddButton.dispatchEvent(new Event('click', {
+            bubbles: true,
+            cancelable: true
+        }));
+
         await sleep(1000);
 
         const imageUpload = await observeElement(formElement.imageUpload);
@@ -174,17 +185,25 @@ export const toutiaoMomentPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -194,22 +213,47 @@ export const toutiaoMomentPublisher = async (data) => {
 
         imageUpload.files = dataTransfer.files;
         imageUpload.dispatchEvent(new Event('change', { bubbles: true }));
+        console.log('图片上传事件已发送');
+        await sleep(5000);
+
+        const confirmUploadButton = await observeElement(formElement.confirmUploadButton, 100000);
+        if (!confirmUploadButton) {
+            return;
+        }
+
+        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
         await sleep(2000);
-        console.log('图片上传成功');
     }
 
     const autoFillContent = async (contentData) => {
-        const editor = await observeElement(formElement.editor);
+        const editor = await observeElement(formElement.editor) as HTMLElement;
         console.log('editor', editor);
         if (!editor) {
             console.log('未找到编辑器');
             return;
         }
+
+        const emptyButton = document.querySelector(formElement.emptyButton) as HTMLElement;
+
+        if (emptyButton) {
+            emptyButton.dispatchEvent(new Event('click', { bubbles: true }));
+        }
+
         editor.focus();
 
         // 填写内容
         const content = contentData?.content?.slice(0, fromRule.content.max) || '';
-        (editor as HTMLTextAreaElement).value = content;
+        // (editor as HTMLTextAreaElement).value = content;
+        // editor.dispatchEvent(new Event('input', { bubbles: true }));
+        // editor.dispatchEvent(new Event('change', { bubbles: true }));
+
+        const editorPasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: new DataTransfer(),
+        });
+        editorPasteEvent.clipboardData.setData('text/plain', content);
+        editor.dispatchEvent(editorPasteEvent);
         editor.dispatchEvent(new Event('input', { bubbles: true }));
         editor.dispatchEvent(new Event('change', { bubbles: true }));
     }
@@ -227,14 +271,14 @@ export const toutiaoMomentPublisher = async (data) => {
     await observeElement(formElement.editor);
     await sleep(1000);
 
+    // 填写内容
+    await autoFillContent(contentData);
+
     // 先上传图片（如果有）
     if (contentData?.images && contentData.images.length > 0) {
         await uploadImages(contentData.images);
         await sleep(2000);
     }
-
-    // 填写内容
-    await autoFillContent(contentData);
 
     // 如果开启自动发布
     if (contentData.isAutoPublish) {

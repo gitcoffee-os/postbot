@@ -78,6 +78,16 @@ export const xiaohongshuMomentPublisher = async (data) => {
     };
 
     const formElement = {
+        // 长文
+        uploadContentButtons: 'div.upload-content button',
+        uploadContextText: '新的创作',
+        contentTitle: 'textarea.d-text[placeholder="输入标题"]',
+        contentEditor: 'div.rich-editor-content div[contenteditable="true"]',
+        contentLayoutButtons: 'div.d-button-content span.d-text',
+        contentLayoutText: '一键排版',
+        contentNextButtons: 'button',
+        contentNextText: '下一步',
+        // 图文
         uploadButtons: 'span[class="title"]',
         uploadImageButtonText: '上传图文',
         uploadVideoButtonText: '上传视频',
@@ -174,17 +184,25 @@ export const xiaohongshuMomentPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {

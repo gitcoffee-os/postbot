@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const bilibiliArticlePublisher = async (data) => {
-    console.log('bilibiliArticlePublisher data', data);
+export const weixinChannelsMomentPublisher = async (data) => {
+    console.log('weixinChannelsMomentPublisher data', data);
 
     // const { contentData, processedData } = data;
 
@@ -46,6 +46,8 @@ export const bilibiliArticlePublisher = async (data) => {
           if (selector instanceof Function) {
             checkElement = selector;
           } else {
+            console.log('editorDocument', editorDocument);
+            console.log('document', document);
             checkElement = () => (editorDocument || document).querySelector(selector);
           }
       
@@ -68,6 +70,8 @@ export const bilibiliArticlePublisher = async (data) => {
           });
       
           // 启动观察
+          console.log('editorDocument', editorDocument);
+          console.log('document', document);
           observer.observe((editorDocument || document).body, {
             childList: true,
             subtree: true,
@@ -80,23 +84,28 @@ export const bilibiliArticlePublisher = async (data) => {
           }, timeout);
         });
       };
-
+    
     const formElement = {
-        editorIframe: '#edit-article-box iframe',
-        title: 'div.bre-title-input textarea',
-        editor: 'div[contenteditable="true"]',
-        imageUpload: 'div.bre-settings__coverbox__img__icon',
-        imagePickerButtons: 'div.bre-modal button.bre-btn',
-        imagePickerConfirmText: '确认',
-        publishButtons: 'div.b-read-editor__btns button.bre-btn',
-        saveDraftButtonText: '存草稿',
-        confirmButtonText: '提交文章',
+        wujieApp: 'wujie-app',
+        editorIframe: 'iframe[name="content"]',
+        title: 'input.weui-desktop-form__input',
+        editor: 'div.input-editor',
+        // videoUpload: 'input[type="file"]',
+        coverDelete: '.article-cover-delete',
+        imageUploadAdd: 'div.article-cover-add',
+        imageUploadTabs: 'div.byte-tabs-header-title',
+        imageUploadTabText: '上传图片',
+        imageUpload: 'input[type="file"]',
+        confirmUploadButton: 'button[data-e2e="imageUploadConfirm-btn"]',
+        publishButtons: 'div.form-btns button.weui-desktop-btn',
+        publishButtonText: '保存草稿',
+        confirmButtonText: '发表',
     }
     
     const fromRule = {
         title: {
-            min: 0,
-            max: 40,
+            min: 6,
+            max: 16,
         }
     }
 
@@ -105,8 +114,12 @@ export const bilibiliArticlePublisher = async (data) => {
     }
 
     const getEditorDocument = () => {
-        const editorIframe = getEditorIframe();
-        return editorIframe.contentWindow.document;
+
+        const wujieApp = document.querySelector(formElement.wujieApp);
+
+        // const editorIframe = getEditorIframe();
+        // return editorIframe.contentWindow.document;
+        return wujieApp?.shadowRoot;
     }
     
     const autoFillContent = (contentData) => {
@@ -125,24 +138,16 @@ export const bilibiliArticlePublisher = async (data) => {
             console.log('未找到编辑器');
             return;
         }
+
+        const content = contentData?.description || contentData?.content;
+
         editor.focus();
-
-        const content = contentData?.content;
-
-        if (editor.contentEditable === 'true') {
-            editor.innerHTML = content;
-            editor.dispatchEvent(new Event('input', { bubbles: true }));
-            editor.dispatchEvent(new Event('change', { bubbles: true }));
-            return;
-        }
-
-        const editorPasteEvent = new ClipboardEvent('paste', {
-            bubbles: true,
-            cancelable: true,
-            clipboardData: new DataTransfer(),
-        });
-        editorPasteEvent.clipboardData.setData('text/html', content);
+        const editorPasteEvent = pasteEvent();
+        editorPasteEvent.clipboardData.setData('text/plain', content);
         editor.dispatchEvent(editorPasteEvent);
+
+        // (editor as HTMLTextAreaElement).value = content;
+
         editor.dispatchEvent(new Event('input', { bubbles: true }));
         editor.dispatchEvent(new Event('change', { bubbles: true }));
     };
@@ -258,26 +263,95 @@ export const bilibiliArticlePublisher = async (data) => {
         console.log('图片上传成功');
     }
     
-    const autoFillCover = async(cover) => {
-        const images = [];
+    // const autoFillCover = async(cover) => {
+    //     const clearDefaultCovers = async() => {
+    //         const coverDeleteElements = editorDocument.querySelectorAll(formElement.coverDelete);
+    //         if (!coverDeleteElements) {
+    //             return;
+    //         }
+    //         console.log('coverDeleteElements length', coverDeleteElements.length);
+    //         for (const coverDeleteElement of coverDeleteElements) {
+    //             if (!coverDeleteElement) {
+    //                 continue;
+    //             }
+    //             console.log('coverDelete trrigle click');
+    //             (coverDeleteElement as HTMLElement).click();
+    //         }
+    //         await sleep(1000);
+    //     };
 
-        console.log('cover', cover);
-        for (const image of cover) {
-            images.push({
-                url: image,
-            });
-        }
+    //     await clearDefaultCovers();
 
-        console.log('images', images);
-        await uploadImages(images);
-        await sleep(2000);
-    };
+    //     const imageUploadAdd = editorDocument.querySelector(formElement.imageUploadAdd) as HTMLElement;
+    //     if (!imageUploadAdd) {
+    //         return;
+    //     }
+
+    //     imageUploadAdd.click();
+    //     await sleep(1000);
+
+    //     const imageUploadTabs = editorDocument.querySelectorAll(formElement.imageUploadTabs);
+    //     const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
+    //     if (!imageUploadTab) {
+    //         return;
+    //     }
+    //     (imageUploadTab as HTMLElement).click();
+    //     await sleep(1000);
+
+    //     const images = [];
+
+    //     console.log('cover', cover);
+    //     for (const image of cover) {
+    //         images.push({
+    //             url: image,
+    //         });
+    //     }
+
+    //     console.log('images', images);
+    //     await uploadImages(images);
+    //     await sleep(2000);
+
+    //     const confirmUploadButton = editorDocument.querySelector(formElement.confirmUploadButton);
+    //     if (!confirmUploadButton) {
+    //         return;
+    //     }
+
+    //     confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
+    //     await sleep(2000);
+    // };
+
+    // const autoUploadMoment = async(videoData) => {
+    //     console.log('videoData', videoData);
+
+    //     const videoUpload = (await observeElement(formElement.videoUpload)) as HTMLElement;
+    //     if (!videoUpload) {
+    //         throw new Error('未找到视频上传元素');
+    //     }
+
+    //     console.log('videoUpload', videoUpload);
+
+    //     // const blob = new Blob([videoData.videoBuffer], { type: videoData.type });
+
+    //     const response = await fetch(videoData.objectUrl);
+    //     const blob = await response.blob();
+
+    //     const file = new File([blob], videoData.name, { type: videoData.type });
+
+    //     const dataTransfer = new DataTransfer();
+    //     dataTransfer.items.add(file);
+
+    //     videoUpload.files = dataTransfer.files;
+    //     videoUpload.dispatchEvent(new Event('input', { bubbles: true }));
+    //     videoUpload.dispatchEvent(new Event('change', { bubbles: true }));
+    //     await sleep(2000);
+    //     console.log('视频上传事件已发送');
+    // }
     
-    const getSaveDraftButton = () => {
+    const getPublishButton = () => {
         const buttons = editorDocument.querySelectorAll(formElement.publishButtons);
-        const saveDraftButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.saveDraftButtonText));
-        console.log('saveDraftButton', saveDraftButton);
-        return saveDraftButton;
+        const publishButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.publishButtonText));
+        console.log('publishButton', publishButton);
+        return publishButton;
     }
 
     const getConfirmPublishButton = () => {
@@ -286,23 +360,19 @@ export const bilibiliArticlePublisher = async (data) => {
         console.log('confirmPublishButton', confirmPublishButton);
         return confirmPublishButton;
     }
-
-    const autoSaveDraft = async() => {
-        console.log('autoSaveDraft');
-        const saveDraftButton = getSaveDraftButton();
-        if (!saveDraftButton) {
-            console.log(`未找到${formElement.saveDraftButtonText}按钮`)
-            return;
-        }
-        console.log('trrigle publish button click');
-        saveDraftButton.dispatchEvent(new Event('click', {
-            bubbles: true,
-            cancelable: true
-        }));
-    }
     
     const autoPublish = async() => {
         console.log('autoPublish');
+        const publishButton = getPublishButton();
+        if (!publishButton) {
+            console.log(`未找到${formElement.publishButtonText}按钮`)
+            return;
+        }
+        console.log('trrigle publish button click');
+        publishButton.dispatchEvent(new Event('click', {
+            bubbles: true,
+            cancelable: true
+        }));
         
         const confirmPlublishButton = await observeElement(getConfirmPublishButton);
         if (!confirmPlublishButton) {
@@ -315,25 +385,36 @@ export const bilibiliArticlePublisher = async (data) => {
         }));
     }
 
-    await observeElement(formElement.editorIframe);
-    await sleep(1000);
-
-    editorDocument = getEditorDocument();
-    
-    await observeElement(formElement.editor);
-
-    autoFillContent(processedData);
     await sleep(5000);
 
-    // if (processedData?.cover) {
-    //     autoFillCover(processedData.cover);
-    // }
+    // await observeElement(formElement.editorIframe);
+    await observeElement(formElement.wujieApp);
+    await sleep(5000);
+
+    editorDocument = getEditorDocument();
+
+    await observeElement(formElement.imageUpload);
+    await sleep(1000);
+
+    // await autoUploadMoment(processedData.videoData);
+    // await sleep(1000);
+
+    await observeElement(formElement.editor);
+    await sleep(1000);
+
+    autoFillContent(processedData);
+    await sleep(1000);
+
+    await uploadImages(processedData.images);
+    await sleep(2000);
+
+    if (processedData?.cover) {
+        // autoFillCover(processedData.cover);
+    }
 
     if (contentData.isAutoPublish) {
         await sleep(5000);
         autoPublish();
-    } else {
-        // autoSaveDraft();
     }
 
 }
