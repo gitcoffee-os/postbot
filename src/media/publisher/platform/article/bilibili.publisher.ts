@@ -259,17 +259,21 @@ export const bilibiliArticlePublisher = async (data) => {
     }
     
     const autoFillCover = async(cover) => {
-        const images = [];
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
         await sleep(2000);
     };
     
@@ -325,9 +329,9 @@ export const bilibiliArticlePublisher = async (data) => {
     autoFillContent(processedData);
     await sleep(5000);
 
-    // if (processedData?.cover) {
-    //     autoFillCover(processedData.cover);
-    // }
+    if (processedData?.cover) {
+        autoFillCover(processedData.cover);
+    }
 
     if (contentData.isAutoPublish) {
         await sleep(5000);

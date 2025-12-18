@@ -90,7 +90,7 @@ export const weiboArticlePublisher = async (data) => {
         imageUploadTabs: 'div.n-tabs-tab[data-name="album"]',
         imageUploadTabText: '图片库',
         imageUpload: 'input[type="file"]',
-        imagePickers: 'div.image-item',
+        imagePickers: 'div.image-item img',
         imageNextButtons: 'div.n-dialog__content button.n-button',
         imageNextButtonText: '下一步',
         imageComfirmButtonText: '确定',
@@ -209,17 +209,25 @@ export const weiboArticlePublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -231,6 +239,19 @@ export const weiboArticlePublisher = async (data) => {
         imageUpload.dispatchEvent(new Event('change', { bubbles: true }));
         await sleep(2000);
         console.log('图片上传成功');
+    }
+
+    const getPickerImage = () => {
+        const imagePickers = document.querySelectorAll(formElement.imagePickers);
+        if (!imagePickers) {
+            return;
+        }
+
+        const picker = imagePickers[0]; 
+        if (picker && picker?.src.indexOf('https://') === 0) {
+            return picker;
+        }
+        return null;
     }
     
     const autoFillCover = async(cover) => {
@@ -268,33 +289,31 @@ export const weiboArticlePublisher = async (data) => {
         (imageUploadTab as HTMLElement).click();
         await sleep(1000);
 
-        const images = [];
+        const covers = [];
+        let imageName = null;
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
         await sleep(2000);
 
-        const image = images[0];
-
-        const imagePickers = document.querySelectorAll(formElement.imagePickers);
-        if (!imagePickers) {
-            return;
-        }
-
-        const picker = imagePickers[0]; // Array.from(imagePickers).find(element => element.textContent?.includes(image.name));
-
+        const picker = await observeElement(getPickerImage, 100000);
         if (!picker) {
             return;
         }
 
-        (picker as HTMLElement).click();
+        await sleep(2000);
+        (picker as HTMLElement).parentElement.click();
         await sleep(2000);
 
         const imageNextButtons = document.querySelectorAll(formElement.imageNextButtons);
@@ -394,14 +413,14 @@ export const weiboArticlePublisher = async (data) => {
     await sleep(5000);
 
     if (processedData?.cover) {
-        autoFillCover(processedData.cover);
+        await autoFillCover(processedData.cover);
     }
-
-    autoSaveDraf();
 
     if (contentData.isAutoPublish) {
         await sleep(5000);
         autoPublish();
+    } else {
+        autoSaveDraf();
     }
 
 }

@@ -65,6 +65,7 @@ export const publisher = reactive({
         weibo: weiboArticlePublisher,
         baijiahao: baijiahaoArticlePublisher,
         qq_om: qqOmArticlePublisher,
+        weixin_channels: weixinChannelsMomentPublisher,
         douyin: douyinArticlePublisher,
         bilibili: bilibiliArticlePublisher,
         kuaishou: kuaishouMomentPublisher,

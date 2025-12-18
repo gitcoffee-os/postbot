@@ -405,12 +405,32 @@ export const weixinChannelsMomentPublisher = async (data) => {
     autoFillContent(processedData);
     await sleep(1000);
 
-    await uploadImages(processedData.images);
-    await sleep(2000);
+    let allImages = [];
 
     if (processedData?.cover) {
-        // autoFillCover(processedData.cover);
+        for (const image of processedData?.cover) {
+            if (image instanceof Object) {
+                allImages.push(image);
+            } else {
+                allImages.push({
+                    url: image,
+                });
+            }
+        }
     }
+
+    const images = processedData?.images || processedData?.contentImages
+
+    if (images) {
+        allImages.push(...images);
+    }
+
+    await uploadImages(allImages);
+    await sleep(2000);
+
+    // if (processedData?.cover) {
+        // autoFillCover(processedData.cover);
+    // }
 
     if (contentData.isAutoPublish) {
         await sleep(5000);

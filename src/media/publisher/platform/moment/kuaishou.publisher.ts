@@ -281,7 +281,28 @@ export const kuaishouMomentPublisher = async (data) => {
     uploadImageButton.dispatchEvent(new Event('click', { bubbles: true }));
     await sleep(1000);
 
-    await uploadImages(contentData?.images || contentData?.contentImages);
+    let allImages = [];
+
+    if (processedData?.cover) {
+        for (const image of processedData?.cover) {
+            if (image instanceof Object) {
+                allImages.push(image);
+            } else {
+                allImages.push({
+                    url: image,
+                });
+            }
+        }
+    }
+
+    const images = processedData?.images || processedData?.contentImages
+
+    if (images) {
+        allImages.push(...images);
+    }
+
+    await uploadImages(allImages);
+
     await sleep(5000);
 
     await autoFillContent(contentData);

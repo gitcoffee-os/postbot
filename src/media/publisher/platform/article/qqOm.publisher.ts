@@ -80,6 +80,7 @@ export const qqOmArticlePublisher = async (data) => {
       };
     
     const formElement = {
+        emptyButton: 'div.omui-countdowntip a',
         title: '#omEditorTitle span[data-placeholder="请输入标题（5-64个字）"]',
         editor: 'div.ProseMirror[contenteditable="true"]',
         coverDelete: '.article-cover-delete',
@@ -87,6 +88,7 @@ export const qqOmArticlePublisher = async (data) => {
         imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label',
         imageUploadTabText: '本地上传',
         imageUpload: 'input[type="file"]',
+        imagePickers: 'li.omui-upload-image-item img',
         confirmUploadButton: 'div.omui-dialog-footer button.omui-button--primary',
         publishButtons: 'ul li button.omui-button',
         publishButtonText: '存草稿',
@@ -102,8 +104,17 @@ export const qqOmArticlePublisher = async (data) => {
         }
     }
     
-    const autoFillContent = (contentData) => {
+    const autoFillContent = async(contentData) => {
         console.log('autoFillContent');
+
+        const emptyButton = document.querySelector(formElement.emptyButton) as HTMLElement;
+
+        if (emptyButton) {
+            await sleep(2000);
+            emptyButton.click();
+            await sleep(2000);
+        }
+
         const titleTextarea = document.querySelector(formElement.title) as HTMLElement;
         console.log('titleTextarea', titleTextarea);
         if (titleTextarea) {
@@ -131,10 +142,10 @@ export const qqOmArticlePublisher = async (data) => {
         }
         editor.focus();
         // 先清空原草稿
-        editor.innerHTML = '';
-        const editorPasteEvent = pasteEvent();
-        editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
-        editor.dispatchEvent(editorPasteEvent);
+        editor.innerHTML = contentData?.content;
+        // const editorPasteEvent = pasteEvent();
+        // editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
+        // editor.dispatchEvent(editorPasteEvent);
         editor.dispatchEvent(new Event('input', { bubbles: true }));
         editor.dispatchEvent(new Event('change', { bubbles: true }));
     };
@@ -218,17 +229,25 @@ export const qqOmArticlePublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -240,6 +259,19 @@ export const qqOmArticlePublisher = async (data) => {
         imageUpload.dispatchEvent(new Event('change', { bubbles: true }));
         await sleep(2000);
         console.log('图片上传成功');
+    }
+
+    const getPickerImage = () => {
+        const imagePickers = document.querySelectorAll(formElement.imagePickers);
+        if (!imagePickers) {
+            return;
+        }
+
+        const picker = imagePickers[0]; 
+        if (picker && picker?.src.indexOf('https://') === 0) {
+            return picker;
+        }
+        return null;
     }
     
     const autoFillCover = async(cover) => {
@@ -277,18 +309,28 @@ export const qqOmArticlePublisher = async (data) => {
         (imageUploadTab as HTMLElement).click();
         await sleep(1000);
 
-        const images = [];
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
         await sleep(2000);
+
+        const picker = await observeElement(getPickerImage, 100000);
+
+        if (!picker) {
+            return;
+        }
 
         const confirmUploadButton = document.querySelector(formElement.confirmUploadButton);
         if (!confirmUploadButton) {
@@ -340,11 +382,12 @@ export const qqOmArticlePublisher = async (data) => {
     await observeElement(formElement.editor);
     await sleep(1000);
 
-    autoFillContent(processedData);
-    await sleep(5000);
+    await sleep(1000);
+    await autoFillContent(processedData);
+    await sleep(2000);
 
     if (processedData?.cover) {
-        autoFillCover(processedData.cover);
+        await autoFillCover(processedData.cover);
     }
 
     if (contentData.isAutoPublish) {

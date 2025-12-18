@@ -121,7 +121,7 @@ export const weixinArticlePublisher = async (data) => {
         editor: 'div.ProseMirror[contenteditable="true"]',
         imageUploadAdd: '.js_imagedialog',
         imageUpload: '.js_upload_btn_container input[type="file"]',
-        imageNextButtons: '.weui-desktop-btn_primary',
+        imageNextButtons: 'button.weui-desktop-btn_primary:not([disabled]',
         imagePickers: '.weui-desktop-img-picker__item',
         imageNextButtonText: '下一步',
         imageComfirmButtonText: '确认',
@@ -357,22 +357,35 @@ export const weixinArticlePublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
 
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+                files.push({
+                    url: image.url,
+                    name: image.name,
+                });
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
+
+                files.push({
+                    url: url,
+                    name: fileName,
+                });
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
-
-            files.push({
-                url: url,
-                name: fileName,
-            });
         }
 
         if (dataTransfer.files.length === 0) {
@@ -382,10 +395,42 @@ export const weixinArticlePublisher = async (data) => {
 
         imageUpload.files = dataTransfer.files;
         imageUpload.dispatchEvent(new Event('change', { bubbles: true }));
+        console.log('图片上传事件已发送');
         await sleep(2000);
-        console.log('图片上传成功');
 
         return files;
+    }
+
+    let imageName = null;
+    const getPickImage = () => {
+        const imagePickers = document.querySelectorAll(formElement.imagePickers);
+        if (!imagePickers) {
+            return;
+        }
+
+        const picker = Array.from(imagePickers).find(element => element.textContent?.includes(imageName));
+
+        return picker;
+    }
+
+    const getPickImageNextButton = () => {
+        const imageNextButtons = document.querySelectorAll(formElement.imageNextButtons);
+        if (!imageNextButtons) {
+            return;
+        }
+
+        const imageNextButton = Array.from(imageNextButtons).find(button => button.textContent?.includes(formElement.imageNextButtonText));
+        return imageNextButton;
+    }
+
+    const getPickImageComfirmButton = () => {
+        const nextButtons = document.querySelectorAll(formElement.imageNextButtons);
+        if (!nextButtons) {
+            return;
+        }
+
+        const comfirmButton = Array.from(nextButtons).find(button => button.textContent?.includes(formElement.imageComfirmButtonText));
+        return comfirmButton;
     }
 
     const autoFillCover = async (cover) => {
@@ -418,9 +463,13 @@ export const weixinArticlePublisher = async (data) => {
 
         console.log('cover', cover);
         for (const image of cover) {
-            covers.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
         console.log('covers', covers);
@@ -429,42 +478,30 @@ export const weixinArticlePublisher = async (data) => {
 
         const image = images[0];
 
-        const imagePickers = document.querySelectorAll(formElement.imagePickers);
-        if (!imagePickers) {
-            return;
-        }
-
-        const picker = Array.from(imagePickers).find(element => element.textContent?.includes(image.name));
-
+        imageName = image.name;
+        const picker = await observeElement(getPickImage, 100000);
         if (!picker) {
             return;
         }
-
+        
+        await sleep(2000);
         (picker as HTMLElement).click();
         await sleep(2000);
 
-        const imageNextButtons = document.querySelectorAll(formElement.imageNextButtons);
-        if (!imageNextButtons) {
-            return;
-        }
-
-        const imageNextButton = Array.from(imageNextButtons).find(button => button.textContent?.includes(formElement.imageNextButtonText));
+        const imageNextButton = await observeElement(getPickImageNextButton, 100000);
         if (!imageNextButton) {
             return;
         }
+        await sleep(2000);
         (imageNextButton as HTMLElement).click();
         await sleep(2000);
 
-        const nextButtons = document.querySelectorAll(formElement.imageNextButtons);
-        if (!nextButtons) {
-            return;
-        }
-
-        const comfirmButton = Array.from(nextButtons).find(button => button.textContent?.includes(formElement.imageComfirmButtonText));
+        const comfirmButton = await observeElement(getPickImageComfirmButton, 100000);
         if (!comfirmButton) {
             return;
         }
 
+        await sleep(2000);
         (comfirmButton as HTMLElement).click();
         await sleep(2000);
 

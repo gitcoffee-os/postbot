@@ -45,7 +45,7 @@ export const updateTabGroup = async (tabGroupId) => {
     await chrome.tabGroups.update(tabGroupId,
         {
             color: 'purple',
-            title: `PostBot发布助手`,
+            title: `PostBot 内容同步助手`,
         }
     );
 }

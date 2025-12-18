@@ -269,11 +269,32 @@ export const xiaohongshuMomentPublisher = async (data) => {
         throw new Error(`未找到${formElement.uploadImageButtonText}按钮元素`);
     }
 
+    await sleep(1000);
     uploadImageButton.click();
     uploadImageButton.dispatchEvent(new Event('click', { bubbles: true }));
     await sleep(1000);
 
-    await uploadImages(contentData?.images || contentData?.contentImages);
+    let allImages = [];
+
+    if (contentData?.cover) {
+        for (const image of contentData?.cover) {
+            if (image instanceof Object) {
+                allImages.push(image);
+            } else {
+                allImages.push({
+                    url: image,
+                });
+            }
+        }
+    }
+
+    const images = contentData?.images || contentData?.contentImages
+
+    if (images) {
+        allImages.push(...images);
+    }
+
+    await uploadImages(allImages);
     await sleep(5000);
 
     await autoFillContent(contentData);
