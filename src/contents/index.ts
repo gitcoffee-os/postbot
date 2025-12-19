@@ -25,7 +25,7 @@ export const config: PlasmoCSConfig = {
 
 import { createApp } from 'vue'
 import PostbotModal from './components/PostbotModal';
-import 'ant-design-vue/dist/reset.css';
+// import 'ant-design-vue/dist/reset.css';
 
 import { handleMessage } from "./services/message.services";
 

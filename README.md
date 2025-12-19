@@ -1,7 +1,7 @@
 <p align="center">
 	<img alt="logo" src="https://postbot.exmay.com/docs/images/postbot_logo.svg" width="150" height="150">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.1.5</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.1.6</h1>
 <h4 align="center">
 	一款开源的多平台内容同步分发生产力工具。
 	<br />
@@ -33,15 +33,15 @@
 <br />
 ![postbot-modal](https://postbot.exmay.com/docs/images/postbot_modal_dark.png)
 <br />
-![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.5)
+![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.6)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.5)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.6)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.5)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.6)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.5)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.6)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.5)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.6)
 <br />
 ![postbot-sidebar](https://postbot.exmay.com/docs/images/postbot_sidebar.png)
 
