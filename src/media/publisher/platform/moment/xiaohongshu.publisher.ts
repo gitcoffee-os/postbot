@@ -288,7 +288,10 @@ export const xiaohongshuMomentPublisher = async (data) => {
         }
     }
 
-    const images = contentData?.images || contentData?.contentImages
+    let images = contentData?.images;
+    if (!images || images.length === 0) {
+        images = contentData?.contentImages
+    }
 
     if (images) {
         allImages.push(...images);

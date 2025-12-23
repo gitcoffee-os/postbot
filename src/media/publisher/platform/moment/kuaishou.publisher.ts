@@ -295,7 +295,10 @@ export const kuaishouMomentPublisher = async (data) => {
         }
     }
 
-    const images = processedData?.images || processedData?.contentImages
+    let images = processedData?.images;
+    if (!images || images.length === 0) {
+        images = processedData?.contentImages
+    }
 
     if (images) {
         allImages.push(...images);

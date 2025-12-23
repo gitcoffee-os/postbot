@@ -194,6 +194,7 @@ export default defineComponent({
             h(
               FloatButton,
               {
+                shape: 'square',
                 //   badge: { count: 5, color: 'red' },
                 //   style: {
                 //     right: '50px',
