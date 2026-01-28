@@ -26,10 +26,22 @@ window.addEventListener('message', async (event) => {
   if (!request?.action) {
     return;
   }
-  // 验证消息来源是否可信
-  // 转发消息
+  if (!isValidOrigin(event.origin)) {
+    console.warn('Untrusted origin:', event.origin);
+    return;
+  }
   dispatchSendMessage(request, event);
 });
+
+const isValidOrigin = (origin: string): boolean => {
+  if (!origin) return false;
+  try {
+    const url = new URL(origin);
+    return url.hostname.endsWith('.exmay.com');
+  } catch {
+    return false;
+  }
+}
 
 const dispatchSendMessage = (request, event) => {
   console.log('dispatchSendMessage', request);

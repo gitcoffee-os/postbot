@@ -45,3 +45,4 @@ keys.json
 tsconfig.tsbuildinfo
 
 ._*
+.gitcoffee

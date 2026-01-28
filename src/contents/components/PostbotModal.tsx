@@ -150,7 +150,7 @@ export default defineComponent({
             //   h('div', {}, `${title.value} - 内容预览`)
             // ]),
             onOk: onOk,
-            zIndex: 10000,
+            zIndex: 1000000,
             // content: computed(() => getContent()),
           }, {
             title: () => h('div', {}, [

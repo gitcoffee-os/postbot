@@ -36,7 +36,7 @@ export const getSegmentFaultMetaInfo = (html) => {
         // 提取 sessionUser 信息
         const sessionUser = jsonData.props?.pageProps?.initialState?.global?.sessionUser;
         
-        if (!sessionUser || !sessionUser.user) {
+        if (!sessionUser || !sessionUser?.user) {
           throw new Error('未找到 sessionUser 数据');
         }
     

@@ -85,6 +85,7 @@ export const segmentfaultArticlePublisher = async (data) => {
     const formElement = {
         title: '#title',
         editor: '.sf-editor div.CodeMirror-code[role="presentation"]',
+        focusHelper: 'button.icon-outdent',
         submitButtons: 'div.d-none button.btn-primary',
         submitButtonText: '提交',
     }
@@ -97,6 +98,7 @@ export const segmentfaultArticlePublisher = async (data) => {
     }
 
     const autoFillContent = async (contentData) => {
+        await sleep(2000);
         console.log('autoFillContent');
         const titleInput = await observeElement(formElement.title) as HTMLElement;
         console.log('titleInput', titleInput);
@@ -116,11 +118,22 @@ export const segmentfaultArticlePublisher = async (data) => {
             return;
         }
         editor.focus();
+        // editor.dispatchEvent(new Event('focus', { bubbles: true }));
+
+        const focusHelper = await observeElement(formElement.focusHelper) as HTMLElement;
+        focusHelper.click();
+
+        const content = contentData?.content;
+        // console.log('content', content);
         const editorPasteEvent = pasteEvent();
-        editorPasteEvent.clipboardData.setData('text/html', contentData?.content);
+        editorPasteEvent.clipboardData.setData('text/html', content);
+        editorPasteEvent.clipboardData.setData('text/plain', content);
+
         editor.dispatchEvent(editorPasteEvent);
         editor.dispatchEvent(new Event('input', { bubbles: true }));
         editor.dispatchEvent(new Event('change', { bubbles: true }));
+
+        await sleep(1000);
     };
 
     const autoPublish = () => {
