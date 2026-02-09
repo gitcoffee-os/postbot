@@ -22,7 +22,7 @@
           <Switch v-model:checked="showFlowButton" checked-children="显示同步浮动按钮" un-checked-children="隐藏同步浮动按钮" @change="onShowSwitchChange" />
         </div>
         <div style="margin:20px 0;">
-          <Switch v-model:checked="showExploreVersion" checked-children="启用探索体验版" un-checked-children="不启用探索体验版" @change="onSwitchChange" />
+          <Switch v-model:checked="config.exploreVersionEnabled" checked-children="启用探索体验版" un-checked-children="不启用探索体验版" @change="onSwitchChange" />
         </div>
         <div class="postbot-ui-main">
             
@@ -144,7 +144,7 @@
 
   const showFlowButton = ref(true);
 
-  const showExploreVersion = ref(config.value.exploreVersionEnabled);
+
   
   // 显示模态框
   const showModal = () => {
@@ -182,7 +182,6 @@
   }
 
   const onSwitchChange = (checked) => {
-    showExploreVersion.value = checked;
     config.value.exploreVersionEnabled = checked;
     saveExploreVersionSetting(checked);
   }
