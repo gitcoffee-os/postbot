@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BASE_URL } from "~config/config";
+import { getPostBotBaseUrl } from "~config/config";
 
 export const isLoginApi = async(params) => {
-    const response = await fetch(`${BASE_URL}/exmay/api/ums/member/islogin`, {
+    const response = await fetch(`${getPostBotBaseUrl()}/exmay/api/ums/member/islogin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ export const isLoginApi = async(params) => {
 }
 
 export const userInfoApi = async(params) => {
-  const response = await fetch(`${BASE_URL}/exmay/api/member/center/info`, {
+  const response = await fetch(`${getPostBotBaseUrl()}/exmay/api/member/center/info`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -31,7 +31,7 @@ import iconUrl from "~assets/icon.png";
 
 import { POSTBOT_ACTION } from '~message/postbot.action';
 
-import { BASE_URL } from '~config/config';
+import { getPostBotBaseUrl } from '~config/config';
 
 // import { state } from './postbot.data';
 
@@ -65,7 +65,7 @@ export default defineComponent({
         if (response.isLogin) {
           state.isModalVisible = true;
         } else {
-          window.open(`${BASE_URL}/exmay/postbot/media/publish`, '_blank');
+          window.open(`${getPostBotBaseUrl()}/exmay/postbot/media/publish`, '_blank');
         }
       });
 
@@ -84,7 +84,7 @@ export default defineComponent({
         data: contentData.value,
       });
 
-      const newWindow = window.open(`${BASE_URL}/exmay/postbot/media/publish`, '_blank');
+      const newWindow = window.open(`${getPostBotBaseUrl()}/exmay/postbot/media/publish`, '_blank');
       if (newWindow) {
         newWindow.onload = () => {
           console.log('同步数据');

@@ -17,7 +17,7 @@ import { getReaderData } from "~media/parser"
 
 import { state } from "../components/postbot.data"
 
-import { BASE_URL } from '~config/config';
+import { getPostBotBaseUrl } from '~config/config';
 
 import { handleMetaMessage } from "./meta.services";
 
@@ -29,7 +29,7 @@ export const handleMessage = (request, sender, sendResponse) => {
     let userInfo = {};
     switch (request.action) {
         case 'doLogin':
-            window.open(`${BASE_URL}/exmay/postbot/media/publish`, '_blank');
+            window.open(`${getPostBotBaseUrl()}/exmay/postbot/media/publish`, '_blank');
             sendResponse({});
             break;
         case 'getImages':

@@ -19,7 +19,10 @@
             <UserCard />
         </div>
         <div style="margin:20px 0;">
-          <Switch v-model:checked="showFlowButton" checked-children="显示同步浮动按钮" un-checked-children="隐藏同步浮动按钮" @change="onSwitchChange" />
+          <Switch v-model:checked="showFlowButton" checked-children="显示同步浮动按钮" un-checked-children="隐藏同步浮动按钮" @change="onShowSwitchChange" />
+        </div>
+        <div style="margin:20px 0;">
+          <Switch v-model:checked="showExploreVersion" checked-children="启用探索体验版" un-checked-children="不启用探索体验版" @change="onSwitchChange" />
         </div>
         <div class="postbot-ui-main">
             
@@ -32,7 +35,7 @@
                     <div>
                       <Empty description="你还没有进行中的同步任务" />
                     </div>
-                    <a href="https://postbot.exmay.com/exmay/postbot/media/publish">
+                    <a :href="`${getPostBotBaseUrl()}/exmay/postbot/media/publish`">
                       <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;" @click="onPlus">
                           <template #icon>
                           <PlusOutlined />
@@ -102,7 +105,7 @@
 
     import { contentImages, content } from '~utils/content';
 
-    import { BASE_URL } from '~config/config';
+    import { getPostBotBaseUrl, config } from '~config/config';
 
     const activeKey = ref('1');
 
@@ -140,6 +143,8 @@
   const newTask = ref("")
 
   const showFlowButton = ref(true);
+
+  const showExploreVersion = ref(config.value.exploreVersionEnabled);
   
   // 显示模态框
   const showModal = () => {
@@ -162,10 +167,10 @@
   }
 
   const onPlus = () => {
-    chrome.tabs.create({ url: `${BASE_URL}/exmay/postbot/media/publish` });
+    chrome.tabs.create({ url: `${getPostBotBaseUrl()}/exmay/postbot/media/publish` });
   }
 
-  const onSwitchChange = (checked) => {
+  const onShowSwitchChange = (checked) => {
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id;
@@ -175,9 +180,17 @@
     });
 
   }
+
+  const onSwitchChange = (checked) => {
+    showExploreVersion.value = checked;
+    config.value.exploreVersionEnabled = checked;
+  }
   </script>
   
   <style lang="less" scoped>
+  :deep(.ant-switch.ant-switch-checked) {
+    background: #bd34fe !important;
+  }
   /* 设置页面布局 */
   .logo {
     color: #fff;

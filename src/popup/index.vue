@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
   import { ref, onMounted } from 'vue';
-  import { BASE_URL } from '../config/config';
+  import { getPostBotBaseUrl } from '../config/config';
 
   // import type { PlasmoCSConfig } from 'plasmo';
 
@@ -28,7 +28,7 @@
   // };
 
   onMounted(() => {
-    chrome.tabs.create({ url: `${BASE_URL}/exmay/postbot/media/publish` });
+    chrome.tabs.create({ url: `${getPostBotBaseUrl()}/exmay/postbot/media/publish` });
   });
 
 </script>

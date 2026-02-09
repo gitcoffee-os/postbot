@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BASE_API } from "~config/config";
+import { getPostBotBaseApi } from "~config/config";
 
 export const listingApi = async(params) => {
-    const response = await fetch(`${BASE_API}/postbot/media/platform/listing`, {
+    const response = await fetch(`${getPostBotBaseApi()}/postbot/media/platform/listing`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
