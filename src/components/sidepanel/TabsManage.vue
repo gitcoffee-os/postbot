@@ -105,7 +105,7 @@
 
     import { contentImages, content } from '~utils/content';
 
-    import { getPostBotBaseUrl, config } from '~config/config';
+    import { getPostBotBaseUrl, config, saveExploreVersionSetting } from '~config/config';
 
     const activeKey = ref('1');
 
@@ -184,6 +184,7 @@
   const onSwitchChange = (checked) => {
     showExploreVersion.value = checked;
     config.value.exploreVersionEnabled = checked;
+    saveExploreVersionSetting(checked);
   }
   </script>
   

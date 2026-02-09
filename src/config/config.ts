@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 // export const BASE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://postbot.exmay.com';
-import { ref } from 'vue';
+import { appSettings, saveExploreVersionSetting } from './setting';
 
-export const config = ref({
-    exploreVersionEnabled: false
-});
+export { saveExploreVersionSetting };
+// Maintain backward compatibility
+export const config = appSettings;
 
 export const BASE_URL = 'https://postbot.exmay.com';
 export const EXPLORE_BASE_URL = 'https://postar.exmay.com';
 
 // Dynamic URL based on explore version setting
 export const getPostBotBaseUrl = () => {
-  return config.value.exploreVersionEnabled ? EXPLORE_BASE_URL : BASE_URL;
+  return appSettings.value.exploreVersionEnabled ? EXPLORE_BASE_URL : BASE_URL;
 };
 
 export const getPostBotBaseApi = () => {

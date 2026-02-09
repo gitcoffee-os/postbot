@@ -20,6 +20,7 @@
 <script lang="ts" setup>
   import { ref, onMounted } from 'vue';
   import { getPostBotBaseUrl } from '../config/config';
+  import { appSettings } from '../config/setting';
 
   // import type { PlasmoCSConfig } from 'plasmo';
 
@@ -28,7 +29,15 @@
   // };
 
   onMounted(() => {
-    chrome.tabs.create({ url: `${getPostBotBaseUrl()}/exmay/postbot/media/publish` });
+    // Load explore version setting and open the appropriate URL
+    chrome.storage.local.get('exploreVersionEnabled', (result) => {
+      // Update appSettings with saved value
+      if (result.exploreVersionEnabled !== undefined) {
+        appSettings.value.exploreVersionEnabled = result.exploreVersionEnabled;
+      }
+      // Now open the URL with the correct base URL
+      chrome.tabs.create({ url: `${getPostBotBaseUrl()}/exmay/postbot/media/publish` });
+    });
   });
 
 </script>

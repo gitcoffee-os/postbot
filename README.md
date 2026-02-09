@@ -33,15 +33,15 @@
 <br />
 ![postbot-modal](https://postbot.exmay.com/docs/images/postbot_modal_dark.png)
 <br />
-![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.7)
+![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.9)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.7)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.9)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.7)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.9)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.7)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.9)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.7)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.9)
 <br />
 ![postbot-sidebar](https://postbot.exmay.com/docs/images/postbot_sidebar.png)
 
