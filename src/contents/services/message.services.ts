@@ -25,7 +25,7 @@ export const handleMessage = (request, sender, sendResponse) => {
     const data = getReaderData();
     const { content, contentImages } = data;
 
-    let mesage = {};
+    let message = {};
     let userInfo = {};
     switch (request.action) {
         case 'doLogin':

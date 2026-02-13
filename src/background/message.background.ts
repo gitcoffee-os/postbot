@@ -27,112 +27,119 @@ import { windowPublish } from "~media/publisher";
 import { isLoginApi } from "~api/media/user.api";
 
 export const handleMessage = async (request, sender, sendResponse) => {
-    let message = {};
-    const data = request?.data;
-    switch (request.action) {
-        case POSTBOT_ACTION.CHECK_EXTENSION:
-            message = {
-                extensionId: chrome.runtime.id,
-                // enabled: enabled,
-            };
-            sendResponse(message);
-            break;
-        case POSTBOT_ACTION.PLATFORM_LIST:
-            const platforms = getPlatforms();
-            console.log('platforms', platforms);
-            message = {
-                platforms: platforms[data?.type],
-            }
-            sendResponse(message);
-            break;
-        case POSTBOT_ACTION.META_INFO_LIST:
+    try {
+        let message = {};
+        const data = request?.data;
+        switch (request.action) {
+            case POSTBOT_ACTION.CHECK_EXTENSION:
+                message = {
+                    extensionId: chrome.runtime.id,
+                    // enabled: enabled,
+                };
+                sendResponse(message);
+                break;
+            case POSTBOT_ACTION.PLATFORM_LIST:
+                const platforms = getPlatforms();
+                console.log('platforms', platforms);
+                message = {
+                    platforms: platforms[data?.type],
+                }
+                sendResponse(message);
+                break;
+            case POSTBOT_ACTION.META_INFO_LIST:
 
-            // chrome.runtime.sendMessage({ action: 'getMetaInfoList' }, (response) => {
-            //   console.log('response', response);
-            const metaInfoList = await getMetaInfoList();
-            state.metaInfoList = metaInfoList;
-            message = {
-                metaInfoList: metaInfoList,
-            }
-            console.log('message', message);
-            sendResponse(message);
-            // return true;
-            // });
-            break;
-        case POSTBOT_ACTION.PUBLISH_SYNC_DATA:
-            console.debug('request.data', request.data);
-            state.contentData = request.data;
-            break;
-        case POSTBOT_ACTION.PUBLISH_SYNC_CONTENT:
-            console.debug('state.contentData', state.contentData);
-            message = state.contentData;
+                // chrome.runtime.sendMessage({ action: 'getMetaInfoList' }, (response) => {
+                //   console.log('response', response);
+                const metaInfoList = await getMetaInfoList();
+                state.metaInfoList = metaInfoList;
+                message = {
+                    metaInfoList: metaInfoList,
+                }
+                console.log('message', message);
+                sendResponse(message);
+                // return true;
+                // });
+                break;
+            case POSTBOT_ACTION.PUBLISH_SYNC_DATA:
+                console.debug('request.data', request.data);
+                state.contentData = request.data;
+                sendResponse({ ok: true });
+                break;
+            case POSTBOT_ACTION.PUBLISH_SYNC_CONTENT:
+                console.debug('state.contentData', state.contentData);
+                message = state.contentData;
 
-            sendResponse(message);
+                sendResponse(message);
 
-            state.contentData = null;
-            break;
-        case POSTBOT_ACTION.PUBLISH_NOW:
-            const mediaType = data.mediaType || 'article'
-            const platformCodes = data.platformCodes;
-            console.debug('platformCodes', platformCodes);
-            const publishPlatforms = getPlatforms();
-            console.debug('publishPlatforms', publishPlatforms);
+                state.contentData = null;
+                break;
+            case POSTBOT_ACTION.PUBLISH_NOW:
+                const mediaType = data.mediaType || 'article'
+                const platformCodes = data.platformCodes;
+                console.debug('platformCodes', platformCodes);
+                const publishPlatforms = getPlatforms();
+                console.debug('publishPlatforms', publishPlatforms);
 
-            let allPlatforms = Object.values(publishPlatforms[mediaType]);
-            const checkedPlatforms = allPlatforms.filter(item => platformCodes.includes(item.code));
-            console.debug('checkedPlatforms', checkedPlatforms);
+                let allPlatforms = Object.values(publishPlatforms[mediaType]);
+                const checkedPlatforms = allPlatforms.filter(item => platformCodes.includes(item.code));
+                console.debug('checkedPlatforms', checkedPlatforms);
 
-            checkedPlatforms.forEach(item => {
-                item['metaInfo'] = state.metaInfoList[item.code];
-            });
-
-            const publishData = {
-                platforms: checkedPlatforms,
-                data: data,
-            }
-            windowPublish(publishData);
-            break;
-        case 'fetchImage':
-            let imageType = null;
-            fetch(data.imageUrl)
-                .then((response) => {
-                    const imageName = getFileName(response);
-                    // 获取图片的 Blob
-                    response.blob().then((blob) => {
-                        imageType = blob.type;
-                        console.log('blob.type', blob.type);
-                        console.log('blob.size', blob.size);
-                        // sendResponse({ imageName: imageName, imageBlob: blob });
-                        // blobToArrayBuffer(blob)
-                        //   .then(arrayBuffer => {
-                        // 发送 ArrayBuffer 到 content.js
-
-                        // })
-                        // .catch(err => {
-                        //   console.error('转换 Blob 为 ArrayBuffer 失败:', err);
-                        // });
-
-                        blob2base64(blob).then((base64data) => {
-                            sendResponse({ imageName: imageName, base64data: base64data, imageType: imageType });
-                        });
-
-
-                    })
-                })
-                .catch((error) => {
-                    console.error('获取图片失败:', error);
-                    sendResponse({ error: error.message });
+                checkedPlatforms.forEach(item => {
+                    item['metaInfo'] = state.metaInfoList[item.code];
                 });
-            break;
-        case 'checkLogin':
-            const res = await isLoginApi({});
-            console.debug('res', res);
-            sendResponse({
-                isLogin: res?.data?.login,
-            });
-            break;
-        default:
-            break;
+
+                const publishData = {
+                    platforms: checkedPlatforms,
+                    data: data,
+                }
+                windowPublish(publishData);
+                sendResponse({ ok: true });
+                break;
+            case 'fetchImage':
+                let imageType = null;
+                fetch(data.imageUrl)
+                    .then((response) => {
+                        const imageName = getFileName(response);
+                        // 获取图片的 Blob
+                        response.blob().then((blob) => {
+                            imageType = blob.type;
+                            console.log('blob.type', blob.type);
+                            console.log('blob.size', blob.size);
+                            // sendResponse({ imageName: imageName, imageBlob: blob });
+                            // blobToArrayBuffer(blob)
+                            //   .then(arrayBuffer => {
+                            // 发送 ArrayBuffer 到 content.js
+
+                            // })
+                            // .catch(err => {
+                            //   console.error('转换 Blob 为 ArrayBuffer 失败:', err);
+                            // });
+
+                            blob2base64(blob).then((base64data) => {
+                                sendResponse({ imageName: imageName, base64data: base64data, imageType: imageType });
+                            });
+
+
+                        })
+                    })
+                    .catch((error) => {
+                        console.error('获取图片失败:', error);
+                        sendResponse({ error: error.message });
+                    });
+                break;
+            case 'checkLogin':
+                const res = await isLoginApi({});
+                console.debug('res', res);
+                sendResponse({
+                    isLogin: res?.data?.login,
+                });
+                break;
+            default:
+                sendResponse({});
+                break;
+        }
+    } catch (e: any) {
+        sendResponse({ error: e?.message ?? String(e) });
     }
 }
 
