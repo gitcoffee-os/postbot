@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { PlasmoCSConfig } from "plasmo"
 import { initPostBot } from "~api"
 
 // 初始化插件系统
