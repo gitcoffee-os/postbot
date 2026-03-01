@@ -21,7 +21,7 @@ import { SyncOutlined } from '@ant-design/icons-vue';
 
 import PostbotButton from './PostbotButton'
 
-import PostbotFloatButton from './PostBotFloatButton';
+import PostbotFloatButton from './PostbotFloatButton';
 
 import { getReaderData } from '~media/parser'
 

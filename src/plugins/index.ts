@@ -17,7 +17,7 @@
 // 插件列表，添加新插件时只需要在这个数组中添加插件代码
 const pluginList = [
   'it'
-  // 在这里添加新的插件代码，例如：'ai', 'tool'
+  // 在这里添加新的插件代码，例如：'ai', 'tool', 'en'
 ];
 
 // 静态导入所有插件
@@ -26,12 +26,15 @@ import { setupInjection } from './injector';
 
 // 导入IT插件
 import itPlugin from './it/index';
+// 导入国际平台插件
+// import enPlugin from './en/index';
 
 // 插件映射，只包含插件本身
 const pluginModulesMap = {
   it: itPlugin
   // 在这里添加新的插件映射，例如：
   // ai: aiPlugin
+  // en: enPlugin
 };
 
 // 注册所有插件
