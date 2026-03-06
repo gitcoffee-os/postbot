@@ -85,12 +85,13 @@ export const toutiaoVideoPublisher = async (data) => {
         title: 'div.form-item-title input.byte-input',
         editor: 'textarea.byte-textarea',
         videoUpload: 'input[type="file"]',
-        coverDelete: '.article-cover-delete',
-        imageUploadAdd: 'div.article-cover-add',
-        imageUploadTabs: 'div.byte-tabs-header-title',
-        imageUploadTabText: '上传图片',
-        imageUpload: 'input[type="file"]',
-        confirmUploadButton: 'button[data-e2e="imageUploadConfirm-btn"]',
+        // coverDelete: '.article-cover-delete',
+        imageUploadAdd: 'div.fake-upload-trigger',
+        imageUploadTabs: 'div.Dialog-container ul.header li',
+        imageUploadTabText: '本地上传',
+        imageUpload: 'div.Dialog-container input[type="file"]',
+        confirmUploadButton: 'button.btn-l.btn-sure',
+        coverConfirmButton: 'button.m-button.red',
         publishButtons: 'div.button-group button.byte-btn',
         publishButtonText: '存草稿',
         confirmButtonText: '发布',
@@ -209,17 +210,25 @@ export const toutiaoVideoPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -234,23 +243,23 @@ export const toutiaoVideoPublisher = async (data) => {
     }
     
     const autoFillCover = async(cover) => {
-        const clearDefaultCovers = async() => {
-            const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
-            if (!coverDeleteElements) {
-                return;
-            }
-            console.log('coverDeleteElements length', coverDeleteElements.length);
-            for (const coverDeleteElement of coverDeleteElements) {
-                if (!coverDeleteElement) {
-                    continue;
-                }
-                console.log('coverDelete trrigle click');
-                (coverDeleteElement as HTMLElement).click();
-            }
-            await sleep(1000);
-        };
+        // const clearDefaultCovers = async() => {
+        //     const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
+        //     if (!coverDeleteElements) {
+        //         return;
+        //     }
+        //     console.log('coverDeleteElements length', coverDeleteElements.length);
+        //     for (const coverDeleteElement of coverDeleteElements) {
+        //         if (!coverDeleteElement) {
+        //             continue;
+        //         }
+        //         console.log('coverDelete trrigle click');
+        //         (coverDeleteElement as HTMLElement).click();
+        //     }
+        //     await sleep(1000);
+        // };
 
-        await clearDefaultCovers();
+        // await clearDefaultCovers();
 
         const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
         if (!imageUploadAdd) {
@@ -268,17 +277,21 @@ export const toutiaoVideoPublisher = async (data) => {
         (imageUploadTab as HTMLElement).click();
         await sleep(1000);
 
-        const images = [];
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
         await sleep(2000);
 
         const confirmUploadButton = document.querySelector(formElement.confirmUploadButton);
@@ -287,6 +300,14 @@ export const toutiaoVideoPublisher = async (data) => {
         }
 
         confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
+        await sleep(1000);
+
+        const coverConfirmButton = document.querySelector(formElement.coverConfirmButton);
+        if (!coverConfirmButton) {
+            return;
+        }
+
+        coverConfirmButton.dispatchEvent(new Event('click', { bubbles: true }));
         await sleep(2000);
     };
 
@@ -367,8 +388,12 @@ export const toutiaoVideoPublisher = async (data) => {
     autoFillContent(processedData);
     await sleep(5000);
 
-    if (processedData?.cover) {
-        // autoFillCover(processedData.cover);
+    // if (processedData?.cover) {
+    //     // autoFillCover(processedData.cover);
+    // }
+
+    if (processedData?.horizontalCover || processedData?.verticalCover) {
+        autoFillCover(processedData.horizontalCover || processedData.verticalCover);
     }
 
     if (contentData.isAutoPublish) {

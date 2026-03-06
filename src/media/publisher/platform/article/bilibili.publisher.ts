@@ -82,15 +82,23 @@ export const bilibiliArticlePublisher = async (data) => {
       };
 
     const formElement = {
-        editorIframe: '#edit-article-box iframe',
-        title: 'div.bre-title-input textarea',
+        // editorIframe: '#edit-article-box iframe',
+        editorIframe: '#new-edit-box iframe',
+        // title: 'div.bre-title-input textarea',
+        title: 'div.title-input textarea',
         editor: 'div[contenteditable="true"]',
-        imageUpload: 'div.bre-settings__coverbox__img__icon',
-        imagePickerButtons: 'div.bre-modal button.bre-btn',
-        imagePickerConfirmText: '确认',
-        publishButtons: 'div.b-read-editor__btns button.bre-btn',
-        saveDraftButtonText: '存草稿',
-        confirmButtonText: '提交文章',
+        // imageUpload: 'div.bre-settings__coverbox__img__icon',
+        imageUpload: 'div.select-cover',
+        // imagePickerButtons: 'div.bre-modal button.bre-btn',
+        imagePickerButtons: 'button.vui_dialog--btn-confirm',
+        // imagePickerConfirmText: '确认',
+        imagePickerConfirmText: '确定',
+        // publishButtons: 'div.b-read-editor__btns button.bre-btn',
+        // saveDraftButtonText: '存草稿',
+        // confirmButtonText: '提交文章',
+        publishButtons: 'button.vui_button',
+        saveDraftButtonText: '保存为草稿',
+        confirmButtonText: '发布',
     }
     
     const fromRule = {

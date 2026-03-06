@@ -1,13 +1,16 @@
 <p align="center">
 	<img alt="logo" src="https://postbot.exmay.com/docs/images/postbot_logo.svg" width="150" height="150">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.1.10</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.1.11</h1>
 <h4 align="center">
 	一款开源的多平台内容同步分发生产力工具。
 	<br />
 	支持将文章、笔记、动态、图片、视频、音频等内容，一键同步发布至主流媒体平台。
 </h4>
 <p align="center">
+	<a href="https://github.com/gitcoffee-os/postbot" style="display:inline-block;margin:5px;">
+      <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/gitcoffee-os/postbot">
+   </a>
 	<a href="https://github.com/gitcoffee-os/postbot/blob/main/LICENSE" style="display:inline-block;margin:5px;">
 		<img src="https://img.shields.io/github/license/gitcoffee-os/postbot.svg?labelColor=47caff&color=bd34fe">
 	</a>
@@ -33,15 +36,15 @@
 <br />
 ![postbot-modal](https://postbot.exmay.com/docs/images/postbot_modal_dark.png)
 <br />
-![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.10)
+![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.11)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.10)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.11)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.10)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.11)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.10)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.11)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.10)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.11)
 <br />
 ![postbot-sidebar](https://postbot.exmay.com/docs/images/postbot_sidebar.png)
 
