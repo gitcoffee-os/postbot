@@ -85,6 +85,12 @@ export const kuaishouVideoPublisher = async (data) => {
         uploadVideoButtonText: '上传视频',
         // title: 'input[type="text"]',
         editor: 'div[contenteditable="true"]',
+        coverAdd: 'div[class^="_cover-full-editor_"]',
+        coverUploadTabs: 'div[class^="_header-title-item_"]',
+        coverUploadText: '上传封面',
+        coverUpload: 'div.ant-modal input[type="file"]',
+        confirmUploadButtons: 'div.ant-modal button.ant-btn',
+        confirmUploadText: '确认',
         submitButton: 'button',
         publishButtonText: '发布',
         draftButtonText: '暂存离开',
@@ -165,7 +171,7 @@ export const kuaishouVideoPublisher = async (data) => {
 
     const uploadImages = async (images) => {
         console.log('images', images);
-        const imageUpload = await observeElement(formElement.imageUpload);
+        const imageUpload = await observeElement(formElement.coverUpload);
         if (!imageUpload) {
             throw new Error('未找到图片上传元素');
         }
@@ -245,6 +251,52 @@ export const kuaishouVideoPublisher = async (data) => {
         // editor.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
+    const autoFillCover = async(cover) => {
+
+        const imageUploadAdd = document.querySelector(formElement.coverAdd) as HTMLElement;
+        if (!imageUploadAdd) {
+            return;
+        }
+
+        imageUploadAdd.click();
+        await sleep(1000);
+
+        const coverUploadTabs = document.querySelectorAll(formElement.coverUploadTabs);
+        const coverUploadTab = Array.from(coverUploadTabs)?.find((button) => button.textContent?.includes(formElement.coverUploadText));
+        if (!coverUploadTab) {
+            return;
+        }
+
+        coverUploadTab.dispatchEvent(new Event('click', { bubbles: true }));
+        await sleep(2000);
+
+        const covers = [];
+
+        console.log('cover', cover);
+        for (const image of cover) {
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
+        }
+
+        console.log('covers', covers);
+        await uploadImages(covers);
+        await sleep(2000);
+
+        const confirmUploadButtons = document.querySelectorAll(formElement.confirmUploadButtons);
+        const confirmUploadButton = Array.from(confirmUploadButtons)?.find((button) => button.textContent?.includes(formElement.confirmUploadText));
+        if (!confirmUploadButton) {
+            return;
+        }
+
+        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
+        await sleep(2000);
+    };
+
     const autoUploadVideo = async(videoData) => {
         console.log('videoData', videoData);
 
@@ -311,6 +363,12 @@ export const kuaishouVideoPublisher = async (data) => {
     // await sleep(5000);
 
     await autoFillContent(contentData);
+    await sleep(2000);
+
+    if (processedData?.horizontalCover || processedData?.verticalCover) {
+        await sleep(5000);
+        autoFillCover(processedData.horizontalCover || processedData.verticalCover);
+    }
 
     if (contentData.isAutoPublish) {
         await sleep(5000);

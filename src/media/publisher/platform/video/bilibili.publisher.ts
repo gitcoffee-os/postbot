@@ -86,9 +86,12 @@ export const bilibiliVideoPublisher = async (data) => {
         videoUpload: 'div.bcc-upload-wrapper input[type="file"]',
         title: 'div.video-title input',
         editor: 'div[contenteditable="true"]',
-        imageUpload: 'div.bre-settings__coverbox__img__icon',
-        imagePickerButtons: 'div.bre-modal button.bre-btn',
-        imagePickerConfirmText: '确认',
+        imageUploadAdd: 'div.cover-main-img',
+        // imageUpload: 'div.upload-area',
+        imageUpload: 'div.bcc-dialog input[type="file"]',
+        coverConfirmButton: 'div.bcc-dialog div.button.submit',
+        // imagePickerButtons: 'div.bcc-dialog div.button.submit',
+        // imagePickerConfirmText: ' 完成 ',
         publishButtons: 'div.submit-container span',
         saveDraftButtonText: '存草稿',
         confirmButtonText: '立即投稿',
@@ -227,17 +230,25 @@ export const bilibiliVideoPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -246,23 +257,44 @@ export const bilibiliVideoPublisher = async (data) => {
         }
 
         imageUpload.files = dataTransfer.files;
+        imageUpload.dispatchEvent(new Event('input', { bubbles: true }));
         imageUpload.dispatchEvent(new Event('change', { bubbles: true }));
         await sleep(2000);
         console.log('图片上传成功');
+
+        const coverConfirmButton = document.querySelector(formElement.coverConfirmButton);
+        if (!coverConfirmButton) {
+            return;
+        }
+
+        coverConfirmButton.dispatchEvent(new Event('click', { bubbles: true }));
+        await sleep(2000);
     }
     
     const autoFillCover = async(cover) => {
-        const images = [];
+        const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
+        if (!imageUploadAdd) {
+            return;
+        }
+
+        imageUploadAdd.click();
+        await sleep(1000);
+
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
         await sleep(2000);
     };
 
@@ -349,6 +381,10 @@ export const bilibiliVideoPublisher = async (data) => {
     // if (processedData?.cover) {
     //     autoFillCover(processedData.cover);
     // }
+
+    if (processedData?.horizontalCover || processedData?.verticalCover) {
+        autoFillCover(processedData.horizontalCover || processedData.verticalCover);
+    }
 
     if (contentData.isAutoPublish) {
         await sleep(5000);

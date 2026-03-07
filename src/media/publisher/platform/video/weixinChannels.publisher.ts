@@ -96,7 +96,12 @@ export const weixinChannelsVideoPublisher = async (data) => {
         imageUploadTabs: 'div.byte-tabs-header-title',
         imageUploadTabText: '上传图片',
         imageUpload: 'input[type="file"]',
-        confirmUploadButton: 'button[data-e2e="imageUploadConfirm-btn"]',
+        videoContent: 'div.video-content',
+        verticalCoverAdd: 'div.vertical-img-wrap',
+        horizonCoverAdd: 'div.horizon-img-wrap',
+        coverEditButton: 'div.btn-directly-edit button',
+        coverUpload: 'div.edit-cover-dialog-container input[type="file"]',
+        confirmUploadButton: 'div.edit-cover-dialog-container div.cover-set-footer button.weui-desktop-btn.weui-desktop-btn_primary',
         publishButtons: 'div.form-btns button.weui-desktop-btn',
         publishButtonText: '保存草稿',
         confirmButtonText: '发表',
@@ -221,7 +226,7 @@ export const weixinChannelsVideoPublisher = async (data) => {
         //     throw new Error('未找到图片上传元素');
         // }
 
-        const imageUpload = editorDocument.querySelector(formElement.imageUpload) as HTMLElement;
+        const imageUpload = editorDocument.querySelector(formElement.coverUpload) as HTMLElement;
         if (!imageUpload) {
             throw new Error('未找到图片上传元素');
         }
@@ -231,17 +236,25 @@ export const weixinChannelsVideoPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -255,55 +268,67 @@ export const weixinChannelsVideoPublisher = async (data) => {
         console.log('图片上传成功');
     }
     
-    const autoFillCover = async(cover) => {
-        const clearDefaultCovers = async() => {
-            const coverDeleteElements = editorDocument.querySelectorAll(formElement.coverDelete);
-            if (!coverDeleteElements) {
-                return;
-            }
-            console.log('coverDeleteElements length', coverDeleteElements.length);
-            for (const coverDeleteElement of coverDeleteElements) {
-                if (!coverDeleteElement) {
-                    continue;
-                }
-                console.log('coverDelete trrigle click');
-                (coverDeleteElement as HTMLElement).click();
-            }
-            await sleep(1000);
-        };
+    const autoFillCover = async(cover, coverElement) => {
+        // const clearDefaultCovers = async() => {
+        //     const coverDeleteElements = editorDocument.querySelectorAll(formElement.coverDelete);
+        //     if (!coverDeleteElements) {
+        //         return;
+        //     }
+        //     console.log('coverDeleteElements length', coverDeleteElements.length);
+        //     for (const coverDeleteElement of coverDeleteElements) {
+        //         if (!coverDeleteElement) {
+        //             continue;
+        //         }
+        //         console.log('coverDelete trrigle click');
+        //         (coverDeleteElement as HTMLElement).click();
+        //     }
+        //     await sleep(1000);
+        // };
 
-        await clearDefaultCovers();
+        // await clearDefaultCovers();
 
-        const imageUploadAdd = editorDocument.querySelector(formElement.imageUploadAdd) as HTMLElement;
+        // const imageUploadAdd = editorDocument.querySelector(formElement.imageUploadAdd) as HTMLElement;
+        const imageUploadAdd = (await observeElement(coverElement || formElement.imageUploadAdd)) as HTMLElement;
         if (!imageUploadAdd) {
             return;
         }
 
         imageUploadAdd.click();
-        await sleep(1000);
+        await sleep(2000);
 
-        const imageUploadTabs = editorDocument.querySelectorAll(formElement.imageUploadTabs);
-        const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
-        if (!imageUploadTab) {
-            return;
+        const coverEditButton = editorDocument.querySelector(formElement.coverEditButton) as HTMLElement;
+        if (coverEditButton) {
+            coverEditButton.click();
+            await sleep(2000);
         }
-        (imageUploadTab as HTMLElement).click();
-        await sleep(1000);
 
-        const images = [];
+        // const imageUploadTabs = editorDocument.querySelectorAll(formElement.imageUploadTabs);
+        // const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
+        // if (!imageUploadTab) {
+        //     return;
+        // }
+        // (imageUploadTab as HTMLElement).click();
+        // await sleep(1000);
+
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
         await sleep(2000);
 
-        const confirmUploadButton = editorDocument.querySelector(formElement.confirmUploadButton);
+        // const confirmUploadButton = editorDocument.querySelector(formElement.confirmUploadButton);
+        const confirmUploadButton = (await observeElement(formElement.confirmUploadButton)) as HTMLElement;
         if (!confirmUploadButton) {
             return;
         }
@@ -395,10 +420,24 @@ export const weixinChannelsVideoPublisher = async (data) => {
     await sleep(1000);
 
     autoFillContent(processedData);
-    await sleep(5000);
+    await sleep(2000);
 
-    if (processedData?.cover) {
-        // autoFillCover(processedData.cover);
+    // if (processedData?.cover) {
+    //     // autoFillCover(processedData.cover);
+    // }
+
+    if (processedData?.horizontalCover) {
+        await sleep(10000);
+        await observeElement(formElement.videoContent, 300000);
+        await autoFillCover(processedData.horizontalCover, formElement.horizonCoverAdd);
+        await sleep(2000);
+    }
+
+    if (processedData?.verticalCover) {
+        await sleep(2000);
+        await observeElement(formElement.videoContent, 300000);
+        await autoFillCover(processedData.verticalCover, formElement.verticalCoverAdd);
+        await sleep(2000);
     }
 
     if (contentData.isAutoPublish) {

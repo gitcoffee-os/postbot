@@ -86,6 +86,17 @@ export const douyinVideoPublisher = async (data) => {
         imageUpload: 'div[class^="addIcon-"]',
         imagePickerButtons: 'div.semi-modal button.semi-button',
         imagePickerConfirmText: '确定',
+        videoContent: 'div.video-content',
+        // verticalCoverAdd: 'div.content-upload-new div[class^="coverControl-"]',
+        // horizonCoverAdd: 'div.content-upload-new div[class^="coverControl-"]',
+        coverControl: 'div.content-upload-new div[class^="coverControl-"]',
+        coverAdd: 'div[class^="filter-"]',
+        coverEditTip: 'div[class^="cover-tip-"]',
+        verticalCoverTip: '竖封面3:4',
+        horizonCoverTip: '横封面4:3',
+        coverUpload: 'div.semi-upload input[type="file"]',
+        confirmUploadButtons: 'div.dy-creator-content-modal button.semi-button.semi-button-primary.semi-button-light',
+        confirmUploadText: '完成',
         publishButtons: 'button',
         saveDraftButtonText: '暂存离开',
         confirmButtonText: '发布',
@@ -191,7 +202,7 @@ export const douyinVideoPublisher = async (data) => {
         //     throw new Error('未找到图片上传元素');
         // }
 
-        const imageUpload = document.querySelector(formElement.imageUpload) as HTMLElement;
+        const imageUpload = document.querySelector(formElement.coverUpload) as HTMLElement;
         if (!imageUpload) {
             throw new Error('未找到图片上传元素');
         }
@@ -201,17 +212,25 @@ export const douyinVideoPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -224,19 +243,67 @@ export const douyinVideoPublisher = async (data) => {
         await sleep(2000);
         console.log('图片上传成功');
     }
+
+    const getCoverElements = () => {
+        const coverControl = document.querySelectorAll(formElement.coverControl);
+        if (!coverControl) {
+            throw new Error('未找到封面添加元素');
+        }
+
+        let coverElements = {
+            horizonCover: null,
+            verticalCover: null
+        }
+
+        coverControl.forEach(element => {
+            const coverEditTip = element.querySelector(formElement.coverEditTip);
+            if (coverEditTip) {
+                const coverAdd = element.querySelector(formElement.coverAdd);
+                if (coverEditTip?.textContent === formElement.horizonCoverTip) {
+                    coverElements.horizonCover = coverAdd;
+                } else if (coverEditTip?.textContent === formElement.verticalCoverTip) {
+                    coverElements.verticalCover = coverAdd;
+                }
+            }
+        });
+        console.log('coverElements', coverElements);
+        return coverElements;   
+    }
     
-    const autoFillCover = async(cover) => {
-        const images = [];
+    const autoFillCover = async(cover, coverElement) => {
+
+        const imageUploadAdd = coverElement as HTMLElement;
+        if (!imageUploadAdd) {
+            return;
+        }
+
+        imageUploadAdd.click();
+        await sleep(2000);
+
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
+        await sleep(2000);
+
+        const confirmUploadButtons = document.querySelectorAll(formElement.confirmUploadButtons);
+        const confirmUploadButton = Array.from(confirmUploadButtons)?.find((button) => button.textContent?.includes(formElement.confirmUploadText));
+        if (!confirmUploadButton) {
+            return;
+        }
+
+        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
         await sleep(2000);
     };
 
@@ -318,8 +385,22 @@ export const douyinVideoPublisher = async (data) => {
     autoFillContent(processedData);
     await sleep(5000);
 
-    if (processedData?.cover) {
-        // autoFillCover(processedData.cover);
+    // if (processedData?.cover) {
+    //     // autoFillCover(processedData.cover);
+    // }
+
+    if (processedData?.horizontalCover) {
+        // await sleep(10000);
+        // await observeElement(formElement.videoContent, 300000);
+        await autoFillCover(processedData.horizontalCover, getCoverElements()?.horizonCover);
+        await sleep(2000);
+    }
+
+    if (processedData?.verticalCover) {
+        // await sleep(2000);
+        // await observeElement(formElement.videoContent, 300000);
+        await autoFillCover(processedData.verticalCover, getCoverElements()?.verticalCover);
+        await sleep(2000);
     }
 
     if (contentData.isAutoPublish) {
