@@ -106,3 +106,7 @@ PostBot 内容同步助手 微信 交流群：
 ## 🌍 开源生态
 
 [开源生态](https://postbot.exmay.com/docs/opensource) 
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/image?repos=gitcoffee-os/postbot&type=date&legend=top-left)](https://www.star-history.com/?repos=gitcoffee-os%2Fpostbot&type=date&legend=top-left)
