@@ -8,9 +8,6 @@
 	支持将文章、笔记、动态、图片、视频、音频等内容，一键同步发布至主流媒体平台。
 </h4>
 <p align="center">
-	<a href="https://github.com/gitcoffee-os/postbot" style="display:inline-block;margin:5px;">
-      <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/gitcoffee-os/postbot">
-   </a>
 	<a href="https://github.com/gitcoffee-os/postbot/blob/main/LICENSE" style="display:inline-block;margin:5px;">
 		<img src="https://img.shields.io/github/license/gitcoffee-os/postbot.svg?labelColor=47caff&color=bd34fe">
 	</a>
