@@ -84,6 +84,11 @@ export const zhihuVideoPublisher = async (data) => {
         title: 'input[placeholder="输入视频标题"]',
         editor: 'textarea[placeholder="填写视频简介，让更多人找到你的视频"]',
         imageUpload: 'input.UploadPicture-input[type="file"]',
+        coverAdd: 'div.VideoUploadForm-imageEditButton',
+        coverUploadTabs: 'h3.Modal-title div div',
+        coverUploadText: '本地上传',
+        coverUpload: 'div.Modal-content input[type="file"]',
+        coverConfirmButton: 'div.Modal-content button.Button.Button--primary',
         publishButtons: 'button.Button',
         // publishButtonText: '预览',
         confirmButtonText: '发布视频',
@@ -197,7 +202,7 @@ export const zhihuVideoPublisher = async (data) => {
         //     throw new Error('未找到图片上传元素');
         // }
 
-        const imageUpload = document.querySelector(formElement.imageUpload) as HTMLElement;
+        const imageUpload = document.querySelector(formElement.coverUpload) as HTMLElement;
         if (!imageUpload) {
             throw new Error('未找到图片上传元素');
         }
@@ -232,17 +237,46 @@ export const zhihuVideoPublisher = async (data) => {
     }
     
     const autoFillCover = async(cover) => {
-        const images = [];
+
+        const imageUploadAdd = document.querySelector(formElement.coverAdd) as HTMLElement;
+        if (!imageUploadAdd) {
+            return;
+        }
+
+        imageUploadAdd.click();
+        await sleep(1000);
+
+        const imageUploadTabs = document.querySelectorAll(formElement.coverUploadTabs);
+        const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.coverUploadText));
+        if (!imageUploadTab) {
+            return;
+        }
+        (imageUploadTab as HTMLElement).click();
+        await sleep(1000);
+
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
+        await sleep(2000);
+
+        const confirmUploadButton = document.querySelector(formElement.coverConfirmButton);
+        if (!confirmUploadButton) {
+            return;
+        }
+
+        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
         await sleep(2000);
     };
    
@@ -323,8 +357,12 @@ export const zhihuVideoPublisher = async (data) => {
     autoFillContent(processedData);
     await sleep(5000);
 
-    if (processedData?.cover) {
-        // autoFillCover(processedData.cover);
+    // if (processedData?.cover) {
+    //     // autoFillCover(processedData.cover);
+    // }
+
+    if (processedData?.horizontalCover || processedData?.verticalCover) {
+        autoFillCover(processedData.horizontalCover || processedData.verticalCover);
     }
 
     if (contentData.isAutoPublish) {

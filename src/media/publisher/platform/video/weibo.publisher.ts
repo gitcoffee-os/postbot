@@ -83,7 +83,8 @@ export const weiboVideoPublisher = async (data) => {
         videoUpload: 'input[type="file"]',
         videoUploadButton: 'button',
         videoUploadButtonText: '上传视频',
-        dragArea: 'div[class^="VideoUpload_"]',
+        // dragArea: 'div[class^="VideoUpload_"]',
+        dragArea: 'div[id^="area_video_button_upload_"]',
         dragAreaText: '拖拽视频到此处也可上传',
         title: 'input[placeholder="填写标题（0～30个字）"]',
         editor: 'textarea[placeholder="有什么新鲜事想分享给大家？"]',
@@ -99,6 +100,11 @@ export const weiboVideoPublisher = async (data) => {
         imageNextButtons: 'div.n-dialog__content button.n-button',
         imageNextButtonText: '下一步',
         imageComfirmButtonText: '确定',
+        coverArea: 'div.woo-picture-main',
+        coverAdd: 'a',
+        coverUpload: 'input[type="file"][accept=".jpg, .jpeg, .bmp, .gif, .png"]',
+        confirmUploadButtons: 'button.woo-button-main.woo-button-primary',
+        confirmUploadText: '完成',
         publishButtons: 'button.woo-button-main',
         // saveDraftButtonText: ' 保存草稿',
         confirmButtonText: '发布',
@@ -121,7 +127,7 @@ export const weiboVideoPublisher = async (data) => {
             titleTextarea.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
-        const editor = document.querySelector(formElement.editor)  as HTMLElement;
+        const editor = document.querySelector(formElement.editor)  as HTMLTextAreaElement;
         console.log('editor', editor);
         if (!editor) {
             console.log('未找到编辑器');
@@ -132,7 +138,7 @@ export const weiboVideoPublisher = async (data) => {
 
         editor.focus();
 
-        editor.innerHTML = content;
+        editor.value = content;
         editor.dispatchEvent(new Event('input', { bubbles: true }));
         editor.dispatchEvent(new Event('change', { bubbles: true }));
 
@@ -212,7 +218,7 @@ export const weiboVideoPublisher = async (data) => {
         //     throw new Error('未找到图片上传元素');
         // }
 
-        const imageUpload = document.querySelector(formElement.imageUpload) as HTMLElement;
+        const imageUpload = document.querySelector(formElement.coverUpload) as HTMLElement;
         if (!imageUpload) {
             throw new Error('未找到图片上传元素');
         }
@@ -222,17 +228,25 @@ export const weiboVideoPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -244,6 +258,10 @@ export const weiboVideoPublisher = async (data) => {
         imageUpload.dispatchEvent(new Event('change', { bubbles: true }));
         await sleep(2000);
         console.log('图片上传成功');
+    }
+
+    const getCoverAdd = () => {
+        return document.querySelector(formElement.coverArea).parentElement.querySelector(formElement.coverAdd);
     }
     
     const autoFillCover = async(cover) => {
@@ -265,7 +283,7 @@ export const weiboVideoPublisher = async (data) => {
 
         // await clearDefaultCovers();
 
-        const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
+        const imageUploadAdd = getCoverAdd() as HTMLElement;
         if (!imageUploadAdd) {
             return;
         }
@@ -273,66 +291,79 @@ export const weiboVideoPublisher = async (data) => {
         imageUploadAdd.click();
         await sleep(1000);
 
-        const imageUploadTabs = document.querySelectorAll(formElement.imageUploadTabs);
-        const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
-        if (!imageUploadTab) {
-            return;
-        }
-        (imageUploadTab as HTMLElement).click();
-        await sleep(1000);
+        // const imageUploadTabs = document.querySelectorAll(formElement.imageUploadTabs);
+        // const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
+        // if (!imageUploadTab) {
+        //     return;
+        // }
+        // (imageUploadTab as HTMLElement).click();
+        // await sleep(1000);
 
-        const images = [];
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
         await sleep(2000);
 
-        const image = images[0];
+        // const image = images[0];
 
-        const imagePickers = document.querySelectorAll(formElement.imagePickers);
-        if (!imagePickers) {
+        // const imagePickers = document.querySelectorAll(formElement.imagePickers);
+        // if (!imagePickers) {
+        //     return;
+        // }
+
+        // const picker = imagePickers[0]; // Array.from(imagePickers).find(element => element.textContent?.includes(image.name));
+
+        // if (!picker) {
+        //     return;
+        // }
+
+        // (picker as HTMLElement).click();
+        // await sleep(2000);
+
+        // const imageNextButtons = document.querySelectorAll(formElement.imageNextButtons);
+        // if (!imageNextButtons) {
+        //     return;
+        // }
+
+        // const imageNextButton = Array.from(imageNextButtons).find(button => button.textContent?.includes(formElement.imageNextButtonText));
+        // if (!imageNextButton) {
+        //     return;
+        // }
+        // (imageNextButton as HTMLElement).click();
+        // await sleep(2000);
+
+        // const nextButtons = document.querySelectorAll(formElement.imageNextButtons);
+        // if (!nextButtons) {
+        //     return;
+        // }
+
+        // const comfirmButton = Array.from(nextButtons).find(button => button.textContent?.includes(formElement.imageComfirmButtonText));
+        // if (!comfirmButton) {
+        //     return;
+        // }
+
+        // (comfirmButton as HTMLElement).click();
+        // await sleep(2000);
+
+        const confirmUploadButtons = document.querySelectorAll(formElement.confirmUploadButtons);
+        const confirmUploadButton = Array.from(confirmUploadButtons)?.find((button) => button.textContent?.includes(formElement.confirmUploadText));
+        if (!confirmUploadButton) {
             return;
         }
 
-        const picker = imagePickers[0]; // Array.from(imagePickers).find(element => element.textContent?.includes(image.name));
-
-        if (!picker) {
-            return;
-        }
-
-        (picker as HTMLElement).click();
-        await sleep(2000);
-
-        const imageNextButtons = document.querySelectorAll(formElement.imageNextButtons);
-        if (!imageNextButtons) {
-            return;
-        }
-
-        const imageNextButton = Array.from(imageNextButtons).find(button => button.textContent?.includes(formElement.imageNextButtonText));
-        if (!imageNextButton) {
-            return;
-        }
-        (imageNextButton as HTMLElement).click();
-        await sleep(2000);
-
-        const nextButtons = document.querySelectorAll(formElement.imageNextButtons);
-        if (!nextButtons) {
-            return;
-        }
-
-        const comfirmButton = Array.from(nextButtons).find(button => button.textContent?.includes(formElement.imageComfirmButtonText));
-        if (!comfirmButton) {
-            return;
-        }
-
-        (comfirmButton as HTMLElement).click();
+        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
         await sleep(2000);
     };
 
@@ -465,8 +496,12 @@ export const weiboVideoPublisher = async (data) => {
     autoFillContent(processedData);
     await sleep(5000);
 
-    if (processedData?.cover) {
-        // autoFillCover(processedData.cover);
+    // if (processedData?.cover) {
+    //     // autoFillCover(processedData.cover);
+    // }
+
+    if (processedData?.horizontalCover || processedData?.verticalCover) {
+        autoFillCover(processedData.horizontalCover || processedData.verticalCover);
     }
 
     // autoSaveDraf();

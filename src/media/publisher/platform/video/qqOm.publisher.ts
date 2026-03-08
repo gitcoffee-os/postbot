@@ -85,12 +85,14 @@ export const qqOmVideoPublisher = async (data) => {
         title: 'div.omui-articletitle span[data-placeholder="请输入标题（5-64个字）"]',
         // editor: 'div.ProseMirror[contenteditable="true"]',
         editor: 'div.omui-textarea textarea',
-        coverDelete: '.article-cover-delete',
+        // coverDelete: '.article-cover-delete',
         imageUploadAdd: 'button.omui-button--add',
-        imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label',
+        imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label.is--animated',
         imageUploadTabText: '本地上传',
-        imageUpload: 'input[type="file"]',
-        confirmUploadButton: 'div.omui-dialog-footer button.omui-button--primary',
+        imageUpload: 'input[type="file"][accept="image/jpeg,image/jpg,image/png,image/svg,image/heic,image/heif"]',
+        imageNextButton: 'div.omui-dialog button.omui-button.omui-button--primary',
+        // confirmUploadButton: 'div.omui-dialog-footer button.omui-button--primary',
+        confirmUploadButton: 'div[class^="dialogFooter-"] button.omui-button--primary',
         publishButtons: 'ul li button.omui-button',
         publishButtonText: '存草稿',
         timingPublishButtonText: '定时发布',
@@ -222,17 +224,25 @@ export const qqOmVideoPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -247,23 +257,23 @@ export const qqOmVideoPublisher = async (data) => {
     }
     
     const autoFillCover = async(cover) => {
-        const clearDefaultCovers = async() => {
-            const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
-            if (!coverDeleteElements) {
-                return;
-            }
-            console.log('coverDeleteElements length', coverDeleteElements.length);
-            for (const coverDeleteElement of coverDeleteElements) {
-                if (!coverDeleteElement) {
-                    continue;
-                }
-                console.log('coverDelete trrigle click');
-                (coverDeleteElement as HTMLElement).click();
-            }
-            await sleep(1000);
-        };
+        // const clearDefaultCovers = async() => {
+        //     const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
+        //     if (!coverDeleteElements) {
+        //         return;
+        //     }
+        //     console.log('coverDeleteElements length', coverDeleteElements.length);
+        //     for (const coverDeleteElement of coverDeleteElements) {
+        //         if (!coverDeleteElement) {
+        //             continue;
+        //         }
+        //         console.log('coverDelete trrigle click');
+        //         (coverDeleteElement as HTMLElement).click();
+        //     }
+        //     await sleep(1000);
+        // };
 
-        await clearDefaultCovers();
+        // await clearDefaultCovers();
 
         const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
         if (!imageUploadAdd) {
@@ -281,17 +291,29 @@ export const qqOmVideoPublisher = async (data) => {
         (imageUploadTab as HTMLElement).click();
         await sleep(1000);
 
-        const images = [];
+        const covers = [];
 
         console.log('cover', cover);
         for (const image of cover) {
-            images.push({
-                url: image,
-            });
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
         }
 
-        console.log('images', images);
-        await uploadImages(images);
+        console.log('covers', covers);
+        await uploadImages(covers);
+        await sleep(2000);
+
+        const imageNextButton = document.querySelector(formElement.imageNextButton);
+        if (!imageNextButton) {
+            return;
+        }
+
+        imageNextButton.dispatchEvent(new Event('click', { bubbles: true }));
         await sleep(2000);
 
         const confirmUploadButton = document.querySelector(formElement.confirmUploadButton);
@@ -387,8 +409,12 @@ export const qqOmVideoPublisher = async (data) => {
     autoFillContent(processedData);
     await sleep(5000);
 
-    if (processedData?.cover) {
-        // autoFillCover(processedData.cover);
+    // if (processedData?.cover) {
+    //     // autoFillCover(processedData.cover);
+    // }
+
+    if (processedData?.horizontalCover || processedData?.verticalCover) {
+        autoFillCover(processedData.horizontalCover || processedData.verticalCover);
     }
 
     if (contentData.isAutoPublish) {

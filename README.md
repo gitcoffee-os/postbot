@@ -1,7 +1,7 @@
 <p align="center">
 	<img alt="logo" src="https://postbot.exmay.com/docs/images/postbot_logo.svg" width="150" height="150">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.1.12</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.1.13</h1>
 <h4 align="center">
 	一款开源的多平台内容同步分发生产力工具。
 	<br />
@@ -36,15 +36,15 @@
 <br />
 ![postbot-modal](https://postbot.exmay.com/docs/images/postbot_modal_dark.png)
 <br />
-![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.12)
+![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.13)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.12)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.13)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.12)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.13)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.12)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.13)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.12)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.13)
 <br />
 ![postbot-sidebar](https://postbot.exmay.com/docs/images/postbot_sidebar.png)
 
@@ -109,4 +109,4 @@ PostBot 内容同步助手 微信 交流群：
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/image?repos=gitcoffee-os/postbot&type=date&legend=top-left)](https://www.star-history.com/?repos=gitcoffee-os%2Fpostbot&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/image?repos=gitcoffee-os/postbot&type=date&legend=top-left)](https://github.com/gitcoffee-os/postbot)

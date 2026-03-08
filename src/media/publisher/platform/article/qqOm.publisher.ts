@@ -85,7 +85,7 @@ export const qqOmArticlePublisher = async (data) => {
         editor: 'div.ProseMirror[contenteditable="true"]',
         coverDelete: '.article-cover-delete',
         imageUploadAdd: 'button.omui-button--add',
-        imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label',
+        imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label.is--animated',
         imageUploadTabText: '本地上传',
         imageUpload: 'input[type="file"]',
         imagePickers: 'li.omui-upload-image-item img',

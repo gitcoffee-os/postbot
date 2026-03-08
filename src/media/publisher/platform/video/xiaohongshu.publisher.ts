@@ -86,6 +86,9 @@ export const xiaohongshuVideoPublisher = async (data) => {
         // title: 'div.title-container input[type="text"]',
         title: 'div.edit-container input[type="text"]',
         editor: 'div[contenteditable="true"]',
+        coverAdd: 'div.cover-plugin-preview div.operator',
+        coverUpload: 'div.d-modal input[type="file"]',
+        coverConfirmButton: 'div.d-modal .d-button.bg-red',
         submitButton: 'div.submit button.d-button',
         publishButtonText: '发布',
         draftButtonText: '暂存离开',
@@ -166,7 +169,7 @@ export const xiaohongshuVideoPublisher = async (data) => {
 
     const uploadImages = async (images) => {
         console.log('images', images);
-        const imageUpload = await observeElement(formElement.imageUpload);
+        const imageUpload = await observeElement(formElement.coverUpload);
         if (!imageUpload) {
             throw new Error('未找到图片上传元素');
         }
@@ -176,17 +179,25 @@ export const xiaohongshuVideoPublisher = async (data) => {
         const dataTransfer = new DataTransfer();
 
         for (const image of images) {
-            const url = image?.url || image?.src;
-            const imageData = await fetchImage(url);
-
-            let fileName = imageData.fileName;
-            if (!fileName) {
-                fileName = getFileName(fileName, url);
+            if (image.objectUrl) {
+                const response = await fetch(image.objectUrl);
+                const blob = await response.blob();
+    
+                const file = new File([blob], image.name, { type: image.type });
+                dataTransfer.items.add(file);
+            } else {
+                const url = image?.url || image?.src;
+                const imageData = await fetchImage(url);
+    
+                let fileName = imageData.fileName;
+                if (!fileName) {
+                    fileName = getFileName(fileName, url);
+                }
+    
+                const blob = new Blob([imageData.bits], { type: imageData.type });
+                const file = new File([blob], fileName, { type: imageData.type });
+                dataTransfer.items.add(file);
             }
-
-            const blob = new Blob([imageData.bits], { type: imageData.type });
-            const file = new File([blob], fileName, { type: imageData.type });
-            dataTransfer.items.add(file);
         }
 
         if (dataTransfer.files.length === 0) {
@@ -230,6 +241,44 @@ export const xiaohongshuVideoPublisher = async (data) => {
         editor.dispatchEvent(new Event('input', { bubbles: true }));
         editor.dispatchEvent(new Event('change', { bubbles: true }));
     }
+
+    const autoFillCover = async(cover) => {
+
+        const imageUploadAdd = document.querySelector(formElement.coverAdd) as HTMLElement;
+        if (!imageUploadAdd) {
+            return;
+        }
+
+        imageUploadAdd.click();
+        await sleep(5000);
+
+        const covers = [];
+
+        console.log('cover', cover);
+        for (const image of cover) {
+            if (image instanceof Object) {
+                covers.push(image);
+            } else {
+                covers.push({
+                    url: image,
+                });
+            }
+        }
+
+        console.log('covers', covers);
+        await uploadImages(covers);
+        await sleep(2000);
+
+        // const confirmUploadButtons = document.querySelectorAll(formElement.confirmUploadButtons);
+        // const confirmUploadButton = Array.from(confirmUploadButtons)?.find((button) => button.textContent?.includes(formElement.confirmUploadText));
+        const confirmUploadButton = document.querySelector(formElement.coverConfirmButton) as HTMLElement;
+        if (!confirmUploadButton) {
+            return;
+        }
+
+        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
+        await sleep(2000);
+    };
 
     const autoUploadVideo = async(videoData) => {
         console.log('videoData', videoData);
@@ -294,9 +343,14 @@ export const xiaohongshuVideoPublisher = async (data) => {
     // await sleep(5000);
 
     await autoFillContent(contentData);
+    await sleep(5000);
+
+    if (processedData?.horizontalCover || processedData?.verticalCover) {
+        autoFillCover(processedData.horizontalCover || processedData.verticalCover);
+    }
 
     if (contentData.isAutoPublish) {
-        await sleep(5000);
+        await sleep(2000);
         autoPublish();
     }
 
