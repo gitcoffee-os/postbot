@@ -83,6 +83,8 @@ export const toutiaoArticlePublisher = async (data) => {
         title: 'textarea[placeholder="请输入文章标题（2～30个字）"]',
         editor: 'div[contenteditable="true"]',
         coverDelete: '.article-cover-delete',
+        cover3Area: 'label.byte-radio input[type="radio"][value="3"]',
+        cover3Element: 'span.byte-radio-inner-text',
         imageUploadAdd: 'div.article-cover-add',
         imageUploadTabs: 'div.byte-tabs-header-title',
         imageUploadTabText: '上传图片',
@@ -235,7 +237,19 @@ export const toutiaoArticlePublisher = async (data) => {
         console.log('图片上传成功');
     }
     
-    const autoFillCover = async(cover) => {
+    const autoFillCover = async(cover, coverMode) => {
+
+        if (coverMode && coverMode == 3) {
+            const cover3Area = (document.querySelector(formElement.cover3Area) as HTMLElement);
+            if (cover3Area) {
+                const cover3Element = cover3Area.parentElement.querySelector(formElement.cover3Element) as HTMLElement;
+                if (cover3Element) {
+                    cover3Element.click();
+                    await sleep(1000);
+                }
+            }
+        }
+
         const clearDefaultCovers = async() => {
             const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
             if (!coverDeleteElements) {
@@ -341,7 +355,7 @@ export const toutiaoArticlePublisher = async (data) => {
     await sleep(5000);
 
     if (processedData?.cover) {
-        autoFillCover(processedData.cover);
+        autoFillCover(processedData.cover, processedData?.coverMode);
     }
 
     if (contentData.isAutoPublish) {

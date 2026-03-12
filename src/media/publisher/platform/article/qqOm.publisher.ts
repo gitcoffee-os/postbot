@@ -84,8 +84,12 @@ export const qqOmArticlePublisher = async (data) => {
         title: '#omEditorTitle span[data-placeholder="请输入标题（5-64个字）"]',
         editor: 'div.ProseMirror[contenteditable="true"]',
         coverDelete: '.article-cover-delete',
+        cover3Area: 'label.omui-radio input[type="radio"][value="3"]',
+        cover3Element: 'span.omui-radio__label',
         imageUploadAdd: 'button.omui-button--add',
-        imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label.is--animated',
+        imageUploadChange: 'div.omui-thumb__action span',
+        // imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label.is--animated',
+        imageUploadTabs: 'ul.omui-tab__nav li.omui-tab__label',
         imageUploadTabText: '本地上传',
         imageUpload: 'input[type="file"]',
         imagePickers: 'li.omui-upload-image-item img',
@@ -274,32 +278,64 @@ export const qqOmArticlePublisher = async (data) => {
         return null;
     }
     
-    const autoFillCover = async(cover) => {
-        const clearDefaultCovers = async() => {
-            const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
-            if (!coverDeleteElements) {
-                return;
-            }
-            console.log('coverDeleteElements length', coverDeleteElements.length);
-            for (const coverDeleteElement of coverDeleteElements) {
-                if (!coverDeleteElement) {
-                    continue;
+    const autoFillCover = async(cover, coverMode, index) => {
+
+        if (index == 0) {
+            if (coverMode && coverMode == 3) {
+                const cover3Area = (document.querySelector(formElement.cover3Area) as HTMLElement);
+                if (cover3Area) {
+                    const cover3Element = cover3Area.parentElement.querySelector(formElement.cover3Element) as HTMLElement;
+                    if (cover3Element) {
+                        cover3Element.click();
+                        await sleep(1000);
+                    }
                 }
-                console.log('coverDelete trrigle click');
-                (coverDeleteElement as HTMLElement).click();
             }
-            await sleep(1000);
-        };
 
-        await clearDefaultCovers();
+            const clearDefaultCovers = async() => {
+                const coverDeleteElements = document.querySelectorAll(formElement.coverDelete);
+                if (!coverDeleteElements) {
+                    return;
+                }
+                console.log('coverDeleteElements length', coverDeleteElements.length);
+                for (const coverDeleteElement of coverDeleteElements) {
+                    if (!coverDeleteElement) {
+                        continue;
+                    }
+                    console.log('coverDelete trrigle click');
+                    (coverDeleteElement as HTMLElement).click();
+                }
+                await sleep(1000);
+            };
 
-        const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
-        if (!imageUploadAdd) {
-            return;
+            await clearDefaultCovers();
         }
 
-        imageUploadAdd.click();
-        await sleep(1000);
+        const imageUploadClick = async() => {
+            const imageUploadAdd = document.querySelector(formElement.imageUploadAdd) as HTMLElement;
+            if (!imageUploadAdd) {
+                return;
+            }
+
+            imageUploadAdd.click();
+            await sleep(1000);
+        }
+       
+        if (coverMode && coverMode == 3) {
+            if (index == 0) {
+                const imageUploadChange = document.querySelector(formElement.imageUploadChange) as HTMLElement;
+                if (imageUploadChange) {
+                    imageUploadChange.click();
+                    await sleep(1000);
+                    return;
+                }
+                await imageUploadClick();
+            } else {
+                await imageUploadClick();
+            }
+        } else {
+            await imageUploadClick();
+        }
 
         const imageUploadTabs = document.querySelectorAll(formElement.imageUploadTabs);
         const imageUploadTab = Array.from(imageUploadTabs).find(tab => tab.textContent?.includes(formElement.imageUploadTabText));
@@ -323,22 +359,33 @@ export const qqOmArticlePublisher = async (data) => {
         }
 
         console.log('covers', covers);
-        await uploadImages(covers);
+        await uploadImages([covers[index]]);
         await sleep(2000);
 
-        const picker = await observeElement(getPickerImage, 100000);
+       const confirmUpload = async() => {
+         const picker = await observeElement(getPickerImage, 100000);
 
-        if (!picker) {
-            return;
-        }
+            if (!picker) {
+                return;
+            }
 
-        const confirmUploadButton = document.querySelector(formElement.confirmUploadButton);
-        if (!confirmUploadButton) {
-            return;
-        }
+            const confirmUploadButton = document.querySelector(formElement.confirmUploadButton);
+            if (!confirmUploadButton) {
+                return;
+            }
 
-        confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
-        await sleep(2000);
+            confirmUploadButton.dispatchEvent(new Event('click', { bubbles: true }));
+            await sleep(2000);
+       }
+
+       await confirmUpload();
+
+        if (coverMode && coverMode == 3) {
+            const isLast = index + 1 == 3;
+            if (!isLast) {
+                await autoFillCover(covers, coverMode, index + 1);
+            }
+        } 
     };
     
     const getPublishButton = () => {
@@ -387,7 +434,7 @@ export const qqOmArticlePublisher = async (data) => {
     await sleep(2000);
 
     if (processedData?.cover) {
-        await autoFillCover(processedData.cover);
+        await autoFillCover(processedData.cover, processedData?.coverMode, 0);
     }
 
     if (contentData.isAutoPublish) {

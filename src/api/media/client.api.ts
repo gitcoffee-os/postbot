@@ -17,7 +17,7 @@ import { getPostBotBaseApi } from "~config/config";
 
 export const updateApi = async(params) => {
     const response = await fetch(`${getPostBotBaseApi()}/postbot/media/client/update`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
