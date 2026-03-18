@@ -19,21 +19,6 @@ export const contentImages = ref([]);
 
 export const content = ref('');
 
-export const getSelectionContent = () => {
-    // // 获取选中的内容
-    // const selection = window.getSelection();
-    // const range = selection.getRangeAt(0);  // 获取选中的第一个范围
-    // const selectedContent = range.cloneContents();  // 获取选中的内容的副本
+export const selectionContent = ref('');
 
-    // // 创建一个临时容器来解析选中的内容
-    // const tempContainer = document.createElement('div');
-    // tempContainer.appendChild(selectedContent);
-
-    // // 查找选中内容中的所有图片
-    // const contentImages = tempContainer.querySelectorAll('img');
-
-    // // 输出图片的链接
-    // contentImages.forEach(img => {
-    // console.log(img.src);  // 或者进行其他处理
-    // });
-}
+export const selectionImages = ref([]);

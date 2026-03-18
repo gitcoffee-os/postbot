@@ -20,7 +20,7 @@ import { initCopyEvent } from "~events/copy.event"
 import { getReaderData } from "~media/parser"
 
 export const config: PlasmoCSConfig = {
-  // matches: ["https://www.plasmo.com/*"]
+  matches: ["<all_urls>"]
 }
 
 import { createApp } from 'vue'
@@ -67,6 +67,73 @@ window.addEventListener("load", () => {
 
   // document.body.style.background = "pink"
 })
+
+// 防抖函数
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// 选区变化处理函数
+const handleSelectionChange = debounce(() => {
+  const selection = window.getSelection();
+  
+  // 检查是否有选中内容
+  const hasSelection = selection && selection.rangeCount > 0 && selection.toString().trim().length > 0;
+  
+  const selectionData = {
+    selectionContent: '',
+    selectionImages: []
+  };
+  
+  if (hasSelection) {
+    try {
+      const range = selection.getRangeAt(0);
+      
+      // 克隆两次，一次用于获取HTML内容，一次用于提取图片
+      const selectedHTMLForContent = range.cloneContents();
+      const selectedHTMLForImages = range.cloneContents();
+      
+      // 获取HTML内容
+      const serializer = new XMLSerializer();
+      const htmlContent = serializer.serializeToString(selectedHTMLForContent);
+      selectionData.selectionContent = htmlContent;
+      
+      // 提取选区中的图片
+      const tempDiv = document.createElement('div');
+      tempDiv.appendChild(selectedHTMLForImages);
+      const imgElements = tempDiv.querySelectorAll('img');
+      const selectedImages = Array.from(imgElements).map(img => ({ src: img.src }));
+      selectionData.selectionImages = selectedImages;
+    } catch (error) {
+      console.error('Error with range operations:', error);
+    }
+  }
+  
+  // 发送选区数据到background script
+  if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
+    chrome.runtime.sendMessage({
+      type: "SELECTION_DATA",
+      ...selectionData,
+      url: window.location.href,
+      timestamp: new Date().toISOString(),
+      hasSelection: hasSelection
+    });
+  }
+}, 300); // 300ms 防抖
+
+document.addEventListener("selectionchange", () => {
+  // console.log("selectionchange 触发", window.getSelection()?.toString());
+  // 调用选区变化处理函数
+  handleSelectionChange();
+});
 
 // 发送获取到的图片URL到后台脚本
 

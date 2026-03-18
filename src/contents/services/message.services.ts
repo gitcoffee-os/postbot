@@ -21,6 +21,8 @@ import { getPostBotBaseUrl } from '~config/config';
 
 import { handleMetaMessage } from "./meta.services";
 
+import { getImgElements } from "~media/handler/image.handler";
+
 export const handleMessage = (request, sender, sendResponse) => {
     const data = getReaderData();
     const { content, contentImages } = data;
@@ -33,11 +35,42 @@ export const handleMessage = (request, sender, sendResponse) => {
             sendResponse({});
             break;
         case 'getImages':
-            message = { contentImages: contentImages };
+            message = { contentImages: contentImages || [] };
             sendResponse(message);
             break;
         case 'getContent':
-            message = { content: content };
+            message = { content: content || '' };
+            sendResponse(message);
+            break;
+        case 'getSelectionContent':
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                
+                // 克隆两次，一次用于获取HTML内容，一次用于提取图片
+                const selectedHTMLForContent = range.cloneContents();
+                const selectedHTMLForImages = range.cloneContents();
+                
+                // 获取HTML内容
+                const serializer = new XMLSerializer();
+                const htmlContent = serializer.serializeToString(selectedHTMLForContent);
+                
+                // 提取选区中的图片
+                const tempDiv = document.createElement('div');
+                tempDiv.appendChild(selectedHTMLForImages);
+                const imgElements = tempDiv.querySelectorAll('img');
+                const selectedImages = Array.from(imgElements).map(img => ({ src: img.src }));
+                
+                message = { 
+                    selectionContent: htmlContent,
+                    selectionImages: selectedImages 
+                };
+            } else {
+                message = { 
+                    selectionContent: '',
+                    selectionImages: [] 
+                };
+            }
             sendResponse(message);
             break;
         case 'previewContent':

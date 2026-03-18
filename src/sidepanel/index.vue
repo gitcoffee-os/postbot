@@ -20,14 +20,5 @@
 <script lang="ts" setup>
     import TabsManage from '~components/sidepanel/TabsManage.vue';
 
-    import { contentImages, content } from '~utils/content';
-
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        console.debug('message', message);
-      if (message.type === 'IMAGE_DETECTED') {
-        contentImages.value = message?.contentImages;
-      } else if (message.type === 'CONTENT_DETECTED') {
-        content.value = message?.content;
-      }
-    });
+    console.log('=== Sidepanel root component loaded ===');
 </script>

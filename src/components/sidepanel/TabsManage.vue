@@ -28,7 +28,7 @@
             
             <div style="width:100%;">
                 <!-- <Divider orientation="left">同步任务</Divider> -->
-            <Tabs v-model:activeKey="activeKey" :destroyInactiveTabPane="true" @change="handleTagChange">
+            <Tabs v-model:activeKey="activeKey" @change="handleTagChange">
               <TabPane :key="'1'" tab="同步任务">
                 <div class="em-ui-action">
                   <Space direction="vertical" align="center">
@@ -55,7 +55,12 @@
                 </div>
               </TabPane>
               <TabPane :key="'5'" tab="选区内容">
-                
+                <div id="selection-content-container" class="em-ui-content">
+                  <div v-if="localSelectionContent" v-html="localSelectionContent"></div>
+                  <div v-else>
+                    <Empty description="当前选区暂无内容，请在页面中选择文本" />
+                  </div>
+                </div>
               </TabPane>
               <TabPane :key="'2'" tab="内容图片">
                 <div class="em-ui-action">
@@ -86,7 +91,43 @@
               </TabPane>
 
               <TabPane :key="'3'" tab="选区图片">
+                <div class="em-ui-action">
+                  <Space direction="vertical" align="center">
+                    <div id="selection-images-empty" v-if="!localSelectionImages || localSelectionImages?.length === 0">
+                      <Empty description="当前选区暂无图片，请在页面中选择包含图片的内容" />
+                    </div>
+                    <div id="selection-images-buttons" v-if="localSelectionImages?.length > 0" style="display:flex;flex-direction: row;justify-content:center;align-items: center;">
+                      <Space>
+                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;">
+                            <template #icon>
+                            <DownloadOutlined />
+                            </template>
+                            下载选区图片
+                        </Button>
 
+                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;">
+                            <template #icon>
+                            <CloudUploadOutlined />
+                            </template>
+                            同步选区图片
+                        </Button>
+                      </Space>
+                  </div>
+                </Space>
+              </div>
+                <div id="selection-images-container" v-if="localSelectionImages?.length > 0" class="em-ui-image-list">
+                  <ImagePreviewGroup class="em-ui-images">
+                    <Space direction="vertical" align="center">
+                      <Image
+                        v-for="(item, index) in localSelectionImages"
+                        :key="index"
+                        :height="200"
+                        :width="200"
+                        :src="item.src"
+                        style="max-width:100%;max-height:100%;" />
+                    </Space>
+                  </ImagePreviewGroup>
+                </div>
               </TabPane>
             </Tabs>
             </div>
@@ -95,9 +136,9 @@
   </template>
   
   <script lang="ts" setup>
-    import {ref } from 'vue'
+    import {ref, onMounted, onActivated, watch, nextTick, reactive, toRefs } from 'vue'
     import 'ant-design-vue/dist/reset.css';
-    import { Space, Button, Modal, Divider, Empty, Switch } from "ant-design-vue"
+    import { Space, Button, Modal, Divider, Empty, Switch, ImagePreviewGroup, Image } from "ant-design-vue"
     // import { Space, Card, CardMeta, Avatar, Button } from 'ant-design-vue';
     import { SettingOutlined, EditOutlined, EllipsisOutlined, PlusOutlined, DownloadOutlined, CloudUploadOutlined } from '@ant-design/icons-vue';
 
@@ -109,6 +150,60 @@
 
     const activeKey = ref('1');
 
+    // 创建响应式对象
+    const selectionState = reactive({
+      content: '',
+      images: []
+    });
+
+    // 转换为ref以便在模板中使用
+    const { content: localSelectionContent, images: localSelectionImages } = toRefs(selectionState);
+
+    // 直接监听消息，不使用全局变量
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.type === 'SELECTION_DATA') {
+            // 直接更新响应式对象
+            selectionState.content = message.selectionContent;
+            selectionState.images = message.selectionImages;
+            
+            // 直接更新DOM，确保实时显示
+            updateSelectionDOM(message.selectionContent, message.selectionImages);
+        } else if (message.type === 'TEST_SELECTION_DATA') {
+            // 直接更新DOM，确保实时显示
+            updateSelectionDOM(message.selectionContent, message.selectionImages);
+        }
+    });
+
+    // 直接更新DOM的函数
+    const updateSelectionDOM = (content, images) => {
+        // 更新选区内容
+        const contentContainer = document.getElementById('selection-content-container');
+        if (contentContainer) {
+            if (content) {
+                contentContainer.innerHTML = `<div>${content}</div>`;
+            } else {
+                contentContainer.innerHTML = `<div style="text-align: center; padding: 20px;"><div style="color: #999; font-size: 14px;">当前选区暂无内容，请在页面中选择文本</div></div>`;
+            }
+        }
+        
+        // 更新选区图片
+        const imagesEmpty = document.getElementById('selection-images-empty');
+        const imagesButtons = document.getElementById('selection-images-buttons');
+        const imagesContainer = document.getElementById('selection-images-container');
+        
+        if (imagesEmpty && imagesButtons && imagesContainer) {
+            if (images && images.length > 0) {
+                imagesEmpty.style.display = 'none';
+                imagesButtons.style.display = 'flex';
+                imagesContainer.style.display = 'block';
+            } else {
+                imagesEmpty.style.display = 'block';
+                imagesButtons.style.display = 'none';
+                imagesContainer.style.display = 'none';
+            }
+        }
+    };
+
     import UserCard from './UserCard.vue';
     import TaskList from './TaskList.vue';
     import ImageList from './ImageList.vue';
@@ -116,17 +211,23 @@
    const size = ref('normal');
 
     const handleTagChange = (activeKey) => {
-      console.log('activeKey', activeKey);
       if (activeKey === '2') {
 
-        chrome.runtime.sendMessage({ action: 'getcontentImages' }, (response) => {
-            console.log('response', response);
+        chrome.runtime.sendMessage({ action: 'getImages' }, (response) => {
             contentImages.value = response.contentImages;
         });
       } else if (activeKey === '4') {
         chrome.runtime.sendMessage({ action: 'getContent' }, (response) => {
-            console.log('response', response);
             content.value = response.content;
+        });
+
+      } else if (activeKey === '5' || activeKey === '3') {
+        chrome.runtime.sendMessage({ action: 'getSelectionContent' }, (response) => {
+            if (response) {
+              // 直接更新本地变量
+              localSelectionContent.value = response.selectionContent;
+              localSelectionImages.value = response.selectionImages;
+            }
         });
 
       }
@@ -144,7 +245,7 @@
 
   const showFlowButton = ref(true);
 
-
+  
   
   // 显示模态框
   const showModal = () => {
@@ -185,6 +286,58 @@
     config.value.exploreVersionEnabled = checked;
     saveExploreVersionSetting(checked);
   }
+  
+  // 当侧边栏显示时重新获取数据
+  onActivated(() => {
+    refreshAllData();
+  });
+  
+  // 监听标签页变化，当页面切换时重新获取数据
+  onMounted(() => {
+    // 监听标签页激活事件
+    chrome.tabs.onActivated.addListener((activeInfo) => {
+      refreshAllData();
+    });
+    
+    // 监听标签页URL变化事件
+    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      if (changeInfo.url) {
+        // 只在当前标签页URL变化时刷新数据
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs[0] && tabs[0].id === tabId) {
+            refreshAllData();
+          }
+        });
+      }
+    });
+    
+    // 初始获取数据
+    refreshAllData();
+  });
+  
+  // 刷新所有数据的函数
+  const refreshAllData = () => {
+    // 获取内容数据
+    chrome.runtime.sendMessage({ action: 'getContent' }, (response) => {
+      if (response) {
+        content.value = response.content;
+      }
+    });
+    // 获取图片数据
+    chrome.runtime.sendMessage({ action: 'getImages' }, (response) => {
+      if (response) {
+        contentImages.value = response.contentImages;
+      }
+    });
+    // 获取选区数据
+    chrome.runtime.sendMessage({ action: 'getSelectionContent' }, (response) => {
+      if (response) {
+        // 直接更新响应式对象
+        selectionState.content = response.selectionContent;
+        selectionState.images = response.selectionImages;
+      }
+    });
+  };
   </script>
   
   <style lang="less" scoped>
@@ -217,5 +370,19 @@
 
   .em-ui-content :deep(img) {
     max-width: 100%;
+  }
+
+  .em-ui-image-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .em-ui-images {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
   </style>  

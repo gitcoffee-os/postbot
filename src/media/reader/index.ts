@@ -22,14 +22,21 @@ import { getImgElements } from "~media/handler/image.handler";
 import { readers } from "~media/adapter";
 
 const readerContent = () => {
-    let contentData = {};
+    let contentData = {
+        title: '',
+        content: '',
+        contentImages: []
+    };
     try {
         const documentClone = document.cloneNode(true);
-        contentData = new Readability(documentClone).parse();
+        const readability = new Readability(documentClone);
+        const parsedData = readability.parse();
+        if (parsedData) {
+            contentData = parsedData;
+        }
     } catch (e) {
-        console.warn('解析异常', e);
+        // 静默处理错误
     }
-    console.debug('contentData', contentData);
     return contentData;
 }
 
@@ -38,7 +45,6 @@ const readerSelection = () => {
     if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         const selectedHTML = range.cloneContents(); // 获取选中的 HTML 内容
-        console.debug('selectedHTML', selectedHTML);
         return selectedHTML;
     }
     return null;
@@ -55,7 +61,15 @@ export const reader = () => {
     };
     let contentImages = [];
 
-    data = readerContent();
+    // 首先使用Readability获取页面内容
+    const readabilityData = readerContent();
+    
+    // 如果Readability成功获取到内容，使用它
+    if (readabilityData && readabilityData.content) {
+        data = readabilityData;
+    }
+    
+    // 检查是否有选中的内容
     const selectionElements = readerSelection();
     if (selectionElements && selectionElements.textContent) {
         const docFragment = selectionElements;  // 获取的 DocumentFragment
@@ -64,9 +78,9 @@ export const reader = () => {
 
         data.content = htmlContent;
     } else {
+        // 尝试使用特定域名的reader来增强内容
         const domain = window.location.hostname;
-        console.log(domain);
-        const reader = readers[domain];
+        const reader = readers[domain] || readers['default'];
         if (reader) {
             const readerContent = reader();
             mergeData(data, readerContent);
@@ -77,9 +91,6 @@ export const reader = () => {
         contentImages = getImgElements(data.content);
         data.contentImages = contentImages;
     }
-
-    console.debug('data.content', data.content);
-    console.debug('data.contentImages', data.contentImages);
 
     return data;
 }

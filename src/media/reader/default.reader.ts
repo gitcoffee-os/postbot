@@ -28,5 +28,5 @@ export const defaultReader = () => {
         content: content,
     }
 
-    return content;
+    return data;
 }

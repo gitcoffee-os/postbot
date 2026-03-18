@@ -41,6 +41,41 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.type === 'request') {
     handleMessage(request, sender, sendResponse);
+  } else if (request.type === 'SELECTION_CHANGED' || 
+             request.type === 'SELECTION_DATA' ||
+             request.type === 'TEST_SELECTION_DATA' ||
+             request.type === 'IMAGE_DETECTED' || 
+             request.type === 'CONTENT_DETECTED' ||
+             request.type === 'TEST_MESSAGE') {
+    // 转发消息到所有扩展组件（包括sidebar）
+    chrome.runtime.sendMessage(request, (response) => {
+      if (chrome.runtime.lastError) {
+        // 即使有错误也要继续，可能是因为没有接收者
+      }
+    });
+    
+    // 立即响应，避免Content Script等待
+    sendResponse({ status: 'forwarded', message: 'Message forwarded successfully' });
+  } else if (request.action === 'getContent' || 
+             request.action === 'getImages' || 
+             request.action === 'getSelectionContent') {
+    // 转发content script相关的请求到content script
+    // 使用tabs.sendMessage发送到当前活动标签页
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        chrome.tabs.sendMessage(tabs[0].id, request, (response) => {
+          if (chrome.runtime.lastError) {
+            sendResponse({ error: chrome.runtime.lastError.message });
+          } else {
+            sendResponse(response);
+          }
+        });
+      } else {
+        sendResponse({ error: 'No active tab found' });
+      }
+    });
+    // 必须返回true以表示异步响应
+    return true;
   }
 
   return true;
