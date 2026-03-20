@@ -15,6 +15,8 @@
  */
 import { getTrustedDomains, setTrustedDomains } from "~stores"
 
+import { appId } from "~config/config";
+
 import { isLoginApi } from "./media/user.api";
 
 import { listingApi } from "./media/platform.api";
@@ -22,6 +24,13 @@ import { listingApi } from "./media/platform.api";
 import { updateApi } from "./media/client.api";
 
 import { state } from "~contents/components/postbot.data";
+
+export const getHeaders = () => {
+  return {
+    'Content-Type': 'application/json',
+    'App-Id': appId,
+  };
+};
 
 const intervalTime: number = 1000 * 30;
 

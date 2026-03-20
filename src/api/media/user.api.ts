@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 import { getPostBotBaseUrl } from "~config/config";
+import { getHeaders } from "../index";
 
 export const isLoginApi = async(params) => {
     const response = await fetch(`${getPostBotBaseUrl()}/exmay/api/ums/member/islogin`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
         credentials: 'include',
         body: JSON.stringify(params),
       });
@@ -34,9 +33,7 @@ export const isLoginApi = async(params) => {
 export const userInfoApi = async(params) => {
   const response = await fetch(`${getPostBotBaseUrl()}/exmay/api/member/center/info`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       credentials: 'include',
     });
     if (response.ok) {

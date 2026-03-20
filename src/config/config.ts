@@ -22,6 +22,7 @@ export const config = appSettings;
 
 export const BASE_URL = 'https://postbot.exmay.com';
 export const EXPLORE_BASE_URL = 'https://postar.exmay.com';
+export const appId = "postbot";
 
 // Dynamic URL based on explore version setting
 export const getPostBotBaseUrl = () => {

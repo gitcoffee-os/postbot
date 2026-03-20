@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 import { getPostBotBaseApi } from "~config/config";
+import { getHeaders } from "../index";
 
 export const listingApi = async(params) => {
-    const response = await fetch(`${getPostBotBaseApi()}/postbot/media/platform/listing`, {
+    const response = await fetch(`${getPostBotBaseApi()}/postbot/media/meta/listing`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
         credentials: 'include',
         body: JSON.stringify(params),
       });

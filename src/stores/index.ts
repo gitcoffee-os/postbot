@@ -24,7 +24,7 @@ export const setTrustedDomains = async (domains) => {
 }
 
 export const getTrustedDomains = async () => {
-  const token = await storage.get(TRUSTE_DOMAINS)
-  console.log('trustedDomains', token)
-  return token
+  const domains = await storage.get(TRUSTE_DOMAINS)
+  console.log('trustedDomains', domains)
+  return domains
 }

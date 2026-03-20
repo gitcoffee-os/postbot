@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 import { getPostBotBaseApi } from "~config/config";
+import { getHeaders } from "../index";
 
 export const listApi = async(params) => {
     const query = new URLSearchParams(params).toString();
     const response = await fetch(`${getPostBotBaseApi()}/postbot/media/task/list?${query}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
         credentials: 'include',
       });
       if (response.ok) {
