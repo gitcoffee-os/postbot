@@ -70,7 +70,7 @@
                     </div>
                     <div v-if="contentImages?.length > 0" style="display:flex;flex-direction: row;justify-content:center;align-items: center;">
                       <Space>
-                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;">
+                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;" @click="downloadAllContentImages">
                             <template #icon>
                             <DownloadOutlined />
                             </template>
@@ -98,7 +98,7 @@
                     </div>
                     <div id="selection-images-buttons" v-if="localSelectionImages?.length > 0" style="display:flex;flex-direction: row;justify-content:center;align-items: center;">
                       <Space>
-                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;">
+                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;" @click="downloadSelectionImages">
                             <template #icon>
                             <DownloadOutlined />
                             </template>
@@ -138,7 +138,7 @@
   <script lang="ts" setup>
     import {ref, onMounted, onActivated, watch, nextTick, reactive, toRefs } from 'vue'
     import 'ant-design-vue/dist/reset.css';
-    import { Space, Button, Modal, Divider, Empty, Switch, ImagePreviewGroup, Image } from "ant-design-vue"
+    import { Space, Button, Modal, Divider, Empty, Switch, ImagePreviewGroup, Image, message } from "ant-design-vue"
     // import { Space, Card, CardMeta, Avatar, Button } from 'ant-design-vue';
     import { SettingOutlined, EditOutlined, EllipsisOutlined, PlusOutlined, DownloadOutlined, CloudUploadOutlined } from '@ant-design/icons-vue';
 
@@ -147,6 +147,11 @@
     import { contentImages, content } from '~utils/content';
 
     import { getPostBotBaseUrl, config, saveExploreVersionSetting } from '~config/config';
+
+    import JSZip from 'jszip';
+    import { saveAs } from 'file-saver';
+
+    import dayjs from 'dayjs';
 
     const activeKey = ref('1');
 
@@ -286,6 +291,114 @@
     config.value.exploreVersionEnabled = checked;
     saveExploreVersionSetting(checked);
   }
+  
+  // 从 URL 中提取文件名
+  const extractFilenameFromUrl = (url, defaultName) => {
+    try {
+      const urlObj = new URL(url);
+      const pathname = urlObj.pathname;
+      const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
+      // 如果文件名包含查询参数，移除它们
+      const cleanFilename = filename.split('?')[0];
+      // 如果文件名包含扩展名，返回它，否则返回默认名称
+      if (cleanFilename && cleanFilename.includes('.')) {
+        return cleanFilename;
+      }
+      return `${defaultName}.jpg`;
+    } catch (e) {
+      return `${defaultName}.jpg`;
+    }
+  };
+
+  // 获取文件扩展名
+  const getFileExtension = (filename) => {
+    const match = filename.match(/\.([a-zA-Z0-9]+)$/);
+    return match ? match[1].toLowerCase() : 'jpg';
+  };
+
+  // 将图片 URL 转换为 Blob
+  const fetchImageAsBlob = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status}`);
+      }
+      return await response.blob();
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      throw error;
+    }
+  };
+
+  // 打包下载图片
+  const downloadImagesAsZip = async (images, zipName) => {
+    if (!images || images.length === 0) {
+      message.warning('没有可下载的图片');
+      return;
+    }
+
+    // 生成带时间戳的文件名
+    const timestamp = dayjs().format('YYYY-MM-DD-HH-mm-ss');
+    const timestampedZipName = `${zipName}_${timestamp}`;
+
+    const loadingMessage = message.loading('正在打包图片，请稍候...', 0);
+
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder(zipName);
+
+      // 用于检测重复文件名
+      const usedFilenames = new Set();
+
+      // 并发下载所有图片
+      const downloadPromises = images.map(async (image, index) => {
+        try {
+          const originalFilename = extractFilenameFromUrl(image.src, `image-${index + 1}`);
+          let filename = originalFilename;
+
+          // 处理重复文件名
+          if (usedFilenames.has(filename)) {
+            const ext = getFileExtension(filename);
+            const baseName = filename.substring(0, filename.lastIndexOf('.'));
+            let counter = 1;
+            while (usedFilenames.has(filename)) {
+              filename = `${baseName}_${counter}.${ext}`;
+              counter++;
+            }
+          }
+          usedFilenames.add(filename);
+
+          const blob = await fetchImageAsBlob(image.src);
+          folder.file(filename, blob);
+        } catch (error) {
+          console.error(`Failed to download image ${index + 1}:`, error);
+        }
+      });
+
+      await Promise.all(downloadPromises);
+
+      // 生成并下载 zip 文件
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, `${timestampedZipName}.zip`);
+
+      message.success('图片打包成功，请确认下载');
+    } catch (error) {
+      console.error('Error creating zip:', error);
+      message.error('打包下载失败，请重试');
+    } finally {
+      loadingMessage();
+    }
+  };
+
+  // 下载所有内容图片
+  const downloadAllContentImages = () => {
+    downloadImagesAsZip(contentImages.value, 'content-images');
+  };
+
+  // 下载选区图片
+  const downloadSelectionImages = () => {
+    downloadImagesAsZip(localSelectionImages.value, 'selection-images');
+  };
   
   // 当侧边栏显示时重新获取数据
   onActivated(() => {

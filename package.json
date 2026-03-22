@@ -1,7 +1,7 @@
 {
   "name": "PostBot",
   "displayName": "PostBot 内容同步助手",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "description": "PostBot 内容同步助手",
   "author": "GitCoffee Team @GitCoffee",
   "scripts": {
@@ -15,6 +15,8 @@
     "@plasmohq/storage": "^1.11.0",
     "ant-design-vue": "^4.2.5",
     "dayjs": "^1.11.13",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "plasmo": "0.90.5",
     "vue": "3.4.19"
   },
