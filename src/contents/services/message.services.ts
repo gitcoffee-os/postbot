@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getReaderData } from "~media/parser"
+import { getReaderData } from "~media/parser";
 
-import { state } from "../components/postbot.data"
+import { state } from "../components/postbot.data";
 
 import { getPostBotBaseUrl } from '~config/config';
 
 import { handleMetaMessage } from "./meta.services";
-
-import { getImgElements } from "~media/handler/image.handler";
+import { handleMediaMessage, handleMediaSyncMessage } from "./media.services";
 
 export const handleMessage = (request, sender, sendResponse) => {
     const data = getReaderData();
-    const { content, contentImages } = data;
+    const { content } = data;
 
     let message = {};
     let userInfo = {};
@@ -33,10 +32,6 @@ export const handleMessage = (request, sender, sendResponse) => {
         case 'doLogin':
             window.open(`${getPostBotBaseUrl()}/exmay/postbot/media/publish`, '_blank');
             sendResponse({});
-            break;
-        case 'getImages':
-            message = { contentImages: contentImages || [] };
-            sendResponse(message);
             break;
         case 'getContent':
             message = { content: content || '' };
@@ -49,26 +44,17 @@ export const handleMessage = (request, sender, sendResponse) => {
                 
                 // 克隆两次，一次用于获取HTML内容，一次用于提取图片
                 const selectedHTMLForContent = range.cloneContents();
-                const selectedHTMLForImages = range.cloneContents();
                 
                 // 获取HTML内容
                 const serializer = new XMLSerializer();
                 const htmlContent = serializer.serializeToString(selectedHTMLForContent);
                 
-                // 提取选区中的图片
-                const tempDiv = document.createElement('div');
-                tempDiv.appendChild(selectedHTMLForImages);
-                const imgElements = tempDiv.querySelectorAll('img');
-                const selectedImages = Array.from(imgElements).map(img => ({ src: img.src }));
-                
                 message = { 
-                    selectionContent: htmlContent,
-                    selectionImages: selectedImages 
+                    selectionContent: htmlContent
                 };
             } else {
                 message = { 
-                    selectionContent: '',
-                    selectionImages: [] 
+                    selectionContent: ''
                 };
             }
             sendResponse(message);
@@ -90,6 +76,17 @@ export const handleMessage = (request, sender, sendResponse) => {
         case 'setFlowButton':
             state.showFlowButton = request?.showFlowButton;
             sendResponse({});
+            break;
+        // 媒体相关的消息处理
+        case 'getImages':
+        case 'getAllImages':
+        case 'getSelectionImages':
+            handleMediaMessage(request, sender, sendResponse);
+            break;
+        // 媒体同步相关的消息处理
+        case 'MEDIA_SYNC.GET_SYNC_IMAGES':
+        case 'MEDIA_SYNC.UPLOAD_COMPLETE':
+            handleMediaSyncMessage(request, sender, sendResponse);
             break;
         default:
             handleMetaMessage(request, sender, sendResponse);

@@ -89,7 +89,9 @@ export const xiaohongshuVideoPublisher = async (data) => {
         coverAdd: 'div.cover-plugin-preview div.operator',
         coverUpload: 'div.d-modal input[type="file"]',
         coverConfirmButton: 'div.d-modal .d-button.bg-red',
-        submitButton: 'div.submit button.d-button',
+        // submitButton: 'div.submit button.d-button',
+        // submitButton: 'div.publish-page-publish-btn button.d-button',
+        submitButton: 'button',
         publishButtonText: '发布',
         draftButtonText: '暂存离开',
     }

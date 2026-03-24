@@ -29,6 +29,11 @@ const readerContent = () => {
     };
     try {
         const documentClone = document.cloneNode(true);
+        // 移除扩展自身的元素
+        const postbotContainer = documentClone.getElementById('postbot-container');
+        if (postbotContainer) {
+            postbotContainer.remove();
+        }
         const readability = new Readability(documentClone);
         const parsedData = readability.parse();
         if (parsedData) {

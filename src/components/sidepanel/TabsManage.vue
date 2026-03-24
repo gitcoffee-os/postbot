@@ -77,11 +77,11 @@
                             下载所有图片
                         </Button>
 
-                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;">
+                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;" @click="handleSyncContentImages">
                             <template #icon>
                             <CloudUploadOutlined />
                             </template>
-                            同步所有图片
+                            同步至素材库
                         </Button>
                       </Space>
                   </div>
@@ -105,11 +105,11 @@
                             下载选区图片
                         </Button>
 
-                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;">
+                        <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;" @click="handleSyncSelectionImages">
                             <template #icon>
                             <CloudUploadOutlined />
                             </template>
-                            同步选区图片
+                            同步至素材库
                         </Button>
                       </Space>
                   </div>
@@ -136,7 +136,7 @@
   </template>
   
   <script lang="ts" setup>
-    import {ref, onMounted, onActivated, watch, nextTick, reactive, toRefs } from 'vue'
+    import {ref, onMounted, onActivated, onUnmounted, watch, nextTick, reactive, toRefs } from 'vue'
     import 'ant-design-vue/dist/reset.css';
     import { Space, Button, Modal, Divider, Empty, Switch, ImagePreviewGroup, Image, message } from "ant-design-vue"
     // import { Space, Card, CardMeta, Avatar, Button } from 'ant-design-vue';
@@ -212,6 +212,7 @@
     import UserCard from './UserCard.vue';
     import TaskList from './TaskList.vue';
     import ImageList from './ImageList.vue';
+    import { syncContentImages, syncSelectionImages, startMediaSyncMessageListener, stopMediaSyncMessageListener } from '~utils/media';
 
    const size = ref('normal');
 
@@ -399,6 +400,68 @@
   const downloadSelectionImages = () => {
     downloadImagesAsZip(localSelectionImages.value, 'selection-images');
   };
+
+  // 同步内容图片至素材库
+  const handleSyncContentImages = async () => {
+    if (!contentImages.value || contentImages.value.length === 0) {
+      message.warning('没有可同步的内容图片');
+      return;
+    }
+
+    const loadingMessage = message.loading('正在同步图片，请稍候...', 0);
+    
+    try {
+      // 获取当前标签页 ID
+      chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        if (tabs[0]) {
+          const success = await syncContentImages(contentImages.value, tabs[0].id);
+          if (success) {
+            message.success('图片同步已开始，正在跳转到素材库...');
+          } else {
+            message.error('图片同步失败，请重试');
+          }
+        } else {
+          message.error('无法获取当前标签页信息');
+        }
+        loadingMessage();
+      });
+    } catch (error) {
+      console.error('同步内容图片失败:', error);
+      message.error('同步失败，请重试');
+      loadingMessage();
+    }
+  };
+
+  // 同步选区图片至素材库
+  const handleSyncSelectionImages = async () => {
+    if (!localSelectionImages.value || localSelectionImages.value.length === 0) {
+      message.warning('没有可同步的选区图片');
+      return;
+    }
+
+    const loadingMessage = message.loading('正在同步图片，请稍候...', 0);
+    
+    try {
+      // 获取当前标签页 ID
+      chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        if (tabs[0]) {
+          const success = await syncSelectionImages(localSelectionImages.value, tabs[0].id);
+          if (success) {
+            message.success('图片同步已开始，正在跳转到素材库...');
+          } else {
+            message.error('图片同步失败，请重试');
+          }
+        } else {
+          message.error('无法获取当前标签页信息');
+        }
+        loadingMessage();
+      });
+    } catch (error) {
+      console.error('同步选区图片失败:', error);
+      message.error('同步失败，请重试');
+      loadingMessage();
+    }
+  };
   
   // 当侧边栏显示时重新获取数据
   onActivated(() => {
@@ -407,15 +470,14 @@
   
   // 监听标签页变化，当页面切换时重新获取数据
   onMounted(() => {
-    // 监听标签页激活事件
+    startMediaSyncMessageListener();
+    
     chrome.tabs.onActivated.addListener((activeInfo) => {
       refreshAllData();
     });
     
-    // 监听标签页URL变化事件
     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       if (changeInfo.url) {
-        // 只在当前标签页URL变化时刷新数据
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           if (tabs[0] && tabs[0].id === tabId) {
             refreshAllData();
@@ -424,8 +486,11 @@
       }
     });
     
-    // 初始获取数据
     refreshAllData();
+  });
+  
+  onUnmounted(() => {
+    stopMediaSyncMessageListener();
   });
   
   // 刷新所有数据的函数

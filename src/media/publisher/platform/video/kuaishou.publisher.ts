@@ -91,7 +91,8 @@ export const kuaishouVideoPublisher = async (data) => {
         coverUpload: 'div.ant-modal input[type="file"]',
         confirmUploadButtons: 'div.ant-modal button.ant-btn',
         confirmUploadText: '确认',
-        submitButton: 'button',
+        // submitButton: 'button',
+        submitButton: 'div[class^="_button_"]',
         publishButtonText: '发布',
         draftButtonText: '暂存离开',
     }
