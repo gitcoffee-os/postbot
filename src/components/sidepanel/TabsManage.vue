@@ -251,6 +251,20 @@
 
   const showFlowButton = ref(true);
 
+  // Load showFlowButton setting from Chrome storage
+  const loadShowFlowButtonSetting = () => {
+    chrome.storage.local.get('showFlowButton', (result) => {
+      if (result.showFlowButton !== undefined) {
+        showFlowButton.value = result.showFlowButton;
+      }
+    });
+  };
+
+  // Save showFlowButton setting to Chrome storage
+  const saveShowFlowButtonSetting = (show: boolean) => {
+    chrome.storage.local.set({ showFlowButton: show });
+  };
+
   
   
   // 显示模态框
@@ -278,14 +292,24 @@
   }
 
   const onShowSwitchChange = (checked) => {
+    // Save to Chrome storage
+    saveShowFlowButtonSetting(checked);
 
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const tabId = tabs[0].id;
-      chrome.tabs.sendMessage(tabId, { action: 'setFlowButton', showFlowButton: checked }, (response) => {
-        console.log('response', response);
+    // Notify all tabs to update state
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
+        if (tab.id) {
+          chrome.tabs.sendMessage(tab.id, { action: 'setFlowButton', showFlowButton: checked }, (response) => {
+            // Ignore errors for tabs that don't have content script
+            if (chrome.runtime.lastError) {
+              // console.log('Tab does not have content script:', tab.id);
+            } else {
+              console.log('response', response);
+            }
+          });
+        }
       });
     });
-
   }
 
   const onSwitchChange = (checked) => {
@@ -471,11 +495,11 @@
   // 监听标签页变化，当页面切换时重新获取数据
   onMounted(() => {
     startMediaSyncMessageListener();
-    
+
     chrome.tabs.onActivated.addListener((activeInfo) => {
       refreshAllData();
     });
-    
+
     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       if (changeInfo.url) {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -485,8 +509,11 @@
         });
       }
     });
-    
+
     refreshAllData();
+
+    // Load showFlowButton setting from Chrome storage
+    loadShowFlowButtonSetting();
   });
   
   onUnmounted(() => {

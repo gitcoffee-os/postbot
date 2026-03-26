@@ -13,12 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
 export const state = reactive({
+    // 默认值为 true，但需要在 storage 加载完成后才生效
     showFlowButton: true,
+    // 标记是否已从 storage 加载完成
+    isStorageLoaded: false,
     rangType: 'content',
     isModalVisible: false,
     contentData: {},
     metaInfoList: {},
 });
+
+// Load showFlowButton setting from Chrome storage
+const loadShowFlowButtonSetting = () => {
+  chrome.storage.local.get('showFlowButton', (result) => {
+    // storage 有值时优先级最高
+    if (result.showFlowButton !== undefined) {
+      state.showFlowButton = result.showFlowButton;
+    }
+    // 标记已从 storage 加载完成
+    state.isStorageLoaded = true;
+  });
+};
+
+// Save showFlowButton setting to Chrome storage
+export const saveShowFlowButtonSetting = (show: boolean) => {
+  chrome.storage.local.set({ showFlowButton: show });
+};
+
+// Watch for changes and save to storage (only after loading from storage)
+watch(() => state.showFlowButton, (newValue) => {
+  if (state.isStorageLoaded) {
+    saveShowFlowButtonSetting(newValue);
+  }
+});
+
+// Load setting when module is initialized
+loadShowFlowButtonSetting();
