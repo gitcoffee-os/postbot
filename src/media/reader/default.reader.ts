@@ -14,15 +14,46 @@
  * limitations under the License.
  */
 export const defaultReader = () => {
-    const contentElements = document.querySelectorAll('body');
+    // 尝试查找文章主体内容的常见选择器
+    const articleSelectors = [
+        'article',
+        '[role="main"]',
+        '.post-content',
+        '.article-content',
+        '.entry-content',
+        '.content',
+        '.post',
+        '.article',
+        'main',
+        '#content',
+        '#main-content',
+        '.main-content'
+    ];
 
-    let content = '';
+    let contentElement = null;
 
-    if (contentElements.length > 0) {
-        content = contentElements[0]?.innerHTML;
+    // 尝试找到最可能包含文章内容的元素
+    for (const selector of articleSelectors) {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+            // 选择内容最长的元素
+            for (const el of elements) {
+                const textLength = el.textContent?.length || 0;
+                if (!contentElement || textLength > (contentElement.textContent?.length || 0)) {
+                    contentElement = el;
+                }
+            }
+        }
     }
 
-    console.debug('content', content);
+    // 如果没找到特定选择器，回退到 body
+    if (!contentElement) {
+        contentElement = document.body;
+    }
+
+    const content = contentElement?.innerHTML || '';
+
+    console.debug('defaultReader content', content);
 
     const data = {
         content: content,

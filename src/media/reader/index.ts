@@ -83,12 +83,21 @@ export const reader = () => {
 
         data.content = htmlContent;
     } else {
-        // 尝试使用特定域名的reader来增强内容
         const domain = window.location.hostname;
-        const reader = readers[domain] || readers['default'];
-        if (reader) {
+        const hasCustomReader = readers[domain] && readers[domain] !== readers['default'];
+        
+        // 如果存在针对当前域名的个性化 reader，优先使用它
+        if (hasCustomReader) {
+            const reader = readers[domain];
             const readerContent = reader();
             mergeData(data, readerContent);
+        } else if (!data.content) {
+            // 只有当 Readability 没有提取到内容且没有个性化 reader 时，才使用默认 reader
+            const reader = readers['default'];
+            if (reader) {
+                const readerContent = reader();
+                mergeData(data, readerContent);
+            }
         }
     }
 
