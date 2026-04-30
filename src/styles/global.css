@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getPostBotBaseApi } from "~config/config";
-import { getHeaders } from "../index";
 
-export const listingApi = async(params) => {
-    const response = await fetch(`${getPostBotBaseApi()}/postbot/media/meta/listing`, {
-        method: 'POST',
-        headers: getHeaders(),
-        credentials: 'include',
-        body: JSON.stringify(params),
-      });
-      if (response.ok) {
-        const body = await response.json();
-        return body;
-      }
-      return null;
+/* Global reset styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base body styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Content image responsive styles */
+.em-ui-content img {
+  max-width: 100%;
 }

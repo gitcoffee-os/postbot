@@ -15,7 +15,7 @@
  */
 import { platformMetas } from "~media/platform";
 
-import { getImageUrl } from "~utils/image";
+import { image } from '@gitcoffee/postbot-utils';
 
 const Api = {
   MediaInfo: platformMetas.qq_om.mediaInfoUrl,
@@ -35,7 +35,7 @@ const getMediaInfo = async () => {
       return {
         userId: mediaId,
         name: mediaName,
-        avatarUrl: getImageUrl(header),
+        avatarUrl: image.getImageUrl(header),
         phone: mobile,
       }
     }

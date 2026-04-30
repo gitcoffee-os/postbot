@@ -36,7 +36,6 @@ export const defaultReader = () => {
     for (const selector of articleSelectors) {
         const elements = document.querySelectorAll(selector);
         if (elements.length > 0) {
-            // 选择内容最长的元素
             for (const el of elements) {
                 const textLength = el.textContent?.length || 0;
                 if (!contentElement || textLength > (contentElement.textContent?.length || 0)) {

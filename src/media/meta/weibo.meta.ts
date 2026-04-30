@@ -15,7 +15,7 @@
  */
 
 import { platformMetas } from "~media/platform";
-import { getImageUrl, imageDownloadToBase64 } from "~utils/image";
+import { image } from '@gitcoffee/postbot-utils';
 
 const Api = {
     MediaInfo: platformMetas.weibo.mediaInfoUrl,
@@ -44,7 +44,7 @@ const getWeiboMetaInfo = async(html) => {
       const userInfo = {
         userId: uid,
         name: nick,
-        avatarUrl: getImageUrl(avatarUrl),
+        avatarUrl: image.getImageUrl(avatarUrl),
         avatar: avatar,
       };
       

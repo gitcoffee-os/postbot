@@ -15,7 +15,7 @@
  */
 
 import { platformMetas } from "~media/platform";
-import { imageToBase64 } from "~utils/image";
+import { image } from '@gitcoffee/postbot-utils';
 
 const Api = {
   MediaInfo: platformMetas.bilibili.mediaInfoUrl,
@@ -32,7 +32,7 @@ const getMediaInfo = async () => {
       const data = body?.data;
       const { mid, uname, face } = data;
 
-      const avatar = await imageToBase64(face);  
+      const avatar = await image.imageToBase64(face);  
 
       return {
         userId: mid,

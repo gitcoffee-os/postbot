@@ -80,7 +80,7 @@ export const douyinVideoPublisher = async (data) => {
       };
     
     const formElement = {
-        title: 'input.semi-input',
+        title: 'input.semi-input[placeholder*="作品标题"]',
         editor: 'div[contenteditable="true"]',
         videoUpload: 'input[type="file"]',
         imageUpload: 'div[class^="addIcon-"]',
@@ -343,7 +343,8 @@ export const douyinVideoPublisher = async (data) => {
 
     const getConfirmPublishButton = () => {
         const buttons = document.querySelectorAll(formElement.publishButtons);
-        const confirmPublishButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.confirmButtonText));
+        // const confirmPublishButton = Array.from(buttons)?.find((button) => button.textContent?.includes(formElement.confirmButtonText));
+        const confirmPublishButton = Array.from(buttons)?.find((button) => button.textContent === formElement.confirmButtonText);
         console.log('confirmPublishButton', confirmPublishButton);
         return confirmPublishButton;
     }

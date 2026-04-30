@@ -16,7 +16,7 @@
 
 import { platformMetas } from "../platform"; 
 
-import { getImageUrl } from "~utils/image";
+import { image } from '@gitcoffee/postbot-utils';
 
 const Api = {
     MediaInfo: platformMetas.cnblogs.mediaInfoUrl,
@@ -45,7 +45,7 @@ export const getCnBlogsMetaInfo = (html) => {
     const userInfo = {
         userId: userId,
         name: username,
-        avatarUrl: getImageUrl(avatar),
+        avatarUrl: image.getImageUrl(avatar),
     }
     console.log('userInfo', userInfo);
     return userInfo;

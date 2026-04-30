@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { state } from "~contents/components/postbot.data";
-import { content } from "~utils/content";
 
 const getToken = () => {
     return state.metaInfoList?.weixin?.token;

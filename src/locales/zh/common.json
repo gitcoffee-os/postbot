@@ -1,0 +1,14 @@
+{
+  "appName": "PostBot",
+  "loading": "加载中...",
+  "save": "保存",
+  "cancel": "取消",
+  "confirm": "确认",
+  "delete": "删除",
+  "edit": "编辑",
+  "close": "关闭",
+  "sync": "同步",
+  "publish": "发布",
+  "load_more": "加载更多",
+  "all_loaded": "已加载全部"
+}

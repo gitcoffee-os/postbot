@@ -1,0 +1,14 @@
+{
+  "appName": "PostBot",
+  "loading": "Loading...",
+  "save": "Save",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "delete": "Delete",
+  "edit": "Edit",
+  "close": "Close",
+  "sync": "Sync",
+  "publish": "Publish",
+  "load_more": "Load More",
+  "all_loaded": "All Loaded"
+}

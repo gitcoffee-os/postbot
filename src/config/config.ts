@@ -13,23 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// export const BASE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://postbot.exmay.com';
-import { appSettings, saveExploreVersionSetting } from './setting';
+interface PostbotConfig {
+  baseUrl: string;
+  baseApiPath: string;
+  publishPath: string;
+  defaultTrustedDomain: string;
+  coverImageUrl: string;
+  defaultAvatarUrl: string;
+}
 
-export { saveExploreVersionSetting };
-// Maintain backward compatibility
-export const config = appSettings;
-
-export const BASE_URL = 'https://postbot.exmay.com';
-export const EXPLORE_BASE_URL = 'https://postar.exmay.com';
-export const appId = "postbot";
-
-// Dynamic URL based on explore version setting
-export const getPostBotBaseUrl = () => {
-  return appSettings.value.exploreVersionEnabled ? EXPLORE_BASE_URL : BASE_URL;
+const defaultConfig: PostbotConfig = {
+  baseUrl: 'https://postbot.exmay.com',
+  baseApiPath: '/exmay/authority/api',
+  publishPath: '/exmay/postbot/media/publish',
+  defaultTrustedDomain: 'exmay.com',
+  coverImageUrl: 'https://cdn.exmay.com/exmay/exmay-app/static/images/postbot_home.png',
+  defaultAvatarUrl: 'https://cdn.exmay.com/exmay/exmay-app/static/images/postbot_logo.png',
 };
 
-export const getPostBotBaseApi = () => {
-  return `${getPostBotBaseUrl()}/exmay/authority/api`;
+const loadConfig = (): PostbotConfig => {
+  try {
+    const envConfig = typeof __POSTBOT_CONFIG__ !== 'undefined' ? __POSTBOT_CONFIG__ : {};
+    return { ...defaultConfig, ...envConfig };
+  } catch {
+    return defaultConfig;
+  }
 };
 
+const config = loadConfig();
+
+export const getPostBotBaseUrl = () => config.baseUrl;
+export const getPostBotBaseApi = () => `${config.baseUrl}${config.baseApiPath}`;
+export const getPublishPath = () => config.publishPath;
+export const getDefaultTrustedDomain = () => config.defaultTrustedDomain;
+export const getCoverImageUrl = () => config.coverImageUrl;
+export const getDefaultAvatarUrl = () => config.defaultAvatarUrl;
+
+export const appId = 'postbot';
+
+declare const __POSTBOT_CONFIG__: Partial<PostbotConfig>;

@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Storage } from '@plasmohq/storage'
+import { createPinia } from 'pinia';
 
-const storage = new Storage({ area: 'local' });
+const pinia = createPinia();
 
-const TRUSTE_DOMAINS = 'TPOSTBOT_RUSTE_DOMAINS';
+export const setupStore = (app: any) => {
+  app.use(pinia);
+};
 
-export const setTrustedDomains = async (domains) => {
-  await storage.set(TRUSTE_DOMAINS, domains)
-}
+export * from './trustedDomains';
 
-export const getTrustedDomains = async () => {
-  const domains = await storage.get(TRUSTE_DOMAINS)
-  console.log('trustedDomains', domains)
-  return domains
-}
+export default pinia;

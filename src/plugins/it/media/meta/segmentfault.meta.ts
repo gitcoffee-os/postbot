@@ -16,7 +16,7 @@
 
 import { platformMetas } from "../platform";
 
-import { getImageUrl } from "~utils/image";
+import { image } from '@gitcoffee/postbot-utils';
 
 const Api = {
     MediaInfo: platformMetas.segmentfault.mediaInfoUrl,
@@ -55,7 +55,7 @@ export const getSegmentFaultMetaInfo = (html) => {
           userId: user.id,
         //   username: user.slug,
           name: user.name,
-          avatarUrl: getImageUrl(avatarUrl || '')
+          avatarUrl: image.getImageUrl(avatarUrl || '')
         };
     
     } catch (error) {

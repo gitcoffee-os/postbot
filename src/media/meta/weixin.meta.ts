@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { platformMetas } from "~media/platform";
-import { getDocument } from "~utils/html";
+import { html as htmlUtils } from '@gitcoffee/postbot-utils';
 
 const Api = {
     HomePage: platformMetas.weixin.homepage,
@@ -57,7 +57,7 @@ const parserUsrInfo = (script) => {
 }
 
 export const getWeixinMetaInfo = (html) => {
-    const doc = getDocument(html);
+    const doc = htmlUtils.getDocument(html);
     const scripts = doc.querySelectorAll('script');
     const script = scripts[0].text;
     const code = script.substring(script.indexOf('window.wx.commonData'));

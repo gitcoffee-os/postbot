@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { getDocument } from "~utils/html";
 import { platformMetas } from "../platform";
-import { getImageUrl } from "~utils/image";
+import { image } from '@gitcoffee/postbot-utils';
 
 const Api = {
     MediaInfo: platformMetas.oschina.mediaInfoUrl,
@@ -37,7 +36,7 @@ export const getOsChinaMetaInfo = (html) => {
     const userInfo = {
         userId: userId,
         name: userName,
-        avatarUrl: getImageUrl(userPortraitSmall),
+        avatarUrl: image.getImageUrl(userPortraitSmall),
     }
     console.log('userInfo', userInfo);
     return userInfo;

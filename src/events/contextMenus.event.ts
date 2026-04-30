@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getSelectionContent } from "~utils/content";
-
-import { isLoginApi } from "~api/media/user.api";
+import { user } from '@gitcoffee/postbot-api';
 
 export const initContextMenusEvent = () => {
 
@@ -40,7 +38,7 @@ export const initContextMenusEvent = () => {
 
   const handelSyncData = async (info, tab) => {
 
-    const res = await isLoginApi({});
+    const res = await user.isLoginApi({});
     console.log('res', res);
     if (!res?.data?.login) {
       chrome.tabs.sendMessage(tab.id, { action: "doLogin" }, (response) => {

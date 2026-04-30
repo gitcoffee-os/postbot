@@ -15,7 +15,7 @@
  */
 
 import { platformMetas } from "~media/platform";
-import { getImageUrl } from "~utils/image";
+import { image } from '@gitcoffee/postbot-utils';
 
 const Api = {
   MediaInfo: platformMetas.jianshu.mediaInfoUrl,
@@ -33,7 +33,7 @@ const getMediaInfo = async () => {
       const { nickname, avatar } = data;
       return {
         name: nickname,
-        avatarUrl: getImageUrl(avatar),
+        avatarUrl: image.getImageUrl(avatar),
       }
     }
     return null;
