@@ -1,13 +1,16 @@
 <p align="center">
 	<img alt="logo" src="https://postbot.exmay.com/docs/images/postbot_logo.svg" width="150" height="150">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.2.0</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">PostBot 内容同步助手 v1.1.20</h1>
 <h4 align="center">
 	一款开源的多平台内容同步分发生产力工具。
 	<br />
 	支持将文章、笔记、动态、图片、视频、音频等内容，一键同步发布至主流媒体平台。
 </h4>
 <p align="center">
+	<a href="https://github.com/gitcoffee-os/postbot" style="display:inline-block;margin:5px;">
+      <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/gitcoffee-os/postbot">
+   </a>
 	<a href="https://github.com/gitcoffee-os/postbot/blob/main/LICENSE" style="display:inline-block;margin:5px;">
 		<img src="https://img.shields.io/github/license/gitcoffee-os/postbot.svg?labelColor=47caff&color=bd34fe">
 	</a>
@@ -33,15 +36,15 @@
 <br />
 ![postbot-modal](https://postbot.exmay.com/docs/images/postbot_modal_dark.png)
 <br />
-![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.2.0)
+![postbot-publisher](https://postbot.exmay.com/docs/images/postbot_publisher.png?v=1.1.20)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.2.0)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_editor.png?v=1.1.20)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.2.0)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_moment.png?v=1.1.20)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.2.0)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_video.png?v=1.1.20)
 <br />
-![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.2.0)
+![postbot-editor](https://postbot.exmay.com/docs/images/postbot_audio.png?v=1.1.20)
 <br />
 ![postbot-sidebar](https://postbot.exmay.com/docs/images/postbot_sidebar.png)
 
@@ -74,6 +77,7 @@
 - [官网文档](https://postbot.exmay.com/docs)
 - [用户指南](https://postbot.exmay.com/docs/README)
 - [快速开始](https://postbot.exmay.com/docs/quickstart)
+- [开发指南](https://postbot.exmay.com/docs/dev-guide)
 
 ## 💻 代码托管
 - GitHub：[https://github.com/gitcoffee-os/postbot](https://github.com/gitcoffee-os/postbot)
@@ -83,9 +87,10 @@
 
 PostBot 只有通过开源协作才能蓬勃发展。秉持这一精神，我们欢迎来自社区的各种贡献。如果您有意参与其中，请查阅我们的 [贡献者指南](https://postbot.exmay.com/docs/contributing) 。
 
+
 ## ⚖️ License
 
-本仓库遵循 [GitCoffee Open Source License](https://github.com/gitcoffee-os/postbot/blob/main/LICENSE) 开源协议，该许可证本质上是 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)，但有一些额外的限制。
+本项目遵循 [GitCoffee Open Source License](https://github.com/gitcoffee-os/postbot/blob/main/LICENSE) 开源协议，该许可证本质上是 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)，但有一些额外的限制。
 
 ## 🤝 商务合作
 
@@ -99,6 +104,10 @@ PostBot 内容同步助手 微信 交流群：
 (扫码添加微信，备注：PostBot，邀您加入群聊)
 
 - [用户社群](https://postbot.exmay.com/docs/usergroup)
+
+## 🌐 国际版
+- [Postar - 国际版内容同步助手](https://postar.exmay.com/docs/) — 面向国际媒体平台（X / Twitter、Facebook、Instagram、TikTok、YouTube、LinkedIn 等）的内容同步分发工具。
+- GitHub：[https://github.com/gitcoffee-os/postar](https://github.com/gitcoffee-os/postar)
 
 ## 🌍 开源生态
 
