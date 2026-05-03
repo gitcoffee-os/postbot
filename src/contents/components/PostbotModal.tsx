@@ -6,14 +6,15 @@ import { state } from './postbot.data'
 import iconUrl from "~assets/icon.png"
 import { POSTBOT_ACTION } from '~message/postbot.action'
 import { getPostBotBaseUrl } from '~config/config'
+import { useTranslation } from '~locales'
 
 const PostbotModalInner = createModal({
   state,
   iconUrl,
-  assistantLabel: 'PostBot内容同步助手',
-  previewLabel: '内容预览',
-  syncNowLabel: '立即同步',
-  cancelLabel: '取消',
+  assistantLabel: () => useTranslation()('postbot:postbot.content_sync_assistant'),
+  previewLabel: () => useTranslation()('postbot:postbot.content_preview'),
+  syncNowLabel: () => useTranslation()('postbot:postbot.sync_now'),
+  cancelLabel: () => useTranslation()('postbot:common.cancel'),
   getBaseUrl: getPostBotBaseUrl,
   publishPath: '/exmay/postbot/media/publish',
   actionSyncData: POSTBOT_ACTION.PUBLISH_SYNC_DATA,
@@ -25,7 +26,7 @@ export default defineComponent({
   setup() {
     const handleClick = () => {
       chrome.runtime.sendMessage({ type: 'request', action: 'checkLogin' }, (response) => {
-        if (response.isLogin) {
+        if (response?.isLogin) {
           state.isModalVisible = true;
         } else {
           window.open(`${getPostBotBaseUrl()}/exmay/postbot/media/publish`, '_blank');

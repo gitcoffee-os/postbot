@@ -25,20 +25,25 @@ export const config: PlasmoCSConfig = {
 
 import { createApp } from 'vue'
 import PostbotModal from './components/PostbotModal';
-// import 'ant-design-vue/dist/reset.css';
+import 'ant-design-vue/dist/reset.css';
 
 import { handleMessage } from "./services/message.services";
+import { setupI18n } from '~locales';
+import { processContent } from '@gitcoffee/postbot-content-adapter';
 
-// 创建并挂载 Vue 应用到页面
-const app = createApp(PostbotModal)
+const initApp = async () => {
+  const app = createApp(PostbotModal)
 
-// 创建一个容器 div，并添加到页面 body 中
-const container = document.createElement('div')
-container.id = 'postbot-container'
-document.body.appendChild(container)
+  await setupI18n(app);
 
-// 将 Vue 应用挂载到刚创建的 div 上
-app.mount(container)
+  const container = document.createElement('div')
+  container.id = 'postbot-container'
+  document.body.appendChild(container)
+
+  app.mount(container)
+}
+
+initApp();
 
 let data = {
   content: '',
@@ -96,21 +101,19 @@ const handleSelectionChange = debounce(() => {
   if (hasSelection) {
     try {
       const range = selection.getRangeAt(0);
-      
-      // 克隆两次，一次用于获取HTML内容，一次用于提取图片
-      const selectedHTMLForContent = range.cloneContents();
-      const selectedHTMLForImages = range.cloneContents();
-      
-      // 获取HTML内容
+      const selectedHTML = range.cloneContents();
       const serializer = new XMLSerializer();
-      const htmlContent = serializer.serializeToString(selectedHTMLForContent);
-      selectionData.selectionContent = htmlContent;
-      
-      // 提取选区中的图片
+      const htmlContent = serializer.serializeToString(selectedHTML);
+      const processedHtml = processContent(htmlContent);
+
+      selectionData.selectionContent = processedHtml;
+
       const tempDiv = document.createElement('div');
-      tempDiv.appendChild(selectedHTMLForImages);
+      tempDiv.innerHTML = processedHtml;
       const imgElements = tempDiv.querySelectorAll('img');
-      const selectedImages = Array.from(imgElements).map(img => ({ src: img.src }));
+      const selectedImages = Array.from(imgElements)
+        .filter(img => img.src && !img.src.startsWith('chrome-extension://'))
+        .map(img => ({ src: img.src }));
       selectionData.selectionImages = selectedImages;
     } catch (error) {
       console.error('Error with range operations:', error);

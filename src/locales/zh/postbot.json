@@ -1,0 +1,9 @@
+{
+  "content_sync": "同步",
+  "content_sync_assistant": "PostBot 内容同步助手",
+  "content_preview": "内容预览",
+  "sync_now": "立即同步",
+  "context_menu_sync_selection": "提取选中内容并同步",
+  "context_menu_sync_image": "提取图片并同步",
+  "context_menu_sync_page": "提取内容并同步"
+}

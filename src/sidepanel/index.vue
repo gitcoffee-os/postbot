@@ -14,31 +14,46 @@
  * limitations under the License.
  */
 <template>
-    <TabsManage
-      app-name="PostBot"
-      :icon-url="iconUrl"
-      :cover-image-url="getCoverImageUrl()"
-      :default-avatar-url="getDefaultAvatarUrl()"
-      :publish-url="publishUrl"
-      :fetch-user-info="fetchUserInfo"
-      :fetch-task-list="fetchTaskList"
-      :download-images="downloadImages"
-      :sync-images="syncImages"
-      :on-explore-version-change="onExploreVersionChange"
-    />
+    <ConfigProvider :theme="themeConfig">
+      <TabsManage
+        app-name="PostBot"
+        :icon-url="iconUrl"
+        :cover-image-url="getCoverImageUrl()"
+        :default-avatar-url="getDefaultAvatarUrl()"
+        :publish-url="publishUrl"
+        :fetch-user-info="fetchUserInfo"
+        :fetch-task-list="fetchTaskList"
+        :download-images="downloadImages"
+        :sync-images="syncImages"
+        :on-explore-version-change="onExploreVersionChange"
+      />
+    </ConfigProvider>
 </template>
 
 <script lang="ts" setup>
 import { TabsManage } from '@gitcoffee/postbot-sidepanel-ui';
-import '~locales';
+import { ConfigProvider } from 'ant-design-vue';
+import 'ant-design-vue/dist/reset.css';
+import { ensureI18n } from '~locales';
 import iconUrl from '~assets/icon.png';
-import { getPostBotBaseUrl, getPublishPath, getCoverImageUrl, getDefaultAvatarUrl, saveExploreVersionSetting } from '~config/config';
+import { getPostBotBaseUrl, getPublishPath, getCoverImageUrl, getDefaultAvatarUrl } from '~config/config';
+import { saveExploreVersionSetting } from '~config/setting';
 import { user, authority } from '@gitcoffee/postbot-api';
 import { syncContentImages, syncSelectionImages } from '~utils/media';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import dayjs from 'dayjs';
 import { message } from 'ant-design-vue';
+
+ensureI18n('zh');
+
+const themeConfig = {
+  token: {
+    colorPrimary: '#bd34fe',
+    colorLink: '#bd34fe',
+    colorInfo: '#bd34fe',
+  },
+};
 
 const publishUrl = `${getPostBotBaseUrl()}${getPublishPath()}`;
 
