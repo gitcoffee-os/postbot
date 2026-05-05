@@ -25,22 +25,38 @@ export const config: PlasmoCSConfig = {
 
 import { createApp } from 'vue'
 import PostbotModal from './components/PostbotModal';
-import 'ant-design-vue/dist/reset.css';
-
 import { handleMessage } from "./services/message.services";
 import { setupI18n } from '~locales';
 import { processContent } from '@gitcoffee/postbot-content-adapter';
+import { debounce as debounceUtils } from '@gitcoffee/postbot-utils';
+import antDesignCss from 'data-text:ant-design-vue/dist/reset.css'
+import globalCss from 'data-text:../styles/global.css'
 
 const initApp = async () => {
-  const app = createApp(PostbotModal)
+  const host = document.createElement('div');
+  host.id = 'postbot-host';
+  host.style.cssText = 'position: fixed; top: 0; left: 0; width: 0; height: 0; overflow: visible; z-index: 2147483647;';
 
-  await setupI18n(app);
+  const shadowRoot = host.attachShadow({ mode: 'open' });
 
-  const container = document.createElement('div')
-  container.id = 'postbot-container'
-  document.body.appendChild(container)
+  const styleEl = document.createElement('style');
+  styleEl.textContent = antDesignCss + '\n' + globalCss;
+  shadowRoot.appendChild(styleEl);
 
-  app.mount(container)
+  const container = document.createElement('div');
+  container.id = 'postbot-container';
+  shadowRoot.appendChild(container);
+
+  document.body.appendChild(host);
+
+  const app = createApp(PostbotModal);
+
+  app.provide('postbot-shadow-root', shadowRoot);
+  app.provide('postbot-shadow-container', container);
+
+  await setupI18n(app, 'zh');
+
+  app.mount(container);
 }
 
 initApp();
@@ -73,34 +89,19 @@ window.addEventListener("load", () => {
   // document.body.style.background = "pink"
 })
 
-// 防抖函数
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
-
-// 选区变化处理函数
-const handleSelectionChange = debounce(() => {
+const handleSelectionChange = debounceUtils.debounce(() => {
   const selection = window.getSelection();
-  
-  // 检查是否有选中内容
+
   const hasSelection = selection && selection.rangeCount > 0 && selection.toString().trim().length > 0;
-  
-  const selectionData = {
+
+  const selectionData: { selectionContent: string; selectionImages: { src: string }[] } = {
     selectionContent: '',
-    selectionImages: []
+    selectionImages: [],
   };
-  
+
   if (hasSelection) {
     try {
-      const range = selection.getRangeAt(0);
+      const range = selection!.getRangeAt(0);
       const selectedHTML = range.cloneContents();
       const serializer = new XMLSerializer();
       const htmlContent = serializer.serializeToString(selectedHTML);
@@ -112,25 +113,24 @@ const handleSelectionChange = debounce(() => {
       tempDiv.innerHTML = processedHtml;
       const imgElements = tempDiv.querySelectorAll('img');
       const selectedImages = Array.from(imgElements)
-        .filter(img => img.src && !img.src.startsWith('chrome-extension://'))
-        .map(img => ({ src: img.src }));
+        .filter((img) => img.src && !img.src.startsWith('chrome-extension://'))
+        .map((img) => ({ src: img.src }));
       selectionData.selectionImages = selectedImages;
     } catch (error) {
       console.error('Error with range operations:', error);
     }
   }
-  
-  // 发送选区数据到background script
+
   if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
     chrome.runtime.sendMessage({
       type: "SELECTION_DATA",
       ...selectionData,
       url: window.location.href,
       timestamp: new Date().toISOString(),
-      hasSelection: hasSelection
+      hasSelection: hasSelection,
     });
   }
-}, 300); // 300ms 防抖
+}, 300);
 
 document.addEventListener("selectionchange", () => {
   // console.log("selectionchange 触发", window.getSelection()?.toString());
