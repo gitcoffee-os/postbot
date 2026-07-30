@@ -77,7 +77,7 @@
 ### ✨ AI
    - 可扩展集成 AI，内容更个性化、流程更智能。
 ### [🧩 扩展](https://postbot.exmay.com/docs/extension)
-   - 通过插件、SDK、API接口、MCP、AI智能体及开放平台与应用市场，可扩展与链接各类行业平台或企业应用服务。
+   - 通过插件、SDK、API接口、MCP、[CLI](https://github.com/gitcoffee-os/postbot-cli)、AI Skills、AI智能体及开放平台与应用市场，可扩展与链接各类行业平台或企业应用服务。
 ### 💡 生态
    - 提供内容创作者效率提升、开发者业务集成生态支持。
 
@@ -89,6 +89,7 @@
 - [用户指南](https://postbot.exmay.com/docs/README)
 - [快速开始](https://postbot.exmay.com/docs/quickstart)
 - [开发指南](https://postbot.exmay.com/docs/dev-guide)
+- [CLI 工具指南](https://postbot.exmay.com/docs/cli)
 
 ## 💻 代码托管
 - GitHub：[https://github.com/gitcoffee-os/postbot](https://github.com/gitcoffee-os/postbot)
@@ -102,6 +103,10 @@ PostBot 只有通过开源协作才能蓬勃发展。秉持这一精神，我们
 ## ⚖️ License
 
 本项目遵循 [GitCoffee Open Source License](https://github.com/gitcoffee-os/postbot/blob/main/LICENSE) 开源协议，该许可证本质上是 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)，但有一些额外的限制。
+
+## ✨ PostBot CLI 工具
+
+[PostBot CLI](https://github.com/gitcoffee-os/postbot-cli) 是 PostBot 内容同步助手 的命令行工具，提供更方便的批量操作和自动化任务管理功能。
 
 ## 🤝 商务合作
 
