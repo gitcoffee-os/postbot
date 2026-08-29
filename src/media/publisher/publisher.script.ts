@@ -17,6 +17,8 @@ import { publisherEntries as cnPublisherEntries } from '@gitcoffee/postbot-publi
 import { publisherEntries as itPublisherEntries } from '@gitcoffee/postbot-publisher-it';
 import { publisherEntries as industryPublisherEntries } from '@gitcoffee/postbot-publisher-industry';
 import type { PublisherEntry, DebugConfig } from '@gitcoffee/postbot-publisher-debug';
+import { backendReportIncident, installRedirectShim } from '@gitcoffee/postbot-ai-adapter';
+import { initAdapterRegistry } from '~ai-adapter/adapter.shared';
 
 const mergePublisherEntries = (...sources: any[]): any => {
     const result: any = { article: {}, moment: {}, video: {}, audio: {} };
@@ -90,29 +92,74 @@ export const executeScriptsToTabs = (tabs: any, data: any) => {
 
                     const publishFunc = entry?.publish;
 
-                    // 1. 先把该发布器的选择器配置注册到页面主世界，调试面板可实时拉取
-                    if (entry?.debugConfig) {
-                        chrome.scripting.executeScript({
-                            target: { tabId: tab.id },
-                            func: registerPublisherConfigOnPage,
-                            args: [platform.code, entry.debugConfig]
-                        });
-                    }
+                    // 0. 若该平台存在 AI 修复补丁，先把旧→新选择器重定向 shim 注入页面
+                    //    再执行发布脚本，保证失效的选择器能在发布期间被自动翻译。
+                    const runAfterRedirect = async () => {
+                        try {
+                            const schemaKey = `${platform.type}_${platform.code}`;
+                            const registry = await initAdapterRegistry();
+                            const redirects = registry.redirectsFor(schemaKey);
+                            if (redirects.length > 0) {
+                                const maps: Record<string, string[]> = {};
+                                redirects.forEach((r) => {
+                                    maps[r.from] = r.to;
+                                });
+                                await chrome.scripting.executeScript({
+                                    target: { tabId: tab.id },
+                                    func: installRedirectShim,
+                                    args: [
+                                        {
+                                            maps,
+                                            schemaKey,
+                                            version: registry.getEffectiveSchema(schemaKey)?.version ?? 1
+                                        }
+                                    ]
+                                });
+                                console.log(`[AiAdapter] 已注入 ${redirects.length} 条选择器重定向 → ${schemaKey}`, redirects);
+                            }
+                        } catch (e) {
+                            console.warn('[AiAdapter] 重定向注入失败，按原选择器执行', e);
+                        }
 
-                    // 2. 执行发布脚本
-                    if (publishFunc && typeof publishFunc === 'function') {
-                        const publisherData = {
-                            data: data?.data,
-                            platform: platform,
-                        };
-                        chrome.scripting.executeScript({
-                            target: { tabId: tab.id },
-                            func: publishFunc,
-                            args: [publisherData]
-                        });
-                    } else {
-                        console.warn(`No publish function found for platform: ${platform.type}/${platform.code}`);
-                    }
+                        // 1. 先把该发布器的选择器配置注册到页面主世界，调试面板可实时拉取
+                        if (entry?.debugConfig) {
+                            chrome.scripting.executeScript({
+                                target: { tabId: tab.id },
+                                func: registerPublisherConfigOnPage,
+                                args: [platform.code, entry.debugConfig]
+                            }).catch(() => undefined);
+                        }
+
+                        // 2. 执行发布脚本
+                        if (publishFunc && typeof publishFunc === 'function') {
+                            const publisherData = {
+                                data: data?.data,
+                                platform: platform,
+                            };
+                            chrome.scripting.executeScript({
+                                target: { tabId: tab.id },
+                                func: publishFunc,
+                                args: [publisherData]
+                            }).catch((err) => {
+                                console.warn('[AiAdapter] 发布脚本执行失败:', err);
+                                // 执行异常大概率是选择器/DOM 变化，上报后端中心记录一次修复事故
+                                void backendReportIncident({
+                                    schemaKey: `${platform.type}_${platform.code}`,
+                                    platform: platform.code,
+                                    pageType: platform.type,
+                                    url: tab.url,
+                                    errorMsg: (err as Error)?.message ?? '发布脚本执行异常',
+                                }).then((r) => {
+                                    if (r.ok) {
+                                        console.log('[AiAdapter] 发布失败事故已上报, remoteId=', r.data?.id);
+                                    }
+                                }).catch(() => undefined);
+                            });
+                        } else {
+                            console.warn(`No publish function found for platform: ${platform.type}/${platform.code}`);
+                        }
+                    };
+                    void runAfterRedirect();
                 }
             }
         };

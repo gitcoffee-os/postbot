@@ -8,6 +8,10 @@ import { platformMetas, platforms } from '~media/platform';
 import { metaInfoList } from '~media/meta';
 import { publisher } from '~media/publisher/publisher.script';
 import { debugPlugin } from './debug.plugin';
+import { collectPublisherDebugConfigs } from './debug.plugin';
+import { createAiAdapterPlugin } from '@gitcoffee/postbot-ai-adapter';
+import type { DebugConfigLike } from '@gitcoffee/postbot-ai-adapter';
+import { getAdapterRegistry } from '~ai-adapter/adapter.shared';
 
 const pluginList = [
   'cn',
@@ -119,7 +123,7 @@ const pluginModulesMap: Record<string, any> = {
   it: itPlugin,
   cn: cnPlugin,
   industry: industryPlugin,
-  debug: debugPlugin
+  debug: debugPlugin,
 };
 
 const registerPlugins = () => {
@@ -142,10 +146,30 @@ const registerPlugins = () => {
       }
     });
 
+    // 发布器插件全部注册完成后，再用工厂构建 AI 自适应插件：
+    // - collectPublisherDebugConfigs() 依赖已注册的 publisher 模块，必须在循环之后调用
+    // - registry 注入共享单例，与 content/background/sidepanel 各上下文保持一致
+    const aiAdapterPlugin = createAiAdapterPlugin({
+      debugConfigs: collectPublisherDebugConfigs() as Record<string, DebugConfigLike>,
+      registry: getAdapterRegistry(),
+    });
+
+    pluginRegistry.register(
+      aiAdapterPlugin.base,
+      aiAdapterPlugin.config,
+      aiAdapterPlugin.implementation,
+      aiAdapterPlugin.modules,
+    );
+
     console.log(`已加载 ${pluginRegistry.getAllPlugins().length} 个插件`);
 
     // 所有发布器插件注册完成后，再挂载调试面板，确保能收集到全部 publisherDebugConfigs
     debugPlugin.implementation.setupDebugger?.();
+
+    // AI 自适应插件：初始化注册中心并基于存量调试配置建立基线（幂等）
+    aiAdapterPlugin.implementation.initialize?.().catch((error: any) => {
+      console.error('AI 自适应插件初始化失败:', error);
+    });
   } catch (error) {
     console.error('插件系统初始化失败:', error);
   }

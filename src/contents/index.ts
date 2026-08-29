@@ -26,6 +26,7 @@ export const config: PlasmoCSConfig = {
 import { createApp } from 'vue'
 import PostbotModal from './components/PostbotModal';
 import { handleMessage } from "./services/message.services";
+import { initAdapterService } from "./services/adapter.service";
 import { setupI18n } from '~locales';
 import { processContent } from '@gitcoffee/postbot-content-adapter';
 import { debounce as debounceUtils } from '@gitcoffee/postbot-utils';
@@ -61,6 +62,9 @@ const initApp = async () => {
 }
 
 initApp();
+
+// AI 自适应修复模块：观测当前页面发布表单健康度，平台改版自动修复
+void initAdapterService();
 
 let data = {
   content: '',

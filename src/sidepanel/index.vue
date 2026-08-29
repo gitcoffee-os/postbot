@@ -26,6 +26,7 @@
         :download-images="downloadImages"
         :sync-images="syncImages"
         :on-explore-version-change="onExploreVersionChange"
+        :adapter-panel="AdapterPanel"
       />
     </ConfigProvider>
 </template>
@@ -44,6 +45,7 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import dayjs from 'dayjs';
 import { message } from 'ant-design-vue';
+import AdapterPanel from './components/AdapterPanel.vue';
 
 ensureI18n('zh');
 

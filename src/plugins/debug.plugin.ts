@@ -36,6 +36,8 @@ function collectPublisherDebugConfigs(): Record<string, DebugConfig> {
   return configs;
 }
 
+export { collectPublisherDebugConfigs };
+
 function shouldActivateDebugger(): boolean {
   if (process.env.NODE_ENV !== 'development') {
     return false;

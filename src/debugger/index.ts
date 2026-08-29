@@ -37,6 +37,16 @@ const PLATFORM_URL_PATTERNS: PlatformPattern[] = [
 
 let debugInstance: DebuggerInstance | null = null
 
+/** 按 URL 推断当前页面对应的调试配置键（article_xiaohongshu / video_douyin …），供适配器观测用 */
+export function matchPlatformKey(url: string): string | null {
+  for (const p of PLATFORM_URL_PATTERNS) {
+    if (p.match(url)) {
+      return p.key
+    }
+  }
+  return null
+}
+
 export function setupDebugger(publisherDebugConfigs: Record<string, DebugConfig>): void {
   if (process.env.NODE_ENV !== 'development') {
     return

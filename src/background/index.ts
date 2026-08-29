@@ -3,6 +3,7 @@ import "~plugins";
 import { handleMessage } from "./message.background";
 import { createBackgroundListener } from '@gitcoffee/postbot-background';
 import { initContextMenusEvent } from "~events";
+import { initAdapterBackground } from "./adapter.background";
 
 export const config: PlasmoCSConfig = {}
 
@@ -13,6 +14,10 @@ initContextMenusEvent();
 
 console.log('PostBot chrome.runtime.onMessage.addListener');
 createBackgroundListener(handleMessage);
+
+initAdapterBackground().catch((error) => {
+  console.error('[AiAdapter] 后台自适应模块初始化失败:', error);
+});
 
 if (process.env.NODE_ENV === 'development') {
   // 供内容脚本读取页面主世界的发布器调试配置注册表
