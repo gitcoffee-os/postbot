@@ -131,7 +131,7 @@ PostBot 内容同步助手 微信 交流群：
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/image?repos=gitcoffee-os/postbot&type=date&legend=top-left)](https://github.com/gitcoffee-os/postbot)
+[![Star History Chart](https://star-history.dera.page/svg?repos=gitcoffee-os/postbot&type=date&legend=top-left)](https://github.com/gitcoffee-os/postbot)
 
 <div align="center">
 
