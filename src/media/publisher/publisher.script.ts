@@ -19,6 +19,7 @@ import { publisherEntries as industryPublisherEntries } from '@gitcoffee/postbot
 import type { PublisherEntry, DebugConfig } from '@gitcoffee/postbot-publisher-debug';
 import { backendReportIncident, installRedirectShim } from '@gitcoffee/postbot-ai-adapter';
 import { initAdapterRegistry } from '~ai-adapter/adapter.shared';
+import { recordAutopublishOutcome } from './autopublish-collector';
 
 const mergePublisherEntries = (...sources: any[]): any => {
     const result: any = { article: {}, moment: {}, video: {}, audio: {} };
@@ -134,8 +135,29 @@ export const executeScriptsToTabs = (tabs: any, data: any) => {
                     target: { tabId: tab.id },
                     func: publishFunc,
                     args: [publisherData]
+                }).then((results: any) => {
+                    // 自动发布终态收集（M3）：发布器函数为 async，executeScript 等其 Promise 落定。
+                    // 发布器可选返回 { status, publishedUrl, failureReason, errorMsg }；无返回按成功处理
+                    // （与既有 fire-and-forget 语义一致，不影响手动发布路径）。
+                    const ret = results?.[0]?.result;
+                    recordAutopublishOutcome({
+                        platformCode: platform.code,
+                        platformName: platform.name,
+                        status: ret?.status === 'FAILED' ? 'FAILED' : 'SUCCESS',
+                        publishedUrl: ret?.publishedUrl || undefined,
+                        screenshotUrl: ret?.screenshotUrl || undefined,
+                        failureReason: ret?.failureReason,
+                        errorMsg: ret?.errorMsg,
+                    });
                 }).catch((err) => {
                     console.warn('[AiAdapter] 发布脚本执行失败:', err);
+                    recordAutopublishOutcome({
+                        platformCode: platform.code,
+                        platformName: platform.name,
+                        status: 'FAILED',
+                        failureReason: 'SCRIPT_ERROR',
+                        errorMsg: (err as Error)?.message ?? '发布脚本执行异常',
+                    });
                     void backendReportIncident({
                         schemaKey: `${platform.type}_${platform.code}`,
                         platform: platform.code,
@@ -150,6 +172,13 @@ export const executeScriptsToTabs = (tabs: any, data: any) => {
                 });
             } else {
                 console.warn(`No publish function found for platform: ${platform.type}/${platform.code}`);
+                recordAutopublishOutcome({
+                    platformCode: platform.code,
+                    platformName: platform.name,
+                    status: 'FAILED',
+                    failureReason: 'NOT_SUPPORTED',
+                    errorMsg: `平台 ${platform.code} 无发布器`,
+                });
             }
         };
 

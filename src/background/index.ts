@@ -1,3 +1,6 @@
+// 必须最先执行：Electron 下用带调用栈的垫片替换缺失的 chrome.tabs.create（路径 D e2e 诊断）
+import { installElectronTabsShim } from "~diagnostics/electron-tabs-shim";
+
 import { initPostBot } from "~api"
 import "~plugins";
 import { handleMessage } from "./message.background";
@@ -9,6 +12,8 @@ import { initCdpBackground } from "./cdp.background";
 export const config: PlasmoCSConfig = {}
 
 console.log("Live now; make now always the most precious time. Now will never come again.")
+
+installElectronTabsShim();
 
 initPostBot();
 initContextMenusEvent();
