@@ -1,12 +1,13 @@
 {
   "name": "PostBot",
   "displayName": "PostBot 内容同步助手",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "PostBot 内容同步助手",
   "author": "GitCoffee Team @GitCoffee",
   "scripts": {
     "dev": "plasmo dev",
     "build": "bash -c 'plasmo build && cp LICENSE README.md build/chrome-mv3-prod/ && for arg in \"$@\"; do if [ \"$arg\" = \"--zip\" ]; then cd build/chrome-mv3-prod && zip -r ../chrome-mv3-prod.zip .; fi; done' --",
+    "build:dev": "bash -c 'PLASMO_PUBLIC_EXMAY_WEB_ENV=dev plasmo build && cp LICENSE README.md build/chrome-mv3-prod/'",
     "package": "plasmo build && cp LICENSE README.md build/chrome-mv3-prod/ && plasmo package"
   },
   "dependencies": {

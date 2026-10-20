@@ -4,7 +4,7 @@ import { state } from "~contents/components/postbot.data";
 import { getPlatforms, platformMetas } from "~media/platform";
 import { getMetaInfoList } from "~media/meta";
 import { windowPublish } from "~media/publisher";
-import { beginAutopublishRun, failAutopublishRun } from "~media/publisher/autopublish-collector";
+import { beginAutopublishRun, failAutopublishRun, isAutopublishRunActiveFor } from "~media/publisher/autopublish-collector";
 import { user } from '@gitcoffee/postbot-api';
 
 // 过滤已禁用的平台
@@ -70,6 +70,12 @@ export const handleMessage = createMessageHandler({
     // 自动发布（路径 D/M3）：请求携带 jobId 时开启终态收集，
     // sourceTabId（发布页标签）用于把 AUTOPUBLISH_RESULT 回传发布页 → 桌面 → engine
     if (data?.jobId !== undefined && data?.jobId !== null) {
+      // 同 jobId 去重：进行中的收集轮期间，忽略陈旧发布页迟到的重复 PUBLISH_NOW
+      // （否则 beginAutopublishRun 冲掉当前轮 + 平台 tab 被再次注入，发布器多实例竞态）
+      if (isAutopublishRunActiveFor(data.jobId)) {
+        console.warn('[autopublish] 同 jobId 发布轮进行中，忽略重复 PUBLISH_NOW:', data.jobId);
+        return;
+      }
       beginAutopublishRun(data.jobId, sender?.tab?.id, checkedPlatforms.map((item: any) => item.code));
       if (checkedPlatforms.length === 0) {
         // 快速失败：无有效平台（编码不匹配/全被禁用），立即交付终态

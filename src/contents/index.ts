@@ -233,12 +233,28 @@ try {
 // 3. 本执行器直连主进程 desktop-bridge（真实开标签 / 脚本注入 / 抓图）。
 const TAB_BRIDGE_REQ_PREFIX = '__tabbridge:req:';
 const TAB_BRIDGE_RESP_PREFIX = '__tabbridge:resp:';
+// 响应投递丢失兜底：主进程 tabs/create 自带 30s 超时（会正常返回错误响应），
+// 此超时只防 fetch 响应本身永不送达时本执行器挂死、resp 永远不写回
+// （SW 侧只能干等超时）。取值须大于主进程 OPEN_TAB_TIMEOUT_MS、小于 SW 的 45s。
+const TAB_BRIDGE_FETCH_TIMEOUT_MS = 38_000;
+// 与 SW 侧 bridgeTimeoutFor 分级对齐：scripting/execute 承载整个发布函数
+// （可达数分钟），必须用分钟级超时，否则发布器还在执行、中继先 abort →
+// collector 被误标 FAILED（e2e 实证）。
+const TAB_BRIDGE_FETCH_TIMEOUT_LONG_MS = 21 * 60_000;
+const TAB_BRIDGE_FETCH_TIMEOUT_IMAGE_MS = 65_000;
+
+const bridgeFetchTimeoutFor = (op: string): number => {
+  if (op === 'scripting/execute') return TAB_BRIDGE_FETCH_TIMEOUT_LONG_MS;
+  if (op === 'runtime/fetch-image') return TAB_BRIDGE_FETCH_TIMEOUT_IMAGE_MS;
+  return TAB_BRIDGE_FETCH_TIMEOUT_MS;
+};
 
 const tabBridgeFetch = async (op: string, payload?: unknown): Promise<unknown> => {
   const res = await fetch(`tabot://bridge/${op}`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(payload ?? {}),
+    signal: AbortSignal.timeout(bridgeFetchTimeoutFor(op)),
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) {
@@ -255,9 +271,16 @@ try {
       const traceId = key.slice(TAB_BRIDGE_REQ_PREFIX.length);
       const req = changes[key]?.newValue as { op?: string; payload?: unknown } | undefined;
       if (!req?.op) continue;
+      console.log(`[PostBot] tabbridge 中继: op=${req.op} trace=${traceId}`);
       void tabBridgeFetch(req.op, req.payload)
-        .then((data) => chrome.storage.local.set({ [`${TAB_BRIDGE_RESP_PREFIX}${traceId}`]: { ok: true, data } }))
-        .catch((e) => chrome.storage.local.set({ [`${TAB_BRIDGE_RESP_PREFIX}${traceId}`]: { ok: false, error: String(e?.message || e) } }))
+        .then((data) => {
+          console.log(`[PostBot] tabbridge 中继成功: op=${req.op} trace=${traceId}`);
+          return chrome.storage.local.set({ [`${TAB_BRIDGE_RESP_PREFIX}${traceId}`]: { ok: true, data } });
+        })
+        .catch((e) => {
+          console.warn(`[PostBot] tabbridge 中继失败: op=${req.op} trace=${traceId} err=${String(e?.message || e)}`);
+          return chrome.storage.local.set({ [`${TAB_BRIDGE_RESP_PREFIX}${traceId}`]: { ok: false, error: String(e?.message || e) } });
+        })
         .finally(() => chrome.storage.local.remove(key));
     }
   });

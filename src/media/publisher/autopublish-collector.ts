@@ -84,6 +84,12 @@ export const recordAutopublishOutcome = (outcome: PlatformOutcome): void => {
 /** 运行是否进行中（publisher.script 等无需感知细节，直接调用 record 即可，内部已守卫） */
 export const isAutopublishCollecting = (): boolean => !!activeRun && !activeRun.delivered;
 
+/** 同一 job 的收集轮是否进行中：陈旧发布页（上轮 180s 超时未关闭）迟到的 publishNow 会
+ *  重复触发 windowPublish → beginAutopublishRun 冲掉进行中的轮 + 平台 tab 二次/三次注入，
+ *  发布器并行三实例同抢同一文件上传入口（e2e 实证）。windowPublish 侧据此守卫。 */
+export const isAutopublishRunActiveFor = (jobId: string | number): boolean =>
+  !!activeRun && !activeRun.delivered && String(activeRun.jobId) === String(jobId);
+
 /** 整轮失败（如 windowPublish 同步异常、开标签失败）：全部平台按 FAILED 落定并立即交付 */
 export const failAutopublishRun = (failureReason: string, errorMsg: string): void => {
   const run = activeRun;

@@ -22,8 +22,31 @@ interface PostbotConfig {
   defaultAvatarUrl: string;
 }
 
+/**
+ * 云端 Web 子域环境（子域名方案，与 desktop 的 EXMAY_WEB_ENV 对齐）：
+ * - prod（默认）: postbot.exmay.com（公网生产，终端用户扩展构建用这个）
+ * - dev         : postbot-dev.exmay.com（开发联调，`pnpm build:dev` 注入）
+ * Plasmo 编译期静态替换 PLASMO_PUBLIC_* 环境变量；运行时无该变量时安全兜底 prod。
+ * __POSTBOT_CONFIG__ 仍具最高覆盖优先级。
+ */
+type ExmayWebEnv = 'dev' | 'prod';
+
+const resolveExmayWebEnv = (): ExmayWebEnv => {
+  try {
+    const env =
+      typeof process !== 'undefined' && process.env
+        ? process.env.PLASMO_PUBLIC_EXMAY_WEB_ENV
+        : undefined;
+    return env === 'dev' ? 'dev' : 'prod';
+  } catch {
+    return 'prod';
+  }
+};
+
+const exmayWebHost = resolveExmayWebEnv() === 'dev' ? 'postbot-dev.exmay.com' : 'postbot.exmay.com';
+
 const defaultConfig: PostbotConfig = {
-  baseUrl: 'https://postbot.exmay.com',
+  baseUrl: `https://${exmayWebHost}`,
   baseApiPath: '/exmay/authority/api',
   publishPath: '/exmay/postbot/media/publish',
   defaultTrustedDomain: 'exmay.com',

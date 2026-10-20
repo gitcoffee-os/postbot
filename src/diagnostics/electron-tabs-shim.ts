@@ -10,8 +10,9 @@
  * 调回主进程（desktop-engine desktop-bridge.ts）完成真实开标签 / 脚本注入。
  *
  * 行为（仅当 chrome.tabs.create 缺失时安装，Chrome/真实扩展环境不生效）：
- * - tabs.create → 桥接开真实标签页（persist:mediastar，与发布页/扩展同 session），
- *   返回 {id: viewId}，viewId 为渲染进程确定性 viewId（mediastar-view-<tabId>）；
+ * - tabs.create → 桥接开真实标签页（props.partition 指定账号会话分区时透传，
+ *   自动发布平台 tab 复用媒体账号登录态；未指定回落 persist:desktop 与发布页同 session），
+ *   返回 {id: viewId}，viewId 为渲染进程确定性 viewId（desktop-view-<tabId>）；
  * - tabs.get / tabs.onUpdated → 桥接查询 + 垫片侧轮询派发 status 事件；
  * - tabs.update / tabs.group / tabGroups.update → 桥接激活视图 / no-op；
  * - scripting.executeScript(func) → 桥接主进程在目标视图主世界执行（发布函数
@@ -23,7 +24,27 @@
 
 const BRIDGE_LOAD_TIMEOUT_MS = 120_000;
 const BRIDGE_POLL_INTERVAL_MS = 400;
-const BRIDGE_CALL_TIMEOUT_MS = 30_000;
+// 必须大于主进程 tabs/create 的 OPEN_TAB_TIMEOUT_MS（30s）：否则渲染进程回传
+// 偏慢时 SW 先超时，主进程的明确错误（如"主窗口尚未就绪"）永远到不了调用方。
+const BRIDGE_CALL_TIMEOUT_MS = 45_000;
+// scripting/execute 注入的是整个发布函数（上传图片→填充→点击发布→等待平台落定），
+// 合法耗时可达数分钟，绝不能用 45s 的通用超时（会导致发布器还在执行、桥接先超时，
+// collector 被误标 FAILED——e2e 实证）。与 autopublish-collector 15min 强制交付
+// 及 runner 20min 轮询上限对齐，取 20min。
+const BRIDGE_SCRIPTING_TIMEOUT_MS = 20 * 60_000;
+// fetch-image 由主进程直接抓远程图，60s 覆盖慢 CDN 即可，不需要分钟级。
+const BRIDGE_FETCH_IMAGE_TIMEOUT_MS = 60_000;
+// resp 键轮询兜底间隔：Electron 下 chrome.storage.onChanged 投递到 MV3 SW
+// 偶发丢失（实测 tabs/create 主进程已响应但 SW 收不到 resp → 白等 30s 超时），
+// 轮询保证回程可靠（与 AUTOPUBLISH_RESULT 的轮询兜底同思路）。
+const BRIDGE_RESP_POLL_INTERVAL_MS = 500;
+
+/** 按操作分级超时：UI 操作（开标签/查询）秒级，发布函数分钟级，抓图 60s */
+const bridgeTimeoutFor = (op: string): number => {
+  if (op === 'scripting/execute') return BRIDGE_SCRIPTING_TIMEOUT_MS;
+  if (op === 'runtime/fetch-image') return BRIDGE_FETCH_IMAGE_TIMEOUT_MS;
+  return BRIDGE_CALL_TIMEOUT_MS;
+};
 const TAB_BRIDGE_REQ_PREFIX = '__tabbridge:req:';
 const TAB_BRIDGE_RESP_PREFIX = '__tabbridge:resp:';
 
@@ -40,12 +61,14 @@ const bridgeCall = (op: string, payload?: unknown): Promise<any> =>
   new Promise((resolve, reject) => {
     let traceId: string;
     let watcher: any = null;
+    let poller: ReturnType<typeof setInterval> | null = null;
     let timer: ReturnType<typeof setTimeout> | null = null;
     let settled = false;
 
     const cleanup = () => {
       settled = true;
       if (timer) clearTimeout(timer);
+      if (poller) clearInterval(poller);
       if (watcher) chrome.storage.onChanged.removeListener(watcher);
       if (traceId) {
         chrome.storage.local.remove([`${TAB_BRIDGE_REQ_PREFIX}${traceId}`, `${TAB_BRIDGE_RESP_PREFIX}${traceId}`]);
@@ -58,24 +81,40 @@ const bridgeCall = (op: string, payload?: unknown): Promise<any> =>
       fn();
     };
 
+    const settleResp = (resp: { ok?: boolean; data?: unknown; error?: string }) => {
+      if (resp?.ok) {
+        finish(() => resolve(resp.data));
+      } else {
+        finish(() => reject(new Error(resp?.error || `[tabs-bridge] ${op} 桥接调用失败`)));
+      }
+    };
+
     try {
       traceId = `sw-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const respKey = `${TAB_BRIDGE_RESP_PREFIX}${traceId}`;
       watcher = (changes: Record<string, chrome.storage.StorageChange>, areaName: string) => {
         if (areaName !== 'local') return;
-        const change = changes[`${TAB_BRIDGE_RESP_PREFIX}${traceId}`];
+        const change = changes[respKey];
         if (!change?.newValue) return;
-        const resp = change.newValue as { ok?: boolean; data?: unknown; error?: string };
-        if (resp?.ok) {
-          finish(() => resolve(resp.data));
-        } else {
-          finish(() => reject(new Error(resp?.error || `[tabs-bridge] ${op} 桥接调用失败`)));
-        }
+        settleResp(change.newValue as { ok?: boolean; data?: unknown; error?: string });
       };
       chrome.storage.onChanged.addListener(watcher);
 
+      // onChanged 之外的轮询兜底（见 BRIDGE_RESP_POLL_INTERVAL_MS 注释）
+      poller = setInterval(async () => {
+        try {
+          const got = await chrome.storage.local.get(respKey);
+          const resp = got?.[respKey] as { ok?: boolean; data?: unknown; error?: string } | undefined;
+          if (resp) settleResp(resp);
+        } catch {
+          /* storage 读取瞬时失败忽略，下一轮继续 */
+        }
+      }, BRIDGE_RESP_POLL_INTERVAL_MS);
+
       timer = setTimeout(() => {
-        finish(() => reject(new Error(`[tabs-bridge] ${op} 桥接超时（${BRIDGE_CALL_TIMEOUT_MS / 1000}s 无响应）`)));
-      }, BRIDGE_CALL_TIMEOUT_MS);
+        const timeoutMs = bridgeTimeoutFor(op);
+        finish(() => reject(new Error(`[tabs-bridge] ${op} 桥接超时（${timeoutMs / 1000}s 无响应）`)));
+      }, bridgeTimeoutFor(op));
 
       chrome.storage.local.set({ [`${TAB_BRIDGE_REQ_PREFIX}${traceId}`]: { op, payload, ts: Date.now() } }, () => {
         const err = chrome.runtime.lastError;
@@ -172,7 +211,8 @@ export const installElectronTabsShim = (): void => {
 
     // —— chrome.tabs.create ——
     defineShim(tabs, 'create', (props: any, cb?: (tab: any) => void) => {
-      const p = bridgeCall('tabs/create', { url: props?.url, active: props?.active, title: props?.title })
+      // partition：账号会话分区（自动发布平台 tab 复用媒体账号登录态），桥接原样透传
+      const p = bridgeCall('tabs/create', { url: props?.url, active: props?.active, title: props?.title, partition: props?.partition })
         .then((r: any) => {
           const id = String(r?.id);
           trackCreatedTab(id);
