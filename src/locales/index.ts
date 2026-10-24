@@ -5,9 +5,9 @@ import {
   registerProjectMessages,
   getCurrentLanguage,
   initI18n
-} from '@gitcoffee/i18n';
+} from '@gitcoffee-os/i18n';
 import { App, ref } from 'vue';
-import '@gitcoffee/postbot-sidepanel-ui/locales';
+import '@gitcoffee-os/postbot-sidepanel-ui/locales';
 import enCommon from './en/common.json';
 import enPostbot from './en/postbot.json';
 import zhCommon from './zh/common.json';
@@ -74,4 +74,4 @@ export const ensureI18n = async (defaultLanguage?: string) => {
 };
 
 export { registerLanguageChangeCallback, localeManager };
-export * from '@gitcoffee/i18n';
+export * from '@gitcoffee-os/i18n';

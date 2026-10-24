@@ -1,4 +1,4 @@
-import { POSTBOT_ACTION } from '@gitcoffee/postbot-actions';
+import { POSTBOT_ACTION } from '@gitcoffee-os/postbot-actions';
 
 /**
  * 自动发布终态收集器（路径 D，M3）。

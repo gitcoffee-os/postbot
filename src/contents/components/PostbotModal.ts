@@ -1,7 +1,7 @@
 import { h, defineComponent, inject } from 'vue'
 import { StyleProvider } from 'ant-design-vue/es/_util/cssinjs'
 import { ConfigProvider } from 'ant-design-vue'
-import { createModal } from '@gitcoffee/postbot-content-ui'
+import { createModal } from '@gitcoffee-os/postbot-content-ui'
 import PostbotFloatButton from './PostbotFloatButton'
 import { getReaderData } from '~media/parser'
 import { state } from './postbot.data'

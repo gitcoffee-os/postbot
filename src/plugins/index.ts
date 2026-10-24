@@ -1,16 +1,16 @@
-import { pluginRegistry, setupInjection, PluginType, PluginBase, PublisherConfig, PluginImplementation } from '@gitcoffee/postbot-plugin-engine';
+import { pluginRegistry, setupInjection, PluginType, PluginBase, PublisherConfig, PluginImplementation } from '@gitcoffee-os/postbot-plugin-engine';
 import { registerCnPlatforms, platformMetas as cnPlatformMetas, metaInfoList as cnMetaInfoList, publisher as cnPublisher, publisherDebugConfigs as cnPublisherDebugConfigs } from '../../../../packages/postbot-engine/publisher-cn/src/index';
-import { registerItPlatforms, platformMetas as itPlatformMetas, platforms as itPlatforms, metaInfoList as itMetaInfoList, publisher as itPublisher, publisherDebugConfigs as itPublisherDebugConfigs } from '@gitcoffee/postbot-publisher-it';
-import { registerIndustryPlatforms, platformMetas as industryPlatformMetas, platforms as industryPlatforms, metaInfoList as industryMetaInfoList, publisher as industryPublisher, publisherDebugConfigs as industryPublisherDebugConfigs } from '@gitcoffee/postbot-publisher-industry';
-import { publishEngine } from '@gitcoffee/postbot-publish-engine';
+import { registerItPlatforms, platformMetas as itPlatformMetas, platforms as itPlatforms, metaInfoList as itMetaInfoList, publisher as itPublisher, publisherDebugConfigs as itPublisherDebugConfigs } from '@gitcoffee-os/postbot-publisher-it';
+import { registerIndustryPlatforms, platformMetas as industryPlatformMetas, platforms as industryPlatforms, metaInfoList as industryMetaInfoList, publisher as industryPublisher, publisherDebugConfigs as industryPublisherDebugConfigs } from '@gitcoffee-os/postbot-publisher-industry';
+import { publishEngine } from '@gitcoffee-os/postbot-publish-engine';
 
 import { platformMetas, platforms } from '~media/platform';
 import { metaInfoList } from '~media/meta';
 import { publisher } from '~media/publisher/publisher.script';
 import { debugPlugin } from './debug.plugin';
 import { collectPublisherDebugConfigs } from './debug.plugin';
-import { createAiAdapterPlugin } from '@gitcoffee/postbot-ai-adapter';
-import type { DebugConfigLike } from '@gitcoffee/postbot-ai-adapter';
+import { createAiAdapterPlugin } from '@gitcoffee-os/postbot-ai-adapter';
+import type { DebugConfigLike } from '@gitcoffee-os/postbot-ai-adapter';
 import { getAdapterRegistry } from '~ai-adapter/adapter.shared';
 
 const pluginList = [
@@ -184,5 +184,5 @@ setupInjection({
 
 registerPlugins();
 
-export { pluginRegistry } from '@gitcoffee/postbot-plugin-engine';
-export { publishEngine } from '@gitcoffee/postbot-publish-engine';
+export { pluginRegistry } from '@gitcoffee-os/postbot-plugin-engine';
+export { publishEngine } from '@gitcoffee-os/postbot-publish-engine';

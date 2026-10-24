@@ -1,4 +1,4 @@
-import { setApiConfig, user, authority } from '@gitcoffee/postbot-api';
+import { setApiConfig, user, authority } from '@gitcoffee-os/postbot-api';
 import { getTrustedDomains, setTrustedDomains } from "~stores"
 import { appId, getPostBotBaseUrl, getPostBotBaseApi, getDefaultTrustedDomain } from "~config/config";
 
@@ -33,5 +33,5 @@ export const startPostBot = async(intervalTime: number) => {
   authority.client.updateApi({});
 }
 
-export { setApiConfig } from '@gitcoffee/postbot-api';
-export { user, authority } from '@gitcoffee/postbot-api';
+export { setApiConfig } from '@gitcoffee-os/postbot-api';
+export { user, authority } from '@gitcoffee-os/postbot-api';

@@ -116,8 +116,8 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { message } from 'ant-design-vue';
-import { ADAPTER_ACTION, adapterApi } from '@gitcoffee/postbot-ai-adapter';
-import type { AdapterPatch, AdapterSettings, AdapterStateView } from '@gitcoffee/postbot-ai-adapter';
+import { ADAPTER_ACTION, adapterApi } from '@gitcoffee-os/postbot-ai-adapter';
+import type { AdapterPatch, AdapterSettings, AdapterStateView } from '@gitcoffee-os/postbot-ai-adapter';
 
 const settings = ref<AdapterSettings>({ enabled: true, autoApprove: false, aiEndpoint: 'backend' });
 const state = ref<AdapterStateView | null>(null);

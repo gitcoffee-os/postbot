@@ -33,8 +33,8 @@ import PostbotModal from './components/PostbotModal';
 import { handleMessage } from "./services/message.services";
 import { initAdapterService } from "./services/adapter.service";
 import { setupI18n } from '~locales';
-import { processContent } from '@gitcoffee/postbot-content-adapter';
-import { debounce as debounceUtils } from '@gitcoffee/postbot-utils';
+import { processContent } from '@gitcoffee-os/postbot-content-adapter';
+import { debounce as debounceUtils } from '@gitcoffee-os/postbot-utils';
 import antDesignCss from 'data-text:ant-design-vue/dist/reset.css'
 import globalCss from 'data-text:../styles/global.css'
 import '~plugins'

@@ -1,1 +1,1 @@
-export { injectPluginPlatforms, setupInjection, mergePlatformMetas, mergePlatforms, mergeMetaInfoList, mergePublishers } from '@gitcoffee/postbot-plugin-engine';
+export { injectPluginPlatforms, setupInjection, mergePlatformMetas, mergePlatforms, mergeMetaInfoList, mergePublishers } from '@gitcoffee-os/postbot-plugin-engine';

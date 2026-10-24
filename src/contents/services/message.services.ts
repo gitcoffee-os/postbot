@@ -1,4 +1,4 @@
-import { createMessageHandler } from '@gitcoffee/postbot-content-services';
+import { createMessageHandler } from '@gitcoffee-os/postbot-content-services';
 import { getReaderData } from "~media/parser";
 import { state } from "../components/postbot.data";
 import { getPostBotBaseUrl } from '~config/config';

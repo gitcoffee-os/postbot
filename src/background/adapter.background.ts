@@ -9,14 +9,14 @@ import {
   ADAPTER_ACTION,
   adapterApi,
   RepairEngine,
-} from '@gitcoffee/postbot-ai-adapter';
+} from '@gitcoffee-os/postbot-ai-adapter';
 import type {
   AdapterAction,
   AdapterMessage,
   DiagnosisReport,
   PageSchema,
   SelectorRedirect,
-} from '@gitcoffee/postbot-ai-adapter';
+} from '@gitcoffee-os/postbot-ai-adapter';
 import { initAdapterRegistry } from '~ai-adapter/adapter.shared';
 
 let engine: RepairEngine | null = null;
@@ -139,7 +139,7 @@ export async function initAdapterBackground(): Promise<void> {
           }
           case ADAPTER_ACTION.UPDATE_SETTINGS: {
             const { settings } = (request.payload ?? {}) as {
-              settings: Partial<import('@gitcoffee/postbot-ai-adapter').AdapterSettings>;
+              settings: Partial<import('@gitcoffee-os/postbot-ai-adapter').AdapterSettings>;
             };
             const next = await registry.updateSettings(settings);
             broadcastChage(ADAPTER_ACTION.STATE_CHANGED, { settings: next });

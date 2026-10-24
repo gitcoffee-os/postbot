@@ -1,13 +1,13 @@
 import {
   pluginRegistry,
   PluginType,
-} from '@gitcoffee/postbot-plugin-engine';
+} from '@gitcoffee-os/postbot-plugin-engine';
 import type {
   PluginBase,
   DebugPluginConfig,
   PluginImplementation,
-} from '@gitcoffee/postbot-plugin-engine';
-import type { DebugConfig } from '@gitcoffee/postbot-publisher-debug';
+} from '@gitcoffee-os/postbot-plugin-engine';
+import type { DebugConfig } from '@gitcoffee-os/postbot-publisher-debug';
 import { setupDebugger } from '~debugger';
 
 const pluginBase: PluginBase = {

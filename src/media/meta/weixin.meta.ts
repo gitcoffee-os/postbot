@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { platformMetas } from "~media/platform";
-import { html as htmlUtils } from '@gitcoffee/postbot-utils';
+import { html as htmlUtils } from '@gitcoffee-os/postbot-utils';
 
 const Api = {
     HomePage: platformMetas.weixin.homepage,

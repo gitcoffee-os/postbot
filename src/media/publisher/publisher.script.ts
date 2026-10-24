@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import { publisherEntries as cnPublisherEntries } from '../../../../../packages/postbot-engine/publisher-cn/src/index';
-import { publisherEntries as itPublisherEntries } from '@gitcoffee/postbot-publisher-it';
-import { publisherEntries as industryPublisherEntries } from '@gitcoffee/postbot-publisher-industry';
-import type { PublisherEntry, DebugConfig } from '@gitcoffee/postbot-publisher-debug';
-import { backendReportIncident, installRedirectShim } from '@gitcoffee/postbot-ai-adapter';
+import { publisherEntries as itPublisherEntries } from '@gitcoffee-os/postbot-publisher-it';
+import { publisherEntries as industryPublisherEntries } from '@gitcoffee-os/postbot-publisher-industry';
+import type { PublisherEntry, DebugConfig } from '@gitcoffee-os/postbot-publisher-debug';
+import { backendReportIncident, installRedirectShim } from '@gitcoffee-os/postbot-ai-adapter';
 import { initAdapterRegistry } from '~ai-adapter/adapter.shared';
 import { recordAutopublishOutcome } from './autopublish-collector';
 

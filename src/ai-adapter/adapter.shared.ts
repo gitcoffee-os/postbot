@@ -5,8 +5,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SchemaRegistry, buildSchemaFromDebugConfig } from '@gitcoffee/postbot-ai-adapter';
-import type { DebugConfigLike } from '@gitcoffee/postbot-ai-adapter';
+import { SchemaRegistry, buildSchemaFromDebugConfig } from '@gitcoffee-os/postbot-ai-adapter';
+import type { DebugConfigLike } from '@gitcoffee-os/postbot-ai-adapter';
 
 let registry: SchemaRegistry | null = null;
 

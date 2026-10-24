@@ -12,13 +12,13 @@ import {
   collectDomSnapshot,
   testFieldOnDom,
   buildDiagnosis,
-} from '@gitcoffee/postbot-ai-adapter';
+} from '@gitcoffee-os/postbot-ai-adapter';
 import type {
   AdapterMessage,
   AdapterPatch,
   DiagnosisReport,
   FieldHealth,
-} from '@gitcoffee/postbot-ai-adapter';
+} from '@gitcoffee-os/postbot-ai-adapter';
 import { matchPlatformKey } from '~debugger';
 import { initAdapterRegistry } from '~ai-adapter/adapter.shared';
 import { showAdapterToast } from '../components/adapter.toast';

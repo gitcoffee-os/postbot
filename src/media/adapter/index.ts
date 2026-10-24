@@ -1,4 +1,4 @@
-import { defaultReader } from "@gitcoffee/postbot-content-reader"
+import { defaultReader } from "@gitcoffee-os/postbot-content-reader"
 
 export { defaultReader };
 

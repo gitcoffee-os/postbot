@@ -1,4 +1,4 @@
-import { createParser } from '@gitcoffee/postbot-media';
+import { createParser } from '@gitcoffee-os/postbot-media';
 import { state } from "~contents/components/postbot.data";
 import { defaultReader } from "~media/adapter";
 

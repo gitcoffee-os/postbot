@@ -1,11 +1,11 @@
-import { createMessageHandler } from '@gitcoffee/postbot-background';
-import { POSTBOT_ACTION } from '@gitcoffee/postbot-actions';
+import { createMessageHandler } from '@gitcoffee-os/postbot-background';
+import { POSTBOT_ACTION } from '@gitcoffee-os/postbot-actions';
 import { state } from "~contents/components/postbot.data";
 import { getPlatforms, platformMetas } from "~media/platform";
 import { getMetaInfoList } from "~media/meta";
 import { windowPublish } from "~media/publisher";
 import { beginAutopublishRun, failAutopublishRun, isAutopublishRunActiveFor } from "~media/publisher/autopublish-collector";
-import { user } from '@gitcoffee/postbot-api';
+import { user } from '@gitcoffee-os/postbot-api';
 
 // 过滤已禁用的平台
 const filterDisabledMetaInfoList = (metaInfoList: any) => {

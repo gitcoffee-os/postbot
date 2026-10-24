@@ -1,3 +1,3 @@
-import { initMessageEventListener } from '@gitcoffee/postbot-content-services';
+import { initMessageEventListener } from '@gitcoffee-os/postbot-content-services';
 
 initMessageEventListener();

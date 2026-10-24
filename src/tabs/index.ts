@@ -1,4 +1,4 @@
-import { createTabsForPlatforms, tabsState } from '@gitcoffee/postbot-tabs';
+import { createTabsForPlatforms, tabsState } from '@gitcoffee-os/postbot-tabs';
 import { executeScriptsToTabs } from '~media/publisher/publisher.script';
 
 export { tabsState };

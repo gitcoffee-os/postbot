@@ -1,1 +1,1 @@
-export { pluginRegistry } from '@gitcoffee/postbot-plugin-engine';
+export { pluginRegistry } from '@gitcoffee-os/postbot-plugin-engine';

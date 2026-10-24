@@ -4,7 +4,7 @@ import { installElectronTabsShim } from "~diagnostics/electron-tabs-shim";
 import { initPostBot } from "~api"
 import "~plugins";
 import { handleMessage } from "./message.background";
-import { createBackgroundListener } from '@gitcoffee/postbot-background';
+import { createBackgroundListener } from '@gitcoffee-os/postbot-background';
 import { initContextMenusEvent } from "~events";
 import { initAdapterBackground } from "./adapter.background";
 import { initCdpBackground } from "./cdp.background";

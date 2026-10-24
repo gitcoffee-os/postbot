@@ -1,4 +1,4 @@
-import { publish, getSupportedPlatforms } from '@gitcoffee/postbot-media';
+import { publish, getSupportedPlatforms } from '@gitcoffee-os/postbot-media';
 import { getMetaInfoList } from "~media/meta";
 import { createTabsForPlatformsWithScript } from "~tabs";
 

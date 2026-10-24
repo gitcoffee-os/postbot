@@ -15,7 +15,7 @@
  */
 
 import { platformMetas } from "~media/platform";
-import { image } from '@gitcoffee/postbot-utils';
+import { image } from '@gitcoffee-os/postbot-utils';
 
 const Api = {
   MediaInfo: platformMetas.bilibili.mediaInfoUrl,
