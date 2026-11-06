@@ -23,9 +23,13 @@ import { initCopyEvent } from "~events/copy.event"
 import { getReaderData } from "~media/parser"
 
 import { POSTBOT_ACTION } from "~message/postbot.action"
+import { BRIDGE_PROTOCOL_VERSION } from '@gitcoffee-os/postbot-content-services';
+import { bridgeProfile } from '~message/bridge.profile';
 
 export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"]
+  matches: ["<all_urls>"],
+  // 兄弟 App 站点不注入（运行时的 channel/origin 闸是第二层）
+  exclude_matches: ["*://postar.exmay.com/*", "*://postar-dev.exmay.com/*"]
 }
 
 import { createApp } from 'vue'
@@ -161,6 +165,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     try {
       window.postMessage({
         type: 'response',
+        protocolVersion: BRIDGE_PROTOCOL_VERSION,
+        channel: bridgeProfile.channel,
         traceId: request.traceId,
         action: request.action,
         code: 0,
@@ -188,6 +194,8 @@ const relayAutopublishResult = (result: unknown): void => {
   try {
     window.postMessage({
       type: 'response',
+      protocolVersion: BRIDGE_PROTOCOL_VERSION,
+      channel: bridgeProfile.channel,
       action: POSTBOT_ACTION.AUTOPUBLISH_RESULT,
       code: 0,
       message: 'success',

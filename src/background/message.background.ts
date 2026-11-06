@@ -1,7 +1,7 @@
 import { createMessageHandler } from '@gitcoffee-os/postbot-background';
 import { POSTBOT_ACTION } from '@gitcoffee-os/postbot-actions';
 import { state } from "~contents/components/postbot.data";
-import { getPlatforms, platformMetas } from "~media/platform";
+import { getPlatforms, platformMetas, platforms } from "~media/platform";
 import { getMetaInfoList } from "~media/meta";
 import { windowPublish } from "~media/publisher";
 import { beginAutopublishRun, failAutopublishRun, isAutopublishRunActiveFor } from "~media/publisher/autopublish-collector";
@@ -38,6 +38,11 @@ const getImageNameFromUrl = (url: string): string => {
 
 export const handleMessage = createMessageHandler({
   getPlatforms: (type?: string) => getPlatforms()[type || 'article'],
+  // 所有 mediaType 下的平台编码：PUBLISH_NOW 混入另一个 App 的平台时整单拒绝。
+  // 用未过滤的 platforms（含 status=disabled）：禁用 ≠ 不属于本 App，
+  // 目标平台被本地禁用时应交给 windowPublish 跳过，而不是整单拒绝。
+  getAllPlatformCodes: () =>
+    Object.values(platforms).flatMap((list: any) => Object.keys(list || {})),
   getMetaInfoList: async () => {
     const metaInfoList = await getMetaInfoList();
     const filteredMetaInfoList = filterDisabledMetaInfoList(metaInfoList);

@@ -8,6 +8,7 @@ import { createBackgroundListener } from '@gitcoffee-os/postbot-background';
 import { initContextMenusEvent } from "~events";
 import { initAdapterBackground } from "./adapter.background";
 import { initCdpBackground } from "./cdp.background";
+import { bridgeProfile } from "~message/bridge.profile";
 
 export const config: PlasmoCSConfig = {}
 
@@ -19,7 +20,7 @@ initPostBot();
 initContextMenusEvent();
 
 console.log('PostBot chrome.runtime.onMessage.addListener');
-createBackgroundListener(handleMessage);
+createBackgroundListener(handleMessage, bridgeProfile);
 
 initCdpBackground();
 
