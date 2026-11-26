@@ -1,7 +1,7 @@
 {
   "name": "PostBot",
   "displayName": "PostBot 内容同步助手",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "PostBot 内容同步助手",
   "author": "GitCoffee Team @GitCoffee",
   "scripts": {
@@ -22,6 +22,7 @@
     "@gitcoffee-os/postbot-content-adapter": "^1.0.0",
     "@gitcoffee-os/postbot-content-reader": "^1.0.0",
     "@gitcoffee-os/postbot-content-services": "^1.0.0",
+    "@gitcoffee-os/postbot-content-transform": "^1.0.0",
     "@gitcoffee-os/postbot-content-ui": "^1.0.0",
     "@gitcoffee-os/postbot-events": "^1.0.0",
     "@gitcoffee-os/postbot-media": "^1.0.0",

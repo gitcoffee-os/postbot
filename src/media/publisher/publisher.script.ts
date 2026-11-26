@@ -127,8 +127,15 @@ export const executeScriptsToTabs = (tabs: any, data: any) => {
 
             // 2. 执行发布脚本
             if (publishFunc && typeof publishFunc === 'function') {
+                // content-transform 已在 windowPublish 中为每个平台生成 prepared，
+                // 合并到 data.data 供发布器直接消费（content / contentHtml / contentText / ...）。
+                const platformPayload = data?.data ?? {};
+                const prepared = (platform as any)?.prepared;
+                if (prepared) {
+                    Object.assign(platformPayload, prepared);
+                }
                 const publisherData = {
-                    data: data?.data,
+                    data: platformPayload,
                     platform: platform,
                 };
                 chrome.scripting.executeScript({
